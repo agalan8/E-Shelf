@@ -43,8 +43,8 @@ Route::post('/images/update', function (Request $request) {
         if ($user->profile_image) {
             Storage::delete($user->profile_image);
         }
-        $extension = $request->file('profile_image')->getClientOriginalExtension();
-        $profilePath = "profile_images/{$user->id}.{$extension}";
+        // $extension = $request->file('profile_image')->getClientOriginalExtension();
+        $profilePath = "profile_images/{$user->id}.jpg";
         Storage::put($profilePath, file_get_contents($request->file('profile_image')));
         $user->profile_image = $profilePath;
     }
@@ -54,8 +54,8 @@ Route::post('/images/update', function (Request $request) {
         if ($user->background_image) {
             Storage::delete($user->background_image);
         }
-        $extension = $request->file('background_image')->getClientOriginalExtension();
-        $backgroundPath = "background_images/{$user->id}.{$extension}";
+        // $extension = $request->file('background_image')->getClientOriginalExtension();
+        $backgroundPath = "background_images/{$user->id}.jpg";
         Storage::put($backgroundPath, file_get_contents($request->file('background_image')));
         $user->background_image = $backgroundPath;
     }
