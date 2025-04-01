@@ -2,6 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import TextAreaInput from '@/Components/TextAreaInput'; // Asegúrate de importar el componente TextAreaInput
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 
@@ -16,12 +17,14 @@ export default function UpdateProfileInformation({
         useForm({
             name: user.name,
             email: user.email,
+            biografia: user.biografia, // Asegúrate de tener un campo "biografia" o el campo de texto que desees
         });
 
     const submit = (e) => {
         e.preventDefault();
-
-        patch(route('profile.update'));
+        patch(route('profile.update'),{
+            preserveScroll: true,
+        });
     };
 
     return (
@@ -92,6 +95,26 @@ export default function UpdateProfileInformation({
                     </div>
                 )}
 
+                <div>
+                    <InputLabel htmlFor="biografia" value="Biografía" />
+
+                    <TextAreaInput
+                        id="biografia"
+                        className="mt-1 block w-full"
+                        value={data.biografia}
+                        onChange={(e) => setData('biografia', e.target.value)}
+                        placeholder="Tell us about yourself"
+                        rows={4}
+                    />
+
+                    <InputError className="mt-2" message={errors.biografia} />
+                </div>
+
+                <h2 className="text-lg font-medium text-gray-900">
+                    Social Media
+                </h2>
+
+
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>
 
@@ -107,6 +130,8 @@ export default function UpdateProfileInformation({
                         </p>
                     </Transition>
                 </div>
+
+
             </form>
         </section>
     );
