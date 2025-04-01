@@ -5,7 +5,8 @@ import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import UpdateProfileImagesForm from './Partials/UpdateProfileImagesForm';  // Importamos el formulario
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function Edit({ mustVerifyEmail, status, user, socials }) {
+
     return (
         <AuthenticatedLayout
             header={
@@ -28,6 +29,8 @@ export default function Edit({ mustVerifyEmail, status }) {
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
+                            user={user}
+                            socials={socials}
                             className="max-w-xl"
                         />
                     </div>

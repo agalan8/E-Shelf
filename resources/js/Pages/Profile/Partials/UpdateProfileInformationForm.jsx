@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import TextAreaInput from '@/Components/TextAreaInput'; // Asegúrate de importar el componente TextAreaInput
+import TextAreaInput from '@/Components/TextAreaInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 
@@ -10,19 +10,27 @@ export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
     className = '',
+    user,
+    socials,
 }) {
-    const user = usePage().props.auth.user;
-
+    const getSocialUrl = (platform) => {
+        const social = socials.find(s => s.nombre.toLowerCase() === platform);
+        console.log(social);
+        return social ? social.perfil : '';
+    };
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
             email: user.email,
-            biografia: user.biografia, // Asegúrate de tener un campo "biografia" o el campo de texto que desees
+            biografia: user.biografia,
+            instagram: getSocialUrl('instagram'),
+            twitter: getSocialUrl('twitter'),
+            facebook: getSocialUrl('facebook'),
         });
 
     const submit = (e) => {
         e.preventDefault();
-        patch(route('profile.update'),{
+        patch(route('profile.update'), {
             preserveScroll: true,
         });
     };
@@ -42,7 +50,6 @@ export default function UpdateProfileInformation({
             <form onSubmit={submit} className="mt-6 space-y-6">
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
-
                     <TextInput
                         id="name"
                         className="mt-1 block w-full"
@@ -52,13 +59,11 @@ export default function UpdateProfileInformation({
                         isFocused
                         autoComplete="name"
                     />
-
                     <InputError className="mt-2" message={errors.name} />
                 </div>
 
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
@@ -68,8 +73,54 @@ export default function UpdateProfileInformation({
                         required
                         autoComplete="username"
                     />
-
                     <InputError className="mt-2" message={errors.email} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="biografia" value="Biografía" />
+                    <TextAreaInput
+                        id="biografia"
+                        className="mt-1 block w-full"
+                        value={data.biografia}
+                        onChange={(e) => setData('biografia', e.target.value)}
+                        placeholder="Tell us about yourself"
+                        rows={4}
+                    />
+                    <InputError className="mt-2" message={errors.biografia} />
+                </div>
+
+                {/* Redes Sociales */}
+                <div>
+                    <InputLabel htmlFor="instagram" value="Instagram" />
+                    <TextInput
+                        id="instagram"
+                        className="mt-1 block w-full"
+                        value={data.instagram}
+                        onChange={(e) => setData('instagram', e.target.value)}
+                    />
+                    <InputError className="mt-2" message={errors.instagram} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="twitter" value="Twitter" />
+                    <TextInput
+                        id="twitter"
+                        className="mt-1 block w-full"
+                        value={data.twitter}
+                        onChange={(e) => setData('twitter', e.target.value)}
+                    />
+                    <InputError className="mt-2" message={errors.twitter} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="facebook" value="Facebook" />
+                    <TextInput
+                        id="facebook"
+                        className="mt-1 block w-full"
+                        value={data.facebook}
+                        onChange={(e) => setData('facebook', e.target.value)}
+                    />
+                    <InputError className="mt-2" message={errors.facebook} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
@@ -85,39 +136,16 @@ export default function UpdateProfileInformation({
                                 Click here to re-send the verification email.
                             </Link>
                         </p>
-
                         {status === 'verification-link-sent' && (
                             <div className="mt-2 text-sm font-medium text-green-600">
-                                A new verification link has been sent to your
-                                email address.
+                                A new verification link has been sent to your email address.
                             </div>
                         )}
                     </div>
                 )}
 
-                <div>
-                    <InputLabel htmlFor="biografia" value="Biografía" />
-
-                    <TextAreaInput
-                        id="biografia"
-                        className="mt-1 block w-full"
-                        value={data.biografia}
-                        onChange={(e) => setData('biografia', e.target.value)}
-                        placeholder="Tell us about yourself"
-                        rows={4}
-                    />
-
-                    <InputError className="mt-2" message={errors.biografia} />
-                </div>
-
-                <h2 className="text-lg font-medium text-gray-900">
-                    Social Media
-                </h2>
-
-
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
                     <Transition
                         show={recentlySuccessful}
                         enter="transition ease-in-out"
@@ -125,13 +153,9 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">
-                            Saved.
-                        </p>
+                        <p className="text-sm text-gray-600">Saved.</p>
                     </Transition>
                 </div>
-
-
             </form>
         </section>
     );
