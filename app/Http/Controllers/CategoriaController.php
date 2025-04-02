@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCategoriaRequest;
 use App\Http\Requests\UpdateCategoriaRequest;
+use Illuminate\Support\Facades\Redirect;
 use App\Models\Categoria;
+use Inertia\Inertia;
 
 class CategoriaController extends Controller
 {
@@ -13,7 +15,10 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        //
+
+        return Inertia::render('Categorias/Index', [
+            'categorias' => Categoria::all(),
+        ]);
     }
 
     /**
@@ -29,7 +34,15 @@ class CategoriaController extends Controller
      */
     public function store(StoreCategoriaRequest $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        Categoria::create([
+            'nombre' => $request->nombre,
+        ]);
+
+        return Redirect::route('categorias.index');
     }
 
     /**
@@ -53,7 +66,16 @@ class CategoriaController extends Controller
      */
     public function update(UpdateCategoriaRequest $request, Categoria $categoria)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        $categoria->update([
+            'nombre' => $request->nombre,
+        ]);
+
+        return Redirect::route('categorias.index');
+
     }
 
     /**
@@ -61,6 +83,6 @@ class CategoriaController extends Controller
      */
     public function destroy(Categoria $categoria)
     {
-        //
+        $categoria->delete();
     }
 }
