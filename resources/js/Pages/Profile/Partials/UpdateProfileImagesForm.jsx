@@ -50,7 +50,7 @@ const ImageUploadForm = () => {
                 name="profile_image"
                 label="Profile Image"
                 onChange={(file) => setData('profile_image', file)}
-                initialImage={user.profile_image ? `/storage/${user.profile_image}` : null}
+                initialImage={user.profile_image ? `/storage/${user.profile_image}?t=${new Date().getTime()})` : null}
             />
             {errors.profile_image && <div className="text-red-500">{errors.profile_image}</div>}
 
@@ -58,7 +58,7 @@ const ImageUploadForm = () => {
                 name="background_image"
                 label="Background Image"
                 onChange={(file) => setData('background_image', file)}
-                initialImage={user.background_image ? `/storage/${user.background_image}` : null}
+                initialImage={user.background_image ? `/storage/${user.background_image}?t=${new Date().getTime()})` : null}
             />
             {errors.background_image && <div className="text-red-500">{errors.background_image}</div>}
 
