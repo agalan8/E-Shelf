@@ -134,7 +134,11 @@ export default function UserIndex() {
                                         className="w-10 h-10 rounded-full mx-auto"
                                     />
                                 </td>
-                                <td className="border p-2">{user.name}</td>
+                                <td className="border p-2">
+                                    <Link href={route('users.show', user.id)} className="text-blue-600 hover:underline">
+                                        {user.name}
+                                    </Link>
+                                </td>
                                 <td className="border p-2">{user.email}</td>
                                 <td className="border p-2">
                                     {user.is_admin ? <span className="text-green-600 font-bold">Admin</span> : 'Usuario'}
