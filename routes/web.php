@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -27,6 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::resource('users', UserController::class);
+
 Route::post('/images/update', function (Request $request) {
     $request->validate([
         'user' => 'required|array',
@@ -47,6 +50,7 @@ Route::post('/images/update', function (Request $request) {
         $profilePath = "profile_images/{$user->id}.jpg";
         Storage::put($profilePath, file_get_contents($request->file('profile_image')));
         $user->profile_image = $profilePath;
+        //prueba
     }
 
     // Subir imagen de portada con el nombre basado en la ID del usuario
