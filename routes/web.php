@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -26,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::resource('users', UserController::class);
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([
