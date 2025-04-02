@@ -47,6 +47,7 @@ Route::post('/images/update', function (Request $request) {
         $profilePath = "profile_images/{$user->id}.jpg";
         Storage::put($profilePath, file_get_contents($request->file('profile_image')));
         $user->profile_image = $profilePath;
+        //prueba
     }
 
     // Subir imagen de portada con el nombre basado en la ID del usuario
