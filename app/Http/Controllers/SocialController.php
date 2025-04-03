@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSocialRequest;
 use App\Http\Requests\UpdateSocialRequest;
 use App\Models\Social;
+use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 
 class SocialController extends Controller
 {
@@ -13,7 +15,9 @@ class SocialController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Socials/Index', [
+            'socials' => Social::all(),
+        ]);
     }
 
     /**
@@ -29,7 +33,15 @@ class SocialController extends Controller
      */
     public function store(StoreSocialRequest $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        Social::create([
+            'nombre' => $request->nombre,
+        ]);
+
+        return Redirect::route('socials.index');
     }
 
     /**
@@ -53,7 +65,15 @@ class SocialController extends Controller
      */
     public function update(UpdateSocialRequest $request, Social $social)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        $social->update([
+            'nombre' => $request->nombre,
+        ]);
+
+        return Redirect::route('socials.index');
     }
 
     /**
@@ -61,6 +81,6 @@ class SocialController extends Controller
      */
     public function destroy(Social $social)
     {
-        //
+        $social->delete();
     }
 }
