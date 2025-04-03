@@ -67,7 +67,7 @@ class PostController extends Controller
 
         DB::commit();
 
-        return redirect()->route('posts.index');
+        return redirect()->route('mis-posts');
 
     }
 

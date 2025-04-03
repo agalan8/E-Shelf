@@ -34,7 +34,7 @@ const PostCreate = () => {
 
         // Enviar el formulario con Inertia
         router.post(route('posts.store'), formData, {
-                        onSuccess: () => closeModal(),
+
                     });
     };
 
