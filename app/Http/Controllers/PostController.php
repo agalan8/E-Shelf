@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Models\Photo;
 use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class PostController extends Controller
 {
@@ -21,7 +26,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Posts/Create');
     }
 
     /**
@@ -29,7 +34,41 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        //
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'localizacion' => 'required|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+
+        $post = Post::create([
+            'titulo' => $request->titulo,
+            'descripcion' => $request->descripcion,
+            'user_id' => Auth::user()->id,
+        ]);
+
+        $user = Auth::user();
+
+        if ($request->hasFile('imagen')) {
+
+            // $extension = $request->file('profile_image')->getClientOriginalExtension();
+            $path = "posts_images/{$post->id}_{$user->id}.jpg";
+            Storage::put($path, file_get_contents($request->file('imagen')));
+
+            Photo::create([
+                'localizacion' => $request->localizacion,
+                'url' => $path,
+                'post_id' => $post->id,
+            ]);
+
+        }
+
+        DB::commit();
+
+        return redirect()->route('posts.index');
+
     }
 
     /**

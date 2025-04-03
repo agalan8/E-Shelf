@@ -13,6 +13,7 @@ class Photo extends Model
     protected $fillable = [
         'url',
         'localizacion',
+        'post_id',
     ];
 
     public function post()

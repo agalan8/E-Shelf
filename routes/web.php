@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialController;
@@ -8,6 +9,7 @@ use App\Http\Middleware\AdminMiddleware;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -34,6 +36,18 @@ Route::middleware('auth')->group(function () {
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class);
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
 Route::resource('socials', SocialController::class)->middleware(AdminMiddleware::class);
+Route::resource('posts', PostController::class)->middleware('auth');
+
+Route::get('/mis-posts', function () {
+
+    $userId = Auth::user()->id;
+    $user = User::findOrFail($userId);
+
+    return Inertia::render('Posts/MisPosts', [
+
+        'posts' => $user->posts()->with('photo')->get(),
+    ]);
+})->middleware('auth')->name('mis-posts');
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([
