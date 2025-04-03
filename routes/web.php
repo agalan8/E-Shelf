@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class);
-Route::resource('categorias', CategoriaController::class)->middleware(AdminMiddleware::class);
+Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([
