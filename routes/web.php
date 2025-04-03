@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\User;
@@ -32,6 +33,7 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class);
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
+Route::resource('socials', SocialController::class)->middleware(AdminMiddleware::class);
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([

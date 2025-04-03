@@ -13,19 +13,18 @@ export default function UpdateProfileInformation({
     user,
     socials,
 }) {
-    const getSocialUrl = (platform) => {
-        const social = socials.find(s => s.nombre.toLowerCase() === platform);
-        console.log(social);
-        return social ? social.perfil : '';
-    };
+    // Mapea las redes sociales del usuario y obtiene los perfiles actuales
+    const userSocials = user.socials.reduce((acc, social) => {
+        acc[social.nombre.toLowerCase()] = social.pivot.perfil;
+        return acc;
+    }, {});
+
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
             email: user.email,
             biografia: user.biografia,
-            instagram: getSocialUrl('instagram'),
-            twitter: getSocialUrl('twitter'),
-            facebook: getSocialUrl('facebook'),
+            ...userSocials, // Carga las redes existentes
         });
 
     const submit = (e) => {
@@ -48,6 +47,7 @@ export default function UpdateProfileInformation({
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
+                {/* Nombre */}
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
                     <TextInput
@@ -61,6 +61,7 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.name} />
                 </div>
 
+                {/* Email */}
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
                     <TextInput
@@ -75,6 +76,7 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.email} />
                 </div>
 
+                {/* Biografía */}
                 <div>
                     <InputLabel htmlFor="biografia" value="Biografía" />
                     <TextAreaInput
@@ -88,40 +90,26 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.biografia} />
                 </div>
 
-                {/* Redes Sociales */}
+                {/* Redes Sociales - Generadas dinámicamente */}
                 <div>
-                    <InputLabel htmlFor="instagram" value="Instagram" />
-                    <TextInput
-                        id="instagram"
-                        className="mt-1 block w-full"
-                        value={data.instagram}
-                        onChange={(e) => setData('instagram', e.target.value)}
-                    />
-                    <InputError className="mt-2" message={errors.instagram} />
+                    <h3 className="text-lg font-medium text-gray-900">Redes Sociales</h3>
+                    {socials.map((social) => (
+                        <div key={social.id} className="mt-4">
+                            <InputLabel htmlFor={social.nombre} value={social.nombre} />
+                            <TextInput
+                                id={social.nombre}
+                                className="mt-1 block w-full"
+                                value={data[social.nombre.toLowerCase()] || ''}
+                                onChange={(e) =>
+                                    setData(social.nombre.toLowerCase(), e.target.value)
+                                }
+                            />
+                            <InputError className="mt-2" message={errors[social.nombre]} />
+                        </div>
+                    ))}
                 </div>
 
-                <div>
-                    <InputLabel htmlFor="twitter" value="Twitter" />
-                    <TextInput
-                        id="twitter"
-                        className="mt-1 block w-full"
-                        value={data.twitter}
-                        onChange={(e) => setData('twitter', e.target.value)}
-                    />
-                    <InputError className="mt-2" message={errors.twitter} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="facebook" value="Facebook" />
-                    <TextInput
-                        id="facebook"
-                        className="mt-1 block w-full"
-                        value={data.facebook}
-                        onChange={(e) => setData('facebook', e.target.value)}
-                    />
-                    <InputError className="mt-2" message={errors.facebook} />
-                </div>
-
+                {/* Verificación de email */}
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>
                         <p className="mt-2 text-sm text-gray-800">
@@ -143,6 +131,7 @@ export default function UpdateProfileInformation({
                     </div>
                 )}
 
+                {/* Botón Guardar */}
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Save</PrimaryButton>
                     <Transition

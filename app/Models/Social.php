@@ -12,12 +12,10 @@ class Social extends Model
 
     protected $fillable = [
         'nombre',
-        'perfil',
-        'user_id',
     ];
 
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class)->withPivot('perfil');
     }
 }

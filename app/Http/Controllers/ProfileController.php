@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Social;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,9 +23,8 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
-            'user' => $request->user(),
-            'socials' => $request->user()->socials,
-
+            'user' => $request->user()->load('socials'),
+            'socials' => Social::all(),
         ]);
     }
 
@@ -33,7 +33,6 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
@@ -42,34 +41,29 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        $user = $request->user(); // Obtiene el usuario autenticado
+        $user = $request->user();
 
-        $socials = [
-            'instagram' => $request->input('instagram'),
-            'twitter'   => $request->input('twitter'),
-            'facebook'  => $request->input('facebook'),
-        ];
+        // Recorrer todas las redes sociales disponibles
+        foreach (Social::all() as $social) {
 
-        foreach ($socials as $nombre => $perfil) {
-            $existingSocial = $user->socials()->where('nombre', $nombre)->first();
+            $perfil = $request->input(strtolower($social->nombre));
 
-            if ($perfil === null) {
+            $existingSocial = $user->socials()->where('social_id', $social->id)->first();
+
+            if ($perfil === null || trim($perfil) === '') {
                 // Si el campo está vacío y existe una relación, eliminarla
                 if ($existingSocial) {
-                    $existingSocial->delete();
+                    $user->socials()->detach($social->id);
                 }
             } else {
-                // Si hay una relación existente, actualizar si la perfil es diferente
+                // Si hay una relación existente, actualizar si el perfil es diferente
                 if ($existingSocial) {
-                    if ($existingSocial->perfil !== $perfil) {
-                        $existingSocial->update(['perfil' => $perfil]);
+                    if ($existingSocial->pivot->perfil !== $perfil) {
+                        $user->socials()->updateExistingPivot($social->id, ['perfil' => $perfil]);
                     }
                 } else {
                     // Si no existe relación, crear una nueva
-                    $user->socials()->create([
-                        'nombre' => $nombre,
-                        'perfil'  => $perfil,
-                    ]);
+                    $user->socials()->attach($social->id, ['perfil' => $perfil]);
                 }
             }
         }

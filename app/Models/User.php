@@ -50,6 +50,6 @@ class User extends Authenticatable
 
     public function socials()
     {
-        return $this->hasMany(Social::class);
+        return $this->belongsToMany(Social::class)->withPivot('perfil');
     }
 }
