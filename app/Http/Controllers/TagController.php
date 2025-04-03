@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCategoriaRequest;
-use App\Http\Requests\UpdateCategoriaRequest;
+use App\Http\Requests\StoreTagRequest;
+use App\Http\Requests\UpdateTagRequest;
 use Illuminate\Support\Facades\Redirect;
-use App\Models\Categoria;
+use App\Models\Tag;
 use Inertia\Inertia;
 
-class CategoriaController extends Controller
+class TagController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +16,8 @@ class CategoriaController extends Controller
     public function index()
     {
 
-        return Inertia::render('Categorias/Index', [
-            'categorias' => Categoria::all(),
+        return Inertia::render('Tags/Index', [
+            'tags' => Tag::all(),
         ]);
     }
 
@@ -32,23 +32,23 @@ class CategoriaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategoriaRequest $request)
+    public function store(StoreTagRequest $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
         ]);
 
-        Categoria::create([
+        Tag::create([
             'nombre' => $request->nombre,
         ]);
 
-        return Redirect::route('categorias.index');
+        return Redirect::route('tags.index');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Categoria $categoria)
+    public function show(Tag $tag)
     {
         //
     }
@@ -56,7 +56,7 @@ class CategoriaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Categoria $categoria)
+    public function edit(Tag $tag)
     {
         //
     }
@@ -64,25 +64,25 @@ class CategoriaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategoriaRequest $request, Categoria $categoria)
+    public function update(UpdateTagRequest $request, Tag $tag)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
         ]);
 
-        $categoria->update([
+        $tag->update([
             'nombre' => $request->nombre,
         ]);
 
-        return Redirect::route('categorias.index');
+        return Redirect::route('tags.index');
 
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Categoria $categoria)
+    public function destroy(Tag $tag)
     {
-        $categoria->delete();
+        $tag->delete();
     }
 }
