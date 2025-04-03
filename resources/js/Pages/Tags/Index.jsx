@@ -2,10 +2,10 @@ import { Link, Head, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
-export default function CategoriaIndex() {
-    const { categorias } = usePage().props;
+export default function TagIndex() {
+    const { tags } = usePage().props;
     const [showModal, setShowModal] = useState(false);
-    const [editingCategoria, setEditingCategoria] = useState(null);
+    const [editingTag, setEditingTag] = useState(null);
     const [nombre, setNombre] = useState('');
     const [search, setSearch] = useState('');
     const [searchField, setSearchField] = useState('nombre');
@@ -13,16 +13,16 @@ export default function CategoriaIndex() {
     const [sortDirection, setSortDirection] = useState('asc');
 
     // Función para abrir el modal en modo edición o creación
-    const openModal = (categoria = null) => {
-        setEditingCategoria(categoria);
-        setNombre(categoria ? categoria.nombre : ''); // Cargar nombre si se edita
+    const openModal = (tag = null) => {
+        setEditingTag(tag);
+        setNombre(tag ? tag.nombre : ''); // Cargar nombre si se edita
         setShowModal(true);
     };
 
     // Función para cerrar el modal
     const closeModal = () => {
         setShowModal(false);
-        setEditingCategoria(null);
+        setEditingTag(null);
         setNombre('');
     };
 
@@ -31,21 +31,21 @@ export default function CategoriaIndex() {
         e.preventDefault();
         const formData = { nombre };
 
-        if (editingCategoria) {
-            router.put(route('categorias.update', editingCategoria.id), formData, {
+        if (editingTag) {
+            router.put(route('tags.update', editingTag.id), formData, {
                 onSuccess: () => closeModal(),
             });
         } else {
-            router.post(route('categorias.store'), formData, {
+            router.post(route('tags.store'), formData, {
                 onSuccess: () => closeModal(),
             });
         }
     };
 
     // Función para eliminar categoría
-    const deleteCategoria = (id) => {
+    const deleteTag = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
-            router.delete(route('categorias.destroy', id));
+            router.delete(route('tags.destroy', id));
         }
     };
 
@@ -60,10 +60,10 @@ export default function CategoriaIndex() {
     };
 
     // Filtrar categorías
-    const filteredCategorias = categorias
-        .filter((categoria) => {
+    const filteredtags = tags
+        .filter((tag) => {
             if (searchField === 'nombre') {
-                return categoria.nombre.toLowerCase().includes(search.toLowerCase());
+                return tag.nombre.toLowerCase().includes(search.toLowerCase());
             }
             return true;
         })
@@ -114,18 +114,18 @@ export default function CategoriaIndex() {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredCategorias.map((categoria) => (
-                            <tr key={categoria.id} className="text-center">
-                                <td className="border p-2">{categoria.nombre}</td>
+                        {filteredtags.map((tag) => (
+                            <tr key={tag.id} className="text-center">
+                                <td className="border p-2">{tag.nombre}</td>
                                 <td className="border p-2 space-x-2">
                                     <button
-                                        onClick={() => openModal(categoria)}
+                                        onClick={() => openModal(tag)}
                                         className="px-4 py-2 rounded bg-yellow-600 text-white"
                                     >
                                         Editar
                                     </button>
                                     <button
-                                        onClick={() => deleteCategoria(categoria.id)}
+                                        onClick={() => deleteTag(tag.id)}
                                         className="px-4 py-2 rounded bg-red-600 text-white"
                                     >
                                         Eliminar
@@ -141,7 +141,7 @@ export default function CategoriaIndex() {
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded shadow-lg w-96">
-                        <h2 className="text-xl font-bold mb-4">{editingCategoria ? 'Editar Categoría' : 'Crear Categoría'}</h2>
+                        <h2 className="text-xl font-bold mb-4">{editingTag ? 'Editar Categoría' : 'Crear Categoría'}</h2>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-2">
                                 <label className="block text-sm font-medium">Nombre</label>
@@ -158,7 +158,7 @@ export default function CategoriaIndex() {
                                     Cancelar
                                 </button>
                                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
-                                    {editingCategoria ? 'Actualizar' : 'Crear'}
+                                    {editingTag ? 'Actualizar' : 'Crear'}
                                 </button>
                             </div>
                         </form>
