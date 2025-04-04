@@ -7,8 +7,10 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Models\Photo;
 use App\Models\Post;
 use App\Models\Tag;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -17,6 +19,8 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+     use AuthorizesRequests;
     public function index()
     {
         //
@@ -158,6 +162,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        $this->authorize('delete', $post);
         $post->delete();
     }
 }
