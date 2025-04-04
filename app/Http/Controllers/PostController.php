@@ -102,10 +102,57 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, $id)
     {
-        //
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'localizacion' => 'nullable|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+
+        // Buscar el post que se quiere actualizar
+        $post = Post::findOrFail($id);
+        $post->titulo = $request->titulo;
+        $post->descripcion = $request->descripcion;
+
+        if ($request->has('localizacion')) {
+            // Si se proporciona una nueva localización, actualízala
+            $post->photo->localizacion = $request->localizacion;
+            $post->photo->save();
+        }
+
+        // Actualizar la imagen si se sube una nueva
+        if ($request->hasFile('imagen')) {
+            $path = "posts_images/{$post->id}_" . Auth::user()->id . ".jpg";
+            Storage::put($path, file_get_contents($request->file('imagen')));
+
+            // Actualizamos la foto asociada al post
+            $post->photo()->update([
+                'localizacion' => $request->localizacion,
+                'url' => $path,
+            ]);
+        }
+
+        // Actualizar las etiquetas
+        $tags = $request->input('tags');
+        if ($tags != null) {
+            // Primero eliminar las etiquetas anteriores
+            $post->tags()->detach();
+
+            // Luego asociamos las nuevas etiquetas
+            foreach ($tags as $tag) {
+                $post->tags()->attach(Tag::findOrFail($tag));
+            }
+        }
+
+        DB::commit();
+
+        return redirect()->route('mis-posts');
     }
+
 
     /**
      * Remove the specified resource from storage.

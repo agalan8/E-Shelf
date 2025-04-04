@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -46,6 +47,7 @@ Route::get('/mis-posts', function () {
     return Inertia::render('Posts/MisPosts', [
 
         'posts' => $user->posts()->with('photo', 'tags')->get(),
+        'tags' => Tag::all(),
     ]);
 })->middleware('auth')->name('mis-posts');
 
