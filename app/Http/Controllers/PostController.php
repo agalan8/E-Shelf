@@ -23,7 +23,12 @@ class PostController extends Controller
      use AuthorizesRequests;
     public function index()
     {
-        //
+        $posts = Post::orderBy('created_at')->with('user', 'photo', 'tags')->get();
+
+        return Inertia::render('Posts/Index', [
+            'posts' => $posts,
+            'tags' => Tag::all(),
+        ]);
     }
 
     /**
