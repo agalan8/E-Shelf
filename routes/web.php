@@ -35,7 +35,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('posts', PostController::class)->middleware('auth');
-Route::resource('users', UserController::class)->middleware(AdminMiddleware::class);
+Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
+Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
 Route::resource('socials', SocialController::class)->middleware(AdminMiddleware::class);
 
