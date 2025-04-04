@@ -129,7 +129,7 @@ export default function UserIndex() {
                             <tr key={user.id} className="text-center">
                                 <td className="border p-2">
                                     <img
-                                        src={`/storage/${user.profile_image}`}
+                                        src={`/storage/${user.profile_image}?t=${new Date().getTime()}`}
                                         alt="Perfil"
                                         className="w-10 h-10 rounded-full mx-auto"
                                     />
