@@ -4,6 +4,7 @@ import { Link } from '@inertiajs/react';
 
 const Show = ({ post, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isImageOpen, setIsImageOpen] = useState(false); // Estado para controlar si la imagen está ampliada
 
   // Al montar el componente, activamos la visibilidad con la transición
   useEffect(() => {
@@ -11,6 +12,16 @@ const Show = ({ post, onClose }) => {
   }, []);
 
   if (!post) return null;
+
+  // Función para abrir la imagen en pantalla completa
+  const handleImageClick = () => {
+    setIsImageOpen(true);
+  };
+
+  // Función para cerrar la vista de la imagen
+  const closeImageView = () => {
+    setIsImageOpen(false);
+  };
 
   return (
     <div
@@ -27,40 +38,64 @@ const Show = ({ post, onClose }) => {
           X
         </button>
 
+        {/* Foto de perfil y nombre del usuario */}
         <div className="flex items-center space-x-3 mb-4">
-            <Link href={route('users.show', post.user.id)}>
-                <img
-                    src={`/storage/${post.user.profile_image}`}
-                    alt={post.user.name}
-                    className="w-10 h-10 rounded-full"
-                />
-            </Link>
-            <Link
+          <Link href={route('users.show', post.user.id)}>
+            <img
+              src={`/storage/${post.user.profile_image}`}
+              alt={post.user.name}
+              className="w-10 h-10 rounded-full"
+            />
+          </Link>
+          <Link
             href={route('users.show', post.user.id)}
             className="font-semibold text-blue-500"
-            >
-                {post.user.name}
-            </Link>
+          >
+            {post.user.name}
+          </Link>
         </div>
 
         {/* Imagen de la publicación */}
-        <img
-          src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
-          alt={post.titulo}
-          className="w-full h-64 object-cover rounded-lg mb-4"
-        />
+        <div className="relative">
+          <img
+            src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
+            alt={post.titulo}
+            className="w-full h-64 object-cover rounded-lg mb-4 cursor-pointer"
+            onClick={handleImageClick}
+          />
+        </div>
 
         {/* Título, descripción y localización */}
         <h2 className="text-2xl font-semibold">{post.titulo}</h2>
         <p className="text-sm text-gray-500 mb-2">{post.localizacion}</p>
         <p className="text-lg">{post.descripcion}</p>
         <div>
-            <h3 className="text-lg font-medium text-gray-900">Categorías</h3>
-            {post.tags.map((tag) => (
-                <p key={tag.id}>{tag.nombre}</p>
-            ))}
+          <h3 className="text-lg font-medium text-gray-900">Categorías</h3>
+          {post.tags.map((tag) => (
+            <p key={tag.id}>{tag.nombre}</p>
+          ))}
         </div>
       </div>
+
+      {/* Vista en pantalla completa de la imagen */}
+      {isImageOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+          {/* Botón para cerrar la vista de imagen */}
+          <button
+            onClick={closeImageView}
+            className="absolute top-4 right-4 text-white text-3xl font-bold"
+          >
+            X
+          </button>
+
+          <img
+            src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
+            alt={post.titulo}
+            className="max-w-full max-h-full object-contain cursor-pointer"
+            onClick={closeImageView}
+          />
+        </div>
+      )}
     </div>
   );
 };
