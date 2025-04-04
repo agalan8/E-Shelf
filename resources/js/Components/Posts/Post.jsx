@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from '@inertiajs/react'; // Importa Link para la navegación
+import { Link, router } from '@inertiajs/react'; // Importa Link para la navegación y router para hacer la solicitud de eliminación
 import Show from '@/Components/Posts/Show'; // Asegúrate de importar el componente Show
 import Edit from '@/Components/Posts/Edit'; // Importa el componente Edit
 
@@ -7,6 +7,7 @@ const Post = ({ post, tags }) => {
   const [showModalOpen, setShowModalOpen] = useState(false); // Estado para controlar el modal de detalles
   const [editModalOpen, setEditModalOpen] = useState(false); // Estado para controlar el modal de edición
   const [selectedPost, setSelectedPost] = useState(null); // Estado para almacenar la publicación seleccionada
+  const [isDeleting, setIsDeleting] = useState(false); // Estado para manejar el proceso de eliminación
 
   // Función para abrir el modal de detalles
   const handleOpenShowModal = () => {
@@ -30,6 +31,24 @@ const Post = ({ post, tags }) => {
   const handleCloseEditModal = () => {
     setEditModalOpen(false); // Cierra el modal de edición
     setSelectedPost(null); // Limpia la publicación seleccionada
+  };
+
+  // Función para eliminar la publicación
+  const handleDeletePost = async () => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+      setIsDeleting(true); // Activar el estado de "eliminando" mientras la solicitud se procesa
+
+      try {
+        // Enviar solicitud DELETE a posts.destroy utilizando Inertia.js
+        await router.delete(route('posts.destroy', post.id), {
+          preserveScroll: true, // Mantener el scroll de la página
+        });
+      } catch (error) {
+        console.error('Error al eliminar la publicación:', error);
+      } finally {
+        setIsDeleting(false); // Desactivar el estado de "eliminando"
+      }
+    }
   };
 
   return (
@@ -69,6 +88,15 @@ const Post = ({ post, tags }) => {
       {/* Botón para abrir el modal de edición */}
       <button onClick={handleOpenEditModal} className="text-green-500 mt-2 ml-4">
         Editar
+      </button>
+
+      {/* Botón para eliminar la publicación */}
+      <button
+        onClick={handleDeletePost}
+        className="text-red-500 mt-2 ml-4"
+        disabled={isDeleting} // Desactivar el botón mientras se está eliminando
+      >
+        {isDeleting ? 'Eliminando...' : 'Eliminar'}
       </button>
 
       {/* Mostrar el modal con la publicación seleccionada */}
