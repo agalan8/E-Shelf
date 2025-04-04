@@ -6,6 +6,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Photo;
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +27,9 @@ class PostController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Posts/Create');
+        return Inertia::render('Posts/Create', [
+            'tags' => Tag::all(),
+        ]);
     }
 
     /**
@@ -34,6 +37,7 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
+
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',
@@ -63,6 +67,14 @@ class PostController extends Controller
                 'post_id' => $post->id,
             ]);
 
+        }
+
+        $tags = $request->input('tags');
+
+        if($tags != null) {
+            foreach ($tags as $tag) {
+                $post->tags()->attach(Tag::findOrFail($tag));
+            }
         }
 
         DB::commit();

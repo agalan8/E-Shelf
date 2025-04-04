@@ -37,6 +37,12 @@ const Show = ({ post, onClose }) => {
         <h2 className="text-2xl font-semibold">{post.titulo}</h2>
         <p className="text-sm text-gray-500 mb-2">{post.localizacion}</p>
         <p className="text-lg">{post.descripcion}</p>
+        <div>
+            <h3 className="text-lg font-medium text-gray-900">Categorías</h3>
+            {post.tags.map((tag) => (
+                <p key={tag.id}>{tag.nombre}</p>
+            ))}
+        </div>
       </div>
     </div>
   );
