@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from '@inertiajs/react'; // Importa Link para la navegación
 import Show from '@/Components/Posts/Show'; // Asegúrate de importar el componente Show
 import Edit from '@/Components/Posts/Edit'; // Importa el componente Edit
 
@@ -33,6 +34,24 @@ const Post = ({ post, tags }) => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
+      {/* Foto de perfil y nombre del usuario */}
+      <div className="flex items-center space-x-3 mb-4">
+        <Link href={route('users.show', post.user.id)}>
+          <img
+            src={`/storage/${post.user.profile_image}`}
+            alt={post.user.name}
+            className="w-10 h-10 rounded-full"
+          />
+        </Link>
+        <Link
+          href={route('users.show', post.user.id)}
+          className="font-semibold text-blue-500"
+        >
+          {post.user.name}
+        </Link>
+      </div>
+
+      {/* Imagen y contenido de la publicación */}
       <img
         src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
         alt={post.titulo}

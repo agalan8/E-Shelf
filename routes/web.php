@@ -46,7 +46,7 @@ Route::get('/mis-posts', function () {
 
     return Inertia::render('Posts/MisPosts', [
 
-        'posts' => $user->posts()->with('photo', 'tags')->get(),
+        'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
         'tags' => Tag::all(),
     ]);
 })->middleware('auth')->name('mis-posts');
