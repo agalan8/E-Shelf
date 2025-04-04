@@ -1,5 +1,6 @@
 // resources/js/Components/Posts/Show.jsx
 import React, { useEffect, useState } from 'react';
+import { Link } from '@inertiajs/react';
 
 const Show = ({ post, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,6 +26,22 @@ const Show = ({ post, onClose }) => {
         >
           X
         </button>
+
+        <div className="flex items-center space-x-3 mb-4">
+            <Link href={route('users.show', post.user.id)}>
+                <img
+                    src={`/storage/${post.user.profile_image}`}
+                    alt={post.user.name}
+                    className="w-10 h-10 rounded-full"
+                />
+            </Link>
+            <Link
+            href={route('users.show', post.user.id)}
+            className="font-semibold text-blue-500"
+            >
+                {post.user.name}
+            </Link>
+        </div>
 
         {/* Imagen de la publicación */}
         <img
