@@ -34,10 +34,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::resource('posts', PostController::class)->middleware('auth');
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class);
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
 Route::resource('socials', SocialController::class)->middleware(AdminMiddleware::class);
-Route::resource('posts', PostController::class)->middleware('auth');
 
 Route::get('/mis-posts', function () {
 

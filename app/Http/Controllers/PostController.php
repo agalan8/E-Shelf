@@ -117,12 +117,7 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         $post->titulo = $request->titulo;
         $post->descripcion = $request->descripcion;
-
-        if ($request->has('localizacion')) {
-            // Si se proporciona una nueva localización, actualízala
-            $post->photo->localizacion = $request->localizacion;
-            $post->photo->save();
-        }
+        $post->photo->localizacion = $request->localizacion;
 
         // Actualizar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
@@ -147,6 +142,10 @@ class PostController extends Controller
                 $post->tags()->attach(Tag::findOrFail($tag));
             }
         }
+
+        $post->save();
+        $post->photo->save();
+
 
         DB::commit();
 
