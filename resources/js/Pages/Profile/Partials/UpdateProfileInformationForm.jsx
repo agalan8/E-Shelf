@@ -82,7 +82,7 @@ export default function UpdateProfileInformation({
                     <TextAreaInput
                         id="biografia"
                         className="mt-1 block w-full"
-                        value={data.biografia}
+                        value={data.biografia || ''}
                         onChange={(e) => setData('biografia', e.target.value)}
                         placeholder="Tell us about yourself"
                         rows={4}
