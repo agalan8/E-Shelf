@@ -31,6 +31,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Dashboard
                                 </NavLink>
                             </div>
+                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                    <NavLink
+                                        href={route('mis-posts')}
+                                        active={route().current('mis-posts')}
+                                    >
+                                        Mis publicaciones
+                                    </NavLink>
+                            </div>
+                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                    <NavLink
+                                        href={route('posts.create')}
+                                        active={route().current('posts.create')}
+                                    >
+                                        Crear Publicación
+                                    </NavLink>
+                            </div>
                             {user.is_admin && (
                                 <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                     <NavLink

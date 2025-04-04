@@ -1,13 +1,16 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -31,9 +34,23 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('users', UserController::class)->middleware(AdminMiddleware::class);
+Route::resource('posts', PostController::class)->middleware('auth');
+Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
+Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
 Route::resource('socials', SocialController::class)->middleware(AdminMiddleware::class);
+
+Route::get('/mis-posts', function () {
+
+    $userId = Auth::user()->id;
+    $user = User::findOrFail($userId);
+
+    return Inertia::render('Posts/MisPosts', [
+
+        'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
+        'tags' => Tag::all(),
+    ]);
+})->middleware('auth')->name('mis-posts');
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([

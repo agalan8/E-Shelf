@@ -52,4 +52,11 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Social::class)->withPivot('perfil');
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+
 }
