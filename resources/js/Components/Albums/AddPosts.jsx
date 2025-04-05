@@ -22,7 +22,7 @@ const AddPosts = ({ album, userPosts, onClose }) => {
       return;
     }
 
-    router.post(route('add-posts', album.id), { posts: selectedPosts }, {
+    router.post(route('albums.posts.store', album.id), { posts: selectedPosts }, {
       onSuccess: () => onClose(),
       preserveScroll: true,
     });

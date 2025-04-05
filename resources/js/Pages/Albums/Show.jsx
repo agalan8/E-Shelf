@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Head } from '@inertiajs/react';
+import { Link, Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Post from '@/Components/Posts/Post';
 import Edit from '@/Components/Albums/Edit';
@@ -34,6 +34,16 @@ const Show = ({ album, userPosts }) => {
   // Función para cerrar el modal de edición
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
+  };
+
+  // Función para eliminar un post del álbum
+  const handleDeletePost = (postId) => {
+    if (confirm('¿Estás seguro de que deseas eliminar esta publicación del álbum?')) {
+        router.delete(route('albums.posts.destroy', { album: album.id, post: postId }), {
+            preserveScroll: true,
+        });
+    }
+
   };
 
   return (
@@ -92,7 +102,18 @@ const Show = ({ album, userPosts }) => {
             <p>No hay publicaciones en este álbum.</p>
           ) : (
             posts.map((post) => (
-              <Post key={post.id} post={post} tags={post.tags || []} />
+              <div key={post.id} className="relative">
+                {/* Botón de eliminar */}
+                <button
+                  onClick={() => handleDeletePost(post.id)}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                >
+                  <span className="text-lg">&times;</span> {/* X */}
+                </button>
+
+                {/* Componente Post */}
+                <Post post={post} tags={post.tags || []} />
+              </div>
             ))
           )}
         </div>
