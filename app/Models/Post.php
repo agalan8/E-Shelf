@@ -32,5 +32,9 @@ class Post extends Model
         return $this->belongsToMany(Tag::class);
     }
 
+    public function albums(){
+        return $this->belongsToMany(Album::class);
+    }
+
 
 }
