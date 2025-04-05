@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import Post from '@/Components/Posts/Post'; // Asegúrate de importar el componente Post
-import Edit from '@/Components/Albums/Edit'; // Importamos el modal Edit.jsx
+import Post from '@/Components/Posts/Post';
+import Edit from '@/Components/Albums/Edit';
+import AddPosts from '@/Components/Albums/AddPosts'; // Importamos el modal AddPosts
 
-const Show = ({ album }) => {
+const Show = ({ album, userPosts }) => {
   const [posts, setPosts] = useState([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Estado para controlar la visibilidad del modal de edición
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddPostsModalOpen, setIsAddPostsModalOpen] = useState(false); // Nuevo estado para el modal de AddPosts
 
   useEffect(() => {
-    // Aquí podrías obtener los posts del álbum si es que no los tienes cargados previamente
-    // Si ya los tienes en el objeto 'album', puedes omitir esta parte
     if (album && album.posts) {
       setPosts(album.posts);
     }
   }, [album]);
 
-  const handleAddPost = () => {
-    // Lógica para añadir una publicación al álbum
-    console.log('Añadir publicación');
+  // Función para abrir el modal de añadir publicaciones
+  const handleOpenAddPostsModal = () => {
+    setIsAddPostsModalOpen(true);
+  };
+
+  // Función para cerrar el modal de añadir publicaciones
+  const handleCloseAddPostsModal = () => {
+    setIsAddPostsModalOpen(false);
   };
 
   // Función para abrir el modal de edición
@@ -40,7 +45,7 @@ const Show = ({ album }) => {
         {/* Enlace para volver a Mis Álbumes */}
         <div className="mb-4">
           <Link
-            href={route('mis-albums')}  // Redirige a la ruta de Mis Álbumes
+            href={route('mis-albums')}
             className="text-blue-500 hover:text-blue-700 font-semibold"
           >
             &larr; Volver a Mis Álbumes
@@ -50,7 +55,7 @@ const Show = ({ album }) => {
         {/* Botón de Editar */}
         <div className="flex justify-end mb-4">
           <button
-            onClick={handleOpenEditModal} // Abrir el modal al hacer clic
+            onClick={handleOpenEditModal}
             className="px-4 py-2 bg-blue-500 text-white rounded-md"
           >
             Editar
@@ -74,7 +79,7 @@ const Show = ({ album }) => {
         {/* Botón para añadir una publicación */}
         <div className="mb-4">
           <button
-            onClick={handleAddPost}
+            onClick={handleOpenAddPostsModal} // Abre el modal AddPosts
             className="px-4 py-2 bg-green-500 text-white rounded-md"
           >
             Añadir Publicación
@@ -93,8 +98,11 @@ const Show = ({ album }) => {
         </div>
       </div>
 
-      {/* Mostrar el modal de edición si isEditModalOpen es verdadero */}
+      {/* Mostrar el modal de edición */}
       {isEditModalOpen && <Edit album={album} onClose={handleCloseEditModal} />}
+
+      {/* Mostrar el modal de añadir posts */}
+      {isAddPostsModalOpen && <AddPosts album={album} onClose={handleCloseAddPostsModal} userPosts={userPosts} />}
     </AuthenticatedLayout>
   );
 };

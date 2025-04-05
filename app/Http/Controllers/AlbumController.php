@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
 use App\Models\Album;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -75,9 +77,12 @@ class AlbumController extends Controller
      */
     public function show(Album $album)
     {
-
+        $userId = Auth::user()->id;
+        $user = User::findOrFail($userId);
+        $posts = Post::where('user_id', $userId)->with('photo', 'tags', 'user')->get();
         return Inertia::render('Albums/Show', [
             'album' => $album->with('posts', 'user', 'posts.photo', 'posts.user', 'posts.tags')->find($album->id),
+            'userPosts' => $posts,
         ]);
     }
 

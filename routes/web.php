@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Models\Album;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Application;
@@ -64,6 +65,25 @@ Route::get('/mis-albums', function () {
         'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
+
+Route::post('add-posts/{album}', function (Request $request, Album $album) {
+
+    // Obtener los IDs de los posts seleccionados
+    $postIds = $request->input('posts', []);
+
+    // Verificar que el álbum existe
+    $album = Album::findOrFail($album->id);
+
+    // Añadir la relación entre el álbum y los posts seleccionados, sin duplicar
+    foreach ($postIds as $postId) {
+        // Verificar si el post ya está relacionado con el álbum
+        $album->posts()->syncWithoutDetaching([$postId]);
+    }
+
+    // Devolver una respuesta con un mensaje de éxito
+    return redirect()->route('albums.show', $album->id);
+})->name('add-posts');
+
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([
