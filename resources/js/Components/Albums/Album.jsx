@@ -48,7 +48,9 @@ const Album = ({ album }) => {
           <Link href={route('albums.edit', album.id)} className="text-green-500">
             Editar
           </Link>
-          <button className="text-red-500" onClick={() => alert('Eliminar álbum')}>Eliminar</button>
+          <button className="text-red-500" onClick={() => alert('Eliminar álbum')}>
+            Eliminar
+          </button>
         </div>
       )}
     </div>

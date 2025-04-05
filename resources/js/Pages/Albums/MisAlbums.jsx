@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react'; // Importamos solo Head
 import { useState } from 'react';
 import Album from '@/Components/Albums/Album';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -28,6 +28,7 @@ const MisAlbums = ({ albums, posts }) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {albums.map((album) => (
+              // Aquí eliminamos el Link y dejamos que el componente Album se encargue del enlace
               <Album key={album.id} album={album} />
             ))}
           </div>
