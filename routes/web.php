@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('posts', PostController::class)->middleware('auth');
+Route::resource('albums', AlbumController::class)->middleware('auth');
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
 Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
@@ -51,6 +53,16 @@ Route::get('/mis-posts', function () {
         'tags' => Tag::all(),
     ]);
 })->middleware('auth')->name('mis-posts');
+
+Route::get('/mis-albums', function () {
+
+    $userId = Auth::user()->id;
+    $user = User::findOrFail($userId);
+
+    return Inertia::render('Albums/MisAlbums', [
+        'albums' => $user->albums()->with('posts', 'user')->get(),
+    ]);
+})->middleware('auth')->name('mis-albums');
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([

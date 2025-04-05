@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
 use App\Models\Album;
+use Illuminate\Support\Facades\Auth;
 
 class AlbumController extends Controller
 {
@@ -29,7 +30,22 @@ class AlbumController extends Controller
      */
     public function store(StoreAlbumRequest $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descrpcion' => 'string|max:255',
+        ]);
+
+        $user = Auth::user();
+
+        $album = Album::create([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'user_id' => $user->id,
+        ]);
+        $album->save();
+
+        return redirect()->route('mis-albums');
+
     }
 
     /**
