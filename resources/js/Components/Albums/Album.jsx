@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import Edit from '@/Components/Albums/Edit'; // Importamos el modal de edición
 
 const Album = ({ album }) => {
   const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
+
+  // Estado para controlar la apertura del modal de edición
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Verificar si el usuario puede editar o eliminar el álbum
   const canEditOrDelete = auth.user.id === album.user.id || auth.user.is_admin;
@@ -45,14 +49,18 @@ const Album = ({ album }) => {
       {/* Botones solo visibles si el usuario tiene permiso */}
       {canEditOrDelete && (
         <div className="mt-4 flex space-x-4">
-          <Link href={route('albums.edit', album.id)} className="text-green-500">
+          {/* Botón de Editar que abre el modal */}
+          <button onClick={() => setIsEditModalOpen(true)} className="text-green-500">
             Editar
-          </Link>
+          </button>
           <button className="text-red-500" onClick={() => alert('Eliminar álbum')}>
             Eliminar
           </button>
         </div>
       )}
+
+      {/* Mostrar el modal de edición si isEditModalOpen es verdadero */}
+      {isEditModalOpen && <Edit album={album} onClose={() => setIsEditModalOpen(false)} />}
     </div>
   );
 };

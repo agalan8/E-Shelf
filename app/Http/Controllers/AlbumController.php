@@ -75,6 +75,7 @@ class AlbumController extends Controller
      */
     public function show(Album $album)
     {
+
         return Inertia::render('Albums/Show', [
             'album' => $album->with('posts', 'user', 'posts.photo', 'posts.user', 'posts.tags')->find($album->id),
         ]);
@@ -93,7 +94,27 @@ class AlbumController extends Controller
      */
     public function update(UpdateAlbumRequest $request, Album $album)
     {
-        //
+
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'string|max:255',
+            'portada' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $album->update([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+        ]);
+
+        if ($request->hasFile('portada')) {
+            $path = "albums_images/{$album->id}_" . Auth::user()->id . ".jpg";
+            Storage::put($path, file_get_contents($request->file('portada')));
+            $album->portada = $path;
+        }
+
+        $album->save();
+
+        return redirect()->to(url()->previous());
     }
 
     /**

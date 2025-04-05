@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Post from '@/Components/Posts/Post'; // Asegúrate de importar el componente Post
-
+import Edit from '@/Components/Albums/Edit'; // Importamos el modal Edit.jsx
 
 const Show = ({ album }) => {
   const [posts, setPosts] = useState([]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Estado para controlar la visibilidad del modal de edición
 
   useEffect(() => {
     // Aquí podrías obtener los posts del álbum si es que no los tienes cargados previamente
@@ -20,20 +21,40 @@ const Show = ({ album }) => {
     console.log('Añadir publicación');
   };
 
+  // Función para abrir el modal de edición
+  const handleOpenEditModal = () => {
+    setIsEditModalOpen(true);
+  };
+
+  // Función para cerrar el modal de edición
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+
   return (
     <AuthenticatedLayout
       header={<h2 className="text-xl font-semibold leading-tight text-gray-800">{album.titulo}</h2>}
     >
-        <Head title="Mis Álbumes" />
-        <div className="container mx-auto p-4">
+      <Head title="Mis Álbumes" />
+      <div className="container mx-auto p-4">
+        {/* Enlace para volver a Mis Álbumes */}
+        <div className="mb-4">
+          <Link
+            href={route('mis-albums')}  // Redirige a la ruta de Mis Álbumes
+            className="text-blue-500 hover:text-blue-700 font-semibold"
+          >
+            &larr; Volver a Mis Álbumes
+          </Link>
+        </div>
+
         {/* Botón de Editar */}
         <div className="flex justify-end mb-4">
-            <Link
-            href={`/albums/${album.id}/edit`}
+          <button
+            onClick={handleOpenEditModal} // Abrir el modal al hacer clic
             className="px-4 py-2 bg-blue-500 text-white rounded-md"
-            >
+          >
             Editar
-            </Link>
+          </button>
         </div>
 
         {/* Título del álbum */}
@@ -41,36 +62,39 @@ const Show = ({ album }) => {
 
         {/* Usuario al que pertenece el álbum */}
         <div className="text-lg text-gray-700 mb-4">
-            <strong>Creado por:</strong> {album.user.name}
+          <strong>Creado por:</strong> {album.user.name}
         </div>
 
         {/* Descripción del álbum */}
         <div className="text-md text-gray-600 mb-4">
-            <strong>Descripción:</strong>
-            <p>{album.descripcion}</p>
+          <strong>Descripción:</strong>
+          <p>{album.descripcion}</p>
         </div>
 
         {/* Botón para añadir una publicación */}
         <div className="mb-4">
-            <button
+          <button
             onClick={handleAddPost}
             className="px-4 py-2 bg-green-500 text-white rounded-md"
-            >
+          >
             Añadir Publicación
-            </button>
+          </button>
         </div>
 
-        {/* Lista de Posts del álbum */}
-        <div className="space-y-4">
-            {posts.length === 0 ? (
+        {/* Lista de Posts del álbum en un grid de 3 columnas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {posts.length === 0 ? (
             <p>No hay publicaciones en este álbum.</p>
-            ) : (
+          ) : (
             posts.map((post) => (
-                <Post key={post.id} post={post} tags={post.tags || []} />
+              <Post key={post.id} post={post} tags={post.tags || []} />
             ))
-            )}
+          )}
         </div>
-        </div>
+      </div>
+
+      {/* Mostrar el modal de edición si isEditModalOpen es verdadero */}
+      {isEditModalOpen && <Edit album={album} onClose={handleCloseEditModal} />}
     </AuthenticatedLayout>
   );
 };
