@@ -61,6 +61,7 @@ Route::get('/mis-albums', function () {
 
     return Inertia::render('Albums/MisAlbums', [
         'albums' => $user->albums()->with('posts', 'user')->get(),
+        'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
 

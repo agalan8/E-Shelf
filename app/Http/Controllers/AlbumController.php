@@ -6,6 +6,7 @@ use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
 use App\Models\Album;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class AlbumController extends Controller
 {
@@ -33,6 +34,7 @@ class AlbumController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'descrpcion' => 'string|max:255',
+            'portada' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $user = Auth::user();
@@ -42,6 +44,16 @@ class AlbumController extends Controller
             'descripcion' => $request->descripcion,
             'user_id' => $user->id,
         ]);
+
+        if ($request->hasFile('portada')) {
+
+            // $extension = $request->file('profile_image')->getClientOriginalExtension();
+            $path = "albums_images/{$album->id}_{$user->id}.jpg";
+            Storage::put($path, file_get_contents($request->file('portada')));
+            $album->portada = $path;
+
+        }
+
         $album->save();
 
         return redirect()->route('mis-albums');

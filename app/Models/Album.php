@@ -13,6 +13,7 @@ class Album extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
+        'portada',
         'user_id',
     ];
 

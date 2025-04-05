@@ -4,7 +4,7 @@ import Album from '@/Components/Albums/Album';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Create from '@/Components/Albums/Create';
 
-const MisAlbums = ({ albums }) => {
+const MisAlbums = ({ albums, posts }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   return (
@@ -34,7 +34,7 @@ const MisAlbums = ({ albums }) => {
         )}
       </div>
 
-      {isCreateModalOpen && <Create onClose={() => setIsCreateModalOpen(false)} />}
+      {isCreateModalOpen && <Create onClose={() => setIsCreateModalOpen(false)} posts={posts} />}
     </AuthenticatedLayout>
   );
 };
