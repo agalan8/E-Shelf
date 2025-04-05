@@ -54,6 +54,15 @@ class AlbumController extends Controller
 
         }
 
+        if ($request->has('selectedPosts')) {
+            foreach ($request->selectedPosts as $postId) {
+                // Verificar si la relación ya existe, si no, agregarla
+                if (!$album->posts->contains($postId)) {
+                    $album->posts()->attach($postId);
+                }
+            }
+        }
+
         $album->save();
 
         return redirect()->route('mis-albums');
