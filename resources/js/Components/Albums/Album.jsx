@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import Edit from '@/Components/Albums/Edit'; // Importamos el modal de edición
+import FlipBook from '@/Components/Albums/FlipBook'; // Importamos el modal FlipBook
 
 const Album = ({ album }) => {
   const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
 
   // Estado para controlar la apertura del modal de edición
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isFlipBookOpen, setIsFlipBookOpen] = useState(false); // Estado para FlipBook
 
   // Verificar si el usuario puede editar o eliminar el álbum
   const canEditOrDelete = auth.user.id === album.user.id || auth.user.is_admin;
@@ -46,6 +48,11 @@ const Album = ({ album }) => {
         Ver álbum completo
       </Link>
 
+      {/* Enlace para ver el FlipBook */}
+      <button onClick={() => setIsFlipBookOpen(true)} className="text-blue-500 mt-2 block">
+        Ver Flipbook
+      </button>
+
       {/* Botones solo visibles si el usuario tiene permiso */}
       {canEditOrDelete && (
         <div className="mt-4 flex space-x-4">
@@ -61,6 +68,9 @@ const Album = ({ album }) => {
 
       {/* Mostrar el modal de edición si isEditModalOpen es verdadero */}
       {isEditModalOpen && <Edit album={album} onClose={() => setIsEditModalOpen(false)} />}
+
+      {/* Mostrar el modal FlipBook si isFlipBookOpen es verdadero */}
+      {isFlipBookOpen && <FlipBook isOpen={isFlipBookOpen} onClose={() => setIsFlipBookOpen(false)} album={album} />}
     </div>
   );
 };
