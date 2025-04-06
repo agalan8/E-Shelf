@@ -4,16 +4,14 @@ import { router } from '@inertiajs/react';
 const AddPosts = ({ album, userPosts, onClose }) => {
   const [selectedPosts, setSelectedPosts] = useState([]);
 
-  // Maneja la selección de posts
   const togglePostSelection = (postId) => {
     setSelectedPosts((prevSelected) =>
       prevSelected.includes(postId)
-        ? prevSelected.filter((id) => id !== postId) // Quitar si ya está seleccionado
-        : [...prevSelected, postId] // Agregar si no está seleccionado
+        ? prevSelected.filter((id) => id !== postId)
+        : [...prevSelected, postId]
     );
   };
 
-  // Maneja el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -28,23 +26,21 @@ const AddPosts = ({ album, userPosts, onClose }) => {
     });
   };
 
-  // Efecto para prevenir el scroll en el body cuando el modal está abierto
   useEffect(() => {
-    document.body.style.overflow = 'hidden'; // Deshabilitar scroll en el body cuando el modal está abierto
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = 'auto'; // Restaurar el scroll al cerrar el modal
+      document.body.style.overflow = 'auto';
     };
   }, []);
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      {/* Modal con tamaño similar al paso 2 */}
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl h-[90%] overflow-hidden flex flex-col">
         <h3 className="text-xl font-semibold mb-4">Seleccionar Posts</h3>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-grow">
-          {/* Contenedor de los posts con scroll */}
-          <div className="max-h-[80%] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+          {/* Contenedor de posts con scroll */}
+          <div className="flex-grow overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[70vh]">
             {userPosts.length === 0 ? (
               <p className="text-gray-500">No tienes posts disponibles.</p>
             ) : (
@@ -53,10 +49,10 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                   key={post.id}
                   className={`relative cursor-pointer rounded-md transition-all transform ${
                     selectedPosts.includes(post.id)
-                      ? 'border-4 border-blue-500 shadow-lg bg-blue-100' // Estilo cuando está seleccionado
+                      ? 'border-4 border-blue-500 shadow-lg bg-blue-100'
                       : 'bg-white'
                   }`}
-                  onClick={() => togglePostSelection(post.id)} // Alternar selección de post
+                  onClick={() => togglePostSelection(post.id)}
                 >
                   <img
                     src={`/storage/${post.photo.url}`}
@@ -71,8 +67,8 @@ const AddPosts = ({ album, userPosts, onClose }) => {
             )}
           </div>
 
-          {/* Botones de acción */}
-          <div className="flex justify-between mt-4">
+          {/* Botones de acción fijos debajo del listado de posts */}
+          <div className="bg-white py-4 flex justify-between border-t border-gray-300 sticky bottom-0 left-0 right-0 z-10">
             <button
               type="button"
               onClick={onClose}
