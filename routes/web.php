@@ -62,7 +62,7 @@ Route::get('/mis-albums', function () {
     $user = User::findOrFail($userId);
 
     return Inertia::render('Albums/MisAlbums', [
-        'albums' => $user->albums()->with('posts', 'user')->orderBy('created_at', 'desc')->get(),
+        'albums' => $user->albums()->with('posts', 'user', 'posts.photo')->orderBy('created_at', 'desc')->get(),
         'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
