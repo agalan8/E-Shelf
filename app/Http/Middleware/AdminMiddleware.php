@@ -20,7 +20,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check() || !Auth::user()->is_admin) {
-            return redirect('/dashboard')->with('error', 'No tienes acceso a esta área.');
+            return redirect('/explorar')->with('error', 'No tienes acceso a esta área.');
         }
 
         return $next($request);
