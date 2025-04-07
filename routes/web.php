@@ -138,4 +138,21 @@ Route::post('/images/update', function (Request $request) {
     return redirect()->back()->with('message', 'Imágenes actualizadas exitosamente');
 })->name('images.update');
 
+Route::get('/buscar', function (Request $request) {
+    $query = $request->query('q');
+    $filter = $request->query('filter');
+
+
+    if ($filter === 'Usuarios') {
+        $results = User::where('name', 'like', "%{$query}%")->get();
+    } else {
+        $results = [];
+    }
+
+    return inertia('BusquedaResultados', [
+        'results' => $results,
+        'filter' => $filter,
+    ]);
+})->name('buscar');
+
 require __DIR__.'/auth.php';
