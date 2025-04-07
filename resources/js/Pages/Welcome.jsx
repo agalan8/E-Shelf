@@ -59,7 +59,7 @@ export default function Welcome({ auth }) {
                         </Link>
 
                         <Link
-                            href={route("dashboard")}
+                            href={route("explorar")}
                             className="px-8 py-4 text-xl bg-transparent text-white rounded-lg shadow border-2 border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20"
                             style={{
                                 fontFamily: "Raleway, sans-serif",
