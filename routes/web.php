@@ -27,9 +27,11 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/explorar', function () {
+    return Inertia::render('Explorar', [
+        'posts' => Post::with('photo', 'tags', 'user')->inRandomOrder()->get(),
+    ]);
+})->name('explorar');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

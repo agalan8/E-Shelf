@@ -1,9 +1,11 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import GuestPageLayout from '@/Layouts/GuestPageLayout';
+const Show = ({ user, auth }) => {
 
-const Show = ({ user }) => {
+    const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
     return (
-        <AuthenticatedLayout>
+        <Layout>
             <div className="user-profile">
                 {/* Fondo de la imagen */}
                 <div
@@ -48,7 +50,7 @@ const Show = ({ user }) => {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </Layout>
     );
 };
 

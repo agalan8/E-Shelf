@@ -53,7 +53,7 @@ const Post = ({ post, tags }) => {
   };
 
 
-    const canEditOrDelete = auth.user.id === post.user.id || auth.user.is_admin;
+  const canEditOrDelete = auth.user && (auth.user.id === post.user.id || auth.user.is_admin);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
