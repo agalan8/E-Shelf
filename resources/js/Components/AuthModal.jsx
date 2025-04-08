@@ -10,7 +10,16 @@ export default function AuthModal({ isOpen, onClose }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+                {/* Botón de cerrar (X) */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-2 right-2 text-2xl text-gray-600 hover:text-gray-900"
+                    style={{ fontWeight: "bold" }}
+                >
+                    X
+                </button>
+
                 {currentView === "register" && (
                     <RegisterForm
                         onClose={onClose}
