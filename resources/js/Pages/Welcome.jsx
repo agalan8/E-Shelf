@@ -1,6 +1,10 @@
-import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
+import { Head } from "@inertiajs/react";
+import AuthModal from "@/Components/AuthModal";
 
 export default function Welcome({ auth }) {
+    const [isRegisterOpen, setRegisterOpen] = useState(false);
+
     return (
         <>
             <Head title="">
@@ -20,7 +24,7 @@ export default function Welcome({ auth }) {
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: "700",
                             marginTop: "-50px",
-                            color: "#F1F1F1", // Color blanco suave
+                            color: "#F1F1F1",
                         }}
                     >
                         <img
@@ -35,8 +39,8 @@ export default function Welcome({ auth }) {
                         style={{
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: "900",
-                            lineHeight: "1.3",  // Ajustando el interlineado
-                            color: "#F1F1F1", // Color blanco suave
+                            lineHeight: "1.3",
+                            color: "#F1F1F1",
                         }}
                     >
                         Organiza tus recuerdos,
@@ -46,31 +50,32 @@ export default function Welcome({ auth }) {
                         Herramientas sencillas para gestionar y compartir imágenes de alta calidad.
                     </p>
                     <div className="flex">
-                        <Link
-                            href={route("register")}
+                        <button
+                            onClick={() => setRegisterOpen(true)}
                             className="px-8 py-4 text-2xl bg-white text-[#240A34] rounded-lg shadow hover:bg-transparent hover:text-white hover:border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20 border-2"
                             style={{
                                 fontFamily: "Raleway, sans-serif",
-                                fontWeight: "900", // Peso máximo de la fuente
-                                marginRight: "30px", // Añadiendo margen derecho al primer botón
+                                fontWeight: "900",
+                                marginRight: "30px",
                             }}
                         >
                             Únete ahora
-                        </Link>
+                        </button>
 
-                        <Link
+                        <a
                             href={route("explorar")}
                             className="px-8 py-4 text-xl bg-transparent text-white rounded-lg shadow border-2 border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20"
                             style={{
                                 fontFamily: "Raleway, sans-serif",
-                                fontWeight: "800", // Peso máximo de la fuente
+                                fontWeight: "800",
                             }}
                         >
                             Explorar
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </div>
+            <AuthModal isOpen={isRegisterOpen} onClose={() => setRegisterOpen(false)} />
         </>
     );
 }
