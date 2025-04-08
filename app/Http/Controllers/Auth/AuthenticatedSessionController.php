@@ -16,13 +16,15 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): Response
-    {
-        return Inertia::render('Auth/Login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => session('status'),
-        ]);
-    }
+public function create(): Response
+{
+    return Inertia::render('Welcome', [
+        'canResetPassword' => Route::has('password.request'),
+        'status' => session('status'),
+        'openAuthModal' => true,  // Esta variable indica que el modal debe abrirse
+    ]);
+}
+
 
     /**
      * Handle an incoming authentication request.

@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Head } from "@inertiajs/react";
 import AuthModal from "@/Components/AuthModal";
 
-export default function Welcome({ auth }) {
+export default function Welcome({ auth, openAuthModal }) {
     const [isRegisterOpen, setRegisterOpen] = useState(false);
+
+    // Usar el valor de openAuthModal que viene del servidor para abrir el modal
+    useEffect(() => {
+        if (openAuthModal) {
+            setRegisterOpen(true); // Abrir el modal si openAuthModal es true
+        }
+    }, [openAuthModal]); // Esto se ejecuta cuando `openAuthModal` cambia
 
     return (
         <>
