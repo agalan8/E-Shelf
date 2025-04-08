@@ -3,7 +3,7 @@ import RegisterForm from "@/Components/RegisterForm";
 import LoginForm from "@/Components/LoginForm";
 import ForgotPasswordForm from "@/Components/ForgotPasswordForm";  // Importar ForgotPasswordForm
 
-export default function AuthModal({ isOpen, onClose }) {
+export default function AuthModal({ isOpen, onClose, status, canResetPassword }) {
     const [currentView, setCurrentView] = useState("register");
 
     if (!isOpen) return null;
@@ -29,6 +29,8 @@ export default function AuthModal({ isOpen, onClose }) {
                 {currentView === "login" && (
                     <LoginForm
                         onClose={onClose}
+                        status={status}
+                        canResetPassword={canResetPassword}
                         onSwitchToRegister={() => setCurrentView("register")}
                         onSwitchToForgotPassword={() => setCurrentView("forgotPassword")}  // Cambia a la vista ForgotPassword
                     />

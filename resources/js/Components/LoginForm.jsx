@@ -6,7 +6,13 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link } from '@inertiajs/react';
 
-export default function LoginForm({ onClose, onSwitchToRegister, onSwitchToForgotPassword }) {
+export default function LoginForm({
+    onClose,
+    onSwitchToRegister,
+    onSwitchToForgotPassword,
+    status,  // Recibe el estado
+    canResetPassword  // Recibe la opción de restablecer contraseña
+}) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -24,6 +30,12 @@ export default function LoginForm({ onClose, onSwitchToRegister, onSwitchToForgo
     return (
         <div>
             <Head title="Log in" />
+
+            {status && (
+                <div className="mb-4 text-sm font-medium text-green-600">
+                    {status}
+                </div>
+            )}
 
             <form onSubmit={submit}>
                 <div>
@@ -81,23 +93,22 @@ export default function LoginForm({ onClose, onSwitchToRegister, onSwitchToForgo
                     >
                         New here?
                     </Link>
+                    {canResetPassword && (
+                        <Link
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onSwitchToForgotPassword();  // Cambia a la vista de Forgot Password
+                            }}
+                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Forgot your password?
+                        </Link>
+                    )}
+
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Log in
                     </PrimaryButton>
-                </div>
-
-                {/* Enlace para cambiar a Forgot Password */}
-                <div className="mt-4 text-sm text-center">
-                    <Link
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onSwitchToForgotPassword();  // Cambia a la vista de Forgot Password
-                        }}
-                        className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                        Forgot your password?
-                    </Link>
                 </div>
             </form>
         </div>

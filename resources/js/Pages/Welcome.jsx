@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Head } from "@inertiajs/react";
 import AuthModal from "@/Components/AuthModal";
 
-export default function Welcome({ auth, openAuthModal }) {
+export default function Welcome({ auth, openAuthModal, status, canResetPassword }) {
     const [isRegisterOpen, setRegisterOpen] = useState(false);
 
     // Usar el valor de openAuthModal que viene del servidor para abrir el modal
@@ -82,7 +82,7 @@ export default function Welcome({ auth, openAuthModal }) {
                     </div>
                 </div>
             </div>
-            <AuthModal isOpen={isRegisterOpen} onClose={() => setRegisterOpen(false)} />
+            <AuthModal isOpen={isRegisterOpen} status={status} canResetPassword={canResetPassword} onClose={() => setRegisterOpen(false)} />
         </>
     );
 }
