@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,13 +17,10 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-public function create(): Response
+public function create(): RedirectResponse
 {
-    return Inertia::render('Welcome', [
-        'canResetPassword' => Route::has('password.request'),
-        'status' => session('status'),
-        'openAuthModal' => true,  // Esta variable indica que el modal debe abrirse
-    ]);
+    Session::put('openAuthModal', true);
+    return redirect('/');
 }
 
 

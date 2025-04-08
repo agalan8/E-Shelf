@@ -15,10 +15,17 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+
+    $openAuthModal = false;
+
+    $openAuthModal = Session::get('openAuthModal');
+
+    Session::forget('openAuthModal');
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -26,6 +33,7 @@ Route::get('/', function () {
         'canResetPassword' => Route::has('password.request'),
         'status' => session('status'),
         'phpVersion' => PHP_VERSION,
+        'openAuthModal' => $openAuthModal
     ]);
 });
 

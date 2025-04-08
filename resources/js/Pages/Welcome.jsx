@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Head } from "@inertiajs/react";
 import AuthModal from "@/Components/AuthModal";
 
-export default function Welcome({ auth, openAuthModal, status, canResetPassword }) {
+export default function Welcome({ openAuthModal, status, canResetPassword }) {
+    // Estado para controlar la apertura del modal
     const [isRegisterOpen, setRegisterOpen] = useState(false);
 
-    // Usar el valor de openAuthModal que viene del servidor para abrir el modal
+    // Abrir el modal si openAuthModal es true (cuando se redirige desde el servidor)
     useEffect(() => {
         if (openAuthModal) {
             setRegisterOpen(true); // Abrir el modal si openAuthModal es true
@@ -58,7 +59,7 @@ export default function Welcome({ auth, openAuthModal, status, canResetPassword 
                     </p>
                     <div className="flex">
                         <button
-                            onClick={() => setRegisterOpen(true)}
+                            onClick={() => setRegisterOpen(true)} // Abrir el modal al hacer clic en el botón
                             className="px-8 py-4 text-2xl bg-white text-[#240A34] rounded-lg shadow hover:bg-transparent hover:text-white hover:border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20 border-2"
                             style={{
                                 fontFamily: "Raleway, sans-serif",
@@ -82,7 +83,14 @@ export default function Welcome({ auth, openAuthModal, status, canResetPassword 
                     </div>
                 </div>
             </div>
-            <AuthModal isOpen={isRegisterOpen} status={status} canResetPassword={canResetPassword} onClose={() => setRegisterOpen(false)} />
+
+            {/* El modal se muestra si isRegisterOpen es true */}
+            <AuthModal
+                isOpen={isRegisterOpen}
+                status={status}
+                canResetPassword={canResetPassword}
+                onClose={() => setRegisterOpen(false)} // Cerrar el modal
+            />
         </>
     );
 }
