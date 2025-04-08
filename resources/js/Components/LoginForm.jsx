@@ -6,7 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link } from '@inertiajs/react';
 
-export default function LoginForm({ onClose, onSwitchToRegister }) {
+export default function LoginForm({ onClose, onSwitchToRegister, onSwitchToForgotPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -84,6 +84,20 @@ export default function LoginForm({ onClose, onSwitchToRegister }) {
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Log in
                     </PrimaryButton>
+                </div>
+
+                {/* Enlace para cambiar a Forgot Password */}
+                <div className="mt-4 text-sm text-center">
+                    <Link
+                        href="#"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onSwitchToForgotPassword();  // Cambia a la vista de Forgot Password
+                        }}
+                        className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                        Forgot your password?
+                    </Link>
                 </div>
             </form>
         </div>
