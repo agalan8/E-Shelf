@@ -17,15 +17,17 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): Response
+    public function edit(Request $request): RedirectResponse
     {
 
-        return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
-            'user' => $request->user()->load('socials'),
-            'socials' => Social::all(),
-        ]);
+        // return Inertia::render('Profile/Edit', [
+        //     'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+        //     'status' => session('status'),
+        //     'user' => $request->user()->load('socials'),
+        //     'socials' => Social::all(),
+        // ]);
+
+        return redirect()->back();
     }
 
     /**

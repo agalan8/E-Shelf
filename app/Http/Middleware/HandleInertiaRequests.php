@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Social;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -29,11 +32,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = User::find(Auth::user()->id);
+
+        if ($user) {
+            $user->load('socials');
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
             ],
+            'userEdit' => $user,
+            'socials' => Social::all(),
         ];
     }
 }

@@ -10,20 +10,22 @@ export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
     className = '',
-    user,
-    socials,
 }) {
+    const { userEdit } = usePage().props;
+    console.log('user', userEdit);
+    const {socials} = usePage().props;
+
     // Mapea las redes sociales del usuario y obtiene los perfiles actuales
-    const userSocials = user.socials.reduce((acc, social) => {
+    const userSocials = userEdit.socials.reduce((acc, social) => {
         acc[social.nombre.toLowerCase()] = social.pivot.perfil;
         return acc;
     }, {});
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
-            name: user.name,
-            email: user.email,
-            biografia: user.biografia,
+            name: userEdit.name,
+            email: userEdit.email,
+            biografia: userEdit.biografia,
             ...userSocials, // Carga las redes existentes
         });
 
@@ -110,7 +112,7 @@ export default function UpdateProfileInformation({
                 </div>
 
                 {/* Verificación de email */}
-                {mustVerifyEmail && user.email_verified_at === null && (
+                {mustVerifyEmail && userEdit.email_verified_at === null && (
                     <div>
                         <p className="mt-2 text-sm text-gray-800">
                             Your email address is unverified.
