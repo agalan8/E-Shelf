@@ -26,6 +26,13 @@ Route::get('/', function () {
     $openAuthModal = Session::get('openAuthModal');
 
     Session::forget('openAuthModal');
+
+    if(Auth::check()){
+        return Inertia::render('Explorar', [
+            'posts' => Post::with('photo', 'tags', 'user')->inRandomOrder()->get(),
+        ]);
+    }
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
