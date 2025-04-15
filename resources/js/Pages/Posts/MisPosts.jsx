@@ -1,11 +1,13 @@
 import { Head } from '@inertiajs/react';
 import Post from '@/Components/Posts/Post';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
 
 const MisPosts = ({ posts, tags }) => {
   return (
     <AuthenticatedLayout
       header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Mis Publicaciones</h2>}
+      subnav={<UsersSubnav />}
     >
       <Head title="Mis publicaciones" />
       <div className="container mx-auto p-4">

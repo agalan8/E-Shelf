@@ -1,11 +1,14 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
+import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
+import User from '@/Components/Users/User';
 const Show = ({ user, auth }) => {
 
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
     return (
-        <Layout>
+        <Layout
+            subnav={<UsersSubnav />}>
             <div className="user-profile">
                 {/* Fondo de la imagen */}
                 <div
