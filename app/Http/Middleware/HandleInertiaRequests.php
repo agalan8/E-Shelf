@@ -32,10 +32,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $user = User::find(Auth::user()->id);
-
-        if ($user) {
-            $user->load('socials');
+        if (Auth::check()) {
+            $user = User::find(Auth::user()->id);
+            if ($user) {
+                $user->load('socials');
+            }
         }
 
         return [
@@ -43,7 +44,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'userEdit' => $user,
+            'userEdit' => $user ?? null,
             'socials' => Social::all(),
         ];
     }
