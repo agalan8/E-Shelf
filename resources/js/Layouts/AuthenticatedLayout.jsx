@@ -25,19 +25,16 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="h-screen flex bg-gray-100">
             {/* Sidebar fijo */}
-            <aside className="bg-[#1A1D1F] text-white w-20 h-screen border-r border-gray-800 hidden sm:flex flex-col z-50">
-                {/* Logo */}
+            <aside className="bg-[#1A1D1F] text-white w-20 h-full border-r border-gray-800 hidden sm:flex flex-col z-50">
                 <div className="flex items-center justify-center h-16 border-b border-gray-700 px-4">
                     <Link href="/">
                         <ApplicationLogo className="block h-9 w-auto fill-current text-white" />
                     </Link>
                 </div>
 
-                {/* Contenido scrollable */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    {/* Navegación principal */}
                     <div className="flex flex-col space-y-3">
                         <NavLink href={route('explorar')} active={route().current('explorar')} className="flex justify-center">
                             <GlobeAsiaAustraliaIcon className="h-9 w-9" />
@@ -50,7 +47,6 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         </NavLink>
                     </div>
 
-                    {/* Admin */}
                     {user.is_admin && (
                         <div className="flex flex-col space-y-3 border-t border-gray-700 pt-3">
                             <NavLink href={route('users.index')} active={route().current('users.index')} className="flex justify-center">
@@ -68,7 +64,6 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         </div>
                     )}
 
-                    {/* Configuración */}
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="flex justify-center hover:text-gray-300 text-sm px-2 py-2 rounded hover:bg-[#2A2D2F]"
@@ -76,7 +71,6 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         <Cog8ToothIcon className="h-9 w-9" />
                     </button>
 
-                    {/* Usuario Dropdown */}
                     <div>
                         <Dropdown align="left" width="100%">
                             <Dropdown.Trigger>
@@ -101,15 +95,14 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                 </div>
             </aside>
 
-            {/* Subnav como columna izquierda si existe */}
             {subnav && (
-                <div className="w-[265px] bg-[#2F3136] border-r border-gray-300 p-4 space-y-2 hidden sm:flex flex-col text-white">
+                <div className="w-[265px] bg-[#2F3136] border-r border-gray-300 p-4 space-y-2 hidden sm:flex flex-col text-white h-full">
                     {subnav}
                 </div>
             )}
 
-            {/* Contenido principal */}
-            <div className="flex-1 flex flex-col">
+            {/* Contenido principal con scroll solo aquí */}
+            <div className="flex-1 flex flex-col h-full">
                 {/* Header */}
                 <div className="bg-white shadow px-4 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     {header && <div className="text-lg font-semibold">{header}</div>}
@@ -118,13 +111,12 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                     </div>
                 </div>
 
-                {/* Main */}
-                <main className="flex-1 p-4">
+                {/* Main con scroll */}
+                <main className="flex-1 overflow-y-auto p-4">
                     {children}
                 </main>
             </div>
 
-            {/* Modal de edición */}
             <Edit
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
