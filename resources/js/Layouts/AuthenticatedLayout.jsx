@@ -39,7 +39,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         <NavLink href={route('explorar')} active={route().current('explorar')} className="flex justify-center">
                             <GlobeAsiaAustraliaIcon className="h-9 w-9" />
                         </NavLink>
-                        <NavLink href={route('users.show', { user: user.id })} active={route().current('users.show')} className="flex justify-center">
+                        <NavLink href={route('users.show', { user: user.id })} active={route().current('users.show') || route().current('mis-posts') || route().current('mis-albums')} className="flex justify-center">
                             <UserIcon className="h-9 w-9" />
                         </NavLink>
                         <NavLink href={route('posts.create')} active={route().current('posts.create')} className="flex justify-center">
