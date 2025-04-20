@@ -39,13 +39,8 @@ export default function UpdateProfileInformation({
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
-                </h2>
+            <h3 className="text-lg font-medium text-white">Información del Perfil</h3>
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
-                </p>
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
@@ -83,18 +78,19 @@ export default function UpdateProfileInformation({
                     <InputLabel htmlFor="biografia" value="Biografía" />
                     <TextAreaInput
                         id="biografia"
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full bg-[#272729] rounded-md text-white resize-none placeholder:text-[#68686e]" // "resize-none" previene el redimensionado
                         value={data.biografia || ''}
                         onChange={(e) => setData('biografia', e.target.value)}
-                        placeholder="Tell us about yourself"
+                        placeholder="Escribe tu biografía aquí..."
                         rows={4}
                     />
+
                     <InputError className="mt-2" message={errors.biografia} />
                 </div>
 
                 {/* Redes Sociales - Generadas dinámicamente */}
                 <div>
-                    <h3 className="text-lg font-medium text-gray-900">Redes Sociales</h3>
+                    <h3 className="text-lg font-medium text-white">Redes Sociales</h3>
                     {socials.map((social) => (
                         <div key={social.id} className="mt-4">
                             <InputLabel htmlFor={social.nombre} value={social.nombre} />

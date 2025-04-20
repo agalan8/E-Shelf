@@ -155,6 +155,29 @@ Route::post('/images/update', function (Request $request) {
     return redirect()->back()->with('message', 'Imágenes actualizadas exitosamente');
 })->name('images.update');
 
+Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $imageType) {
+    // Verificar el tipo de imagen a eliminar (profile_image o background_image)
+    if ($imageType === 'profile_image' && $user->profile_image) {
+        Storage::delete($user->profile_image);
+        $user->profile_image = null;
+    }
+
+    if ($imageType === 'background_image' && $user->background_image) {
+        Storage::delete($user->background_image);
+        $user->background_image = null;
+    }
+
+    // Guardar los cambios en el usuario (vaciar la ruta de la imagen)
+    $user->save();
+
+    // Redirigir con un mensaje de éxito
+    return redirect()->back()->with('message', 'La imagen ha sido eliminada correctamente');
+})->name('images.destroy');
+
+
+
+
+
 Route::get('/buscar', function (Request $request) {
     $query = $request->query('q');
     $filter = $request->query('filter');

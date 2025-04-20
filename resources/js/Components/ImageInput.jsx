@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowUpTrayIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { useForm } from '@inertiajs/react';
 
-const ImageInput = ({ name, label, onChange, initialImage }) => {
+const ImageInput = ({ name, label, onChange, initialImage, previewClassName = '', destroyUrl }) => {
     const [imagePreview, setImagePreview] = useState(initialImage);
+    const fileInputRef = useRef();
+    const { delete: deleteRequest } = useForm(); // Use the correct `delete` method
 
     useEffect(() => {
         setImagePreview(initialImage);
@@ -15,21 +19,71 @@ const ImageInput = ({ name, label, onChange, initialImage }) => {
         }
     };
 
+    const triggerFileSelect = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleDelete = () => {
+        if (destroyUrl) {
+            // Make sure delete is being called correctly
+            deleteRequest(destroyUrl, {
+                preserveScroll: true, // Keep the scroll position
+            });
+            setImagePreview(null); // Clear the preview of the image
+        }
+    };
+
     return (
-        <div className="image-input">
-            {label && <label htmlFor={name}>{label}</label>}
-            <input
-                type="file"
-                name={name}
-                accept="image/*"
-                onChange={handleImageChange}
-                className="image-upload"
-            />
-            {imagePreview && (
-                <div className="image-preview">
-                    <img src={imagePreview} alt="Preview" width="100" />
+        <div className="image-input space-y-2">
+            {label && <label className="block font-medium text-base text-white">{label}</label>}
+
+            <div className="relative inline-block">
+                {/* Image Preview */}
+                <div
+                    className={`image-preview ${previewClassName} ${!imagePreview ? 'bg-[#2A2C32]' : ''}`}
+                    style={{ height: previewClassName ? undefined : '145px', width: previewClassName ? undefined : '145px'}}
+                >
+                    {imagePreview && (
+                        <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className={previewClassName}
+                        />
+                    )}
                 </div>
-            )}
+
+                {/* Hidden file input */}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    name={name}
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                />
+
+                {/* Upload button */}
+                <button
+                    type="button"
+                    onClick={triggerFileSelect}
+                    className="absolute top-2 right-2 bg-white hover:bg-gray-100 rounded-full shadow-lg p-2 transition"
+                    title="Subir imagen"
+                >
+                    <ArrowUpTrayIcon className="h-7 w-7 text-gray-800" />
+                </button>
+
+                {/* Delete button */}
+                {imagePreview && (
+                    <button
+                        type="button"
+                        onClick={handleDelete}
+                        className="absolute bottom-2 right-2 bg-red-500 hover:bg-red-600 rounded-full shadow-lg p-2 transition"
+                        title="Eliminar imagen"
+                    >
+                        <TrashIcon className="h-7 w-7 text-white" />
+                    </button>
+                )}
+            </div>
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 
-export default function NavLink({
+export default function SubNavLink({
     active = false,
     className = '',
     children,
