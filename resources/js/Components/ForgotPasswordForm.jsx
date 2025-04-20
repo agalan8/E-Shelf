@@ -1,6 +1,7 @@
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import InputLabel from '@/Components/InputLabel';
 import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function ForgotPasswordForm({ onClose, onSwitchToLogin }) {
@@ -15,14 +16,12 @@ export default function ForgotPasswordForm({ onClose, onSwitchToLogin }) {
     };
 
     return (
-        <div>
+        <div className="px-6 py-4 w-full max-w-sm mx-auto bg-[#18191C] rounded-lg">
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                Forgot your password? No problem. Just let us know your email
-                address and we will email you a password reset link that will
-                allow you to choose a new one.
-            </div>
+            <h2 className="mb-6 text-xl text-white font-semibold text-center">
+                Forgot Password
+            </h2>
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -31,35 +30,46 @@ export default function ForgotPasswordForm({ onClose, onSwitchToLogin }) {
             )}
 
             <form onSubmit={submit}>
-                <TextInput
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused={true}
-                    onChange={(e) => setData('email', e.target.value)}
-                />
+                {/* Input para el email */}
+                <div className="mb-4">
+                    <InputLabel htmlFor="email" value="Enter email" />
+                    <TextInput
+                        id="email"
+                        type="email"
+                        name="email"
+                        value={data.email}
+                        className="mt-1 block w-full px-4 py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        isFocused={true}
+                        onChange={(e) => setData('email', e.target.value)}
+                    />
 
-                <InputError message={errors.email} className="mt-2" />
+                    {/* Error del input */}
+                    <InputError message={errors.email} className="mt-2" />
+                </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Email Password Reset Link
+                <div className="flex justify-center mt-6">
+                    <PrimaryButton
+                        className="w-full py-2  text-sm font-medium rounded-full transition-all duration-300 ease-in-out"
+                        disabled={processing}
+                    >
+                        Send Password Reset Link
                     </PrimaryButton>
                 </div>
+
+
+
             </form>
 
-            <div className="mt-4 text-sm text-center">
+            <div className="mt-6 text-sm text-center">
                 <Link
                     href="#"
                     onClick={(e) => {
                         e.preventDefault();
                         onSwitchToLogin();  // Volver a la vista de Login
                     }}
-                    className="text-blue-600 hover:text-blue-800 underline"
+                    className="text-sm text-[#a42bfd] underline hover:text-[#8222cc] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
                 >
-                    Remember your password? Log in
+                    ← Ir a Iniciar sesión
                 </Link>
             </div>
         </div>

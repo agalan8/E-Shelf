@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "@heroicons/react": "^2.2.0",
-        "react-pageflip": "^2.0.3"
+        "react-pageflip": "^2.0.3",
+        "react-transition-group": "^4.4.5"
     }
 }

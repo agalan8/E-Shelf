@@ -1,17 +1,17 @@
-import { useForm } from '@inertiajs/react';  // Asegúrate de importar useForm aquí
+import { useForm } from '@inertiajs/react';
 import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 
 export default function LoginForm({
     onClose,
     onSwitchToRegister,
     onSwitchToForgotPassword,
-    status,  // Recibe el estado
-    canResetPassword  // Recibe la opción de restablecer contraseña
+    status,
+    canResetPassword
 }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
@@ -28,16 +28,14 @@ export default function LoginForm({
     };
 
     return (
-        <div>
-            <Head title="Log in" />
-
+        <div className="w-full max-w-[480px] mx-auto">
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="space-y-6">
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
                     <TextInput
@@ -53,7 +51,7 @@ export default function LoginForm({
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                <div>
                     <InputLabel htmlFor="password" value="Password" />
                     <TextInput
                         id="password"
@@ -67,47 +65,33 @@ export default function LoginForm({
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4 block">
+                <div className="flex items-center justify-between">
                     <label className="flex items-center">
                         <Checkbox
                             name="remember"
                             checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
+                            onChange={(e) => setData('remember', e.target.checked)}
                         />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
+                        <span className="ml-2 text-sm text-[#eceeef]">Remember me</span>
                     </label>
-                </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onSwitchToRegister();  // Cambia a la vista de registro
-                        }}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        New here?
-                    </Link>
                     {canResetPassword && (
                         <Link
                             href="#"
                             onClick={(e) => {
                                 e.preventDefault();
-                                onSwitchToForgotPassword();  // Cambia a la vista de Forgot Password
+                                onSwitchToForgotPassword();
                             }}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="text-sm text-[#a42bfd] underline hover:text-[#8222cc] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
                         >
                             Forgot your password?
                         </Link>
                     )}
+                </div>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
+                <div className="flex justify-center">
+                    <PrimaryButton className="mt-4" disabled={processing}>
+                        Iniciar sesión
                     </PrimaryButton>
                 </div>
             </form>

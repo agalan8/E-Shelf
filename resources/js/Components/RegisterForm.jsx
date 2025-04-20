@@ -3,7 +3,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 
 export default function RegisterForm({ onClose, onSwitchToLogin }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -25,10 +25,8 @@ export default function RegisterForm({ onClose, onSwitchToLogin }) {
     };
 
     return (
-        <div>
-            <Head title="Register" />
-            <h2 className="text-xl font-bold mb-4">Register</h2>
-            <form onSubmit={submit}>
+        <div className="w-full max-w-[480px] mx-auto">
+            <form onSubmit={submit} className="space-y-6">
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
                     <TextInput
@@ -44,7 +42,7 @@ export default function RegisterForm({ onClose, onSwitchToLogin }) {
                     <InputError message={errors.name} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                <div>
                     <InputLabel htmlFor="email" value="Email" />
                     <TextInput
                         id="email"
@@ -59,7 +57,7 @@ export default function RegisterForm({ onClose, onSwitchToLogin }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                <div>
                     <InputLabel htmlFor="password" value="Password" />
                     <TextInput
                         id="password"
@@ -74,7 +72,7 @@ export default function RegisterForm({ onClose, onSwitchToLogin }) {
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                <div>
                     <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
                     <TextInput
                         id="password_confirmation"
@@ -89,21 +87,10 @@ export default function RegisterForm({ onClose, onSwitchToLogin }) {
                     <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                    <Link
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();  // Evita que el enlace cierre el modal
-                            onSwitchToLogin();  // Cambia la vista a Login
-                        }}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
-                    <div className="flex gap-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded-md">Cancel</button>
-                        <PrimaryButton className="ms-4" disabled={processing}>Register</PrimaryButton>
-                    </div>
+                <div className="flex justify-center">
+                    <PrimaryButton className="mt-4" disabled={processing}>
+                        Registrarse
+                    </PrimaryButton>
                 </div>
             </form>
         </div>
