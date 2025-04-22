@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('portada')->nullable();
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
