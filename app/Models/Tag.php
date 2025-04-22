@@ -18,4 +18,11 @@ class Tag extends Model
     {
         return $this->belongsToMany(Post::class);
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($tag) {
+            $tag->posts()->detach();
+        });
+    }
 }

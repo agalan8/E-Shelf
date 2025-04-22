@@ -45,7 +45,7 @@ class TagPolicy
      */
     public function delete(User $user, Tag $tag): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**
