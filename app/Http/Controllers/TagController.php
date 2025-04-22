@@ -7,12 +7,15 @@ use App\Http\Requests\UpdateTagRequest;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Tag;
 use Inertia\Inertia;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TagController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+     use AuthorizesRequests;
     public function index()
     {
 
@@ -83,6 +86,7 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag)
     {
+        $this->authorize('delete', $tag);
         $tag->delete();
     }
 }
