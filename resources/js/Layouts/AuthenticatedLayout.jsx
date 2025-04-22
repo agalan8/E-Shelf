@@ -13,7 +13,8 @@ import {
     RectangleStackIcon,
     SwatchIcon,
     AtSymbolIcon,
-    Cog8ToothIcon
+    Cog8ToothIcon,
+    ArrowLeftStartOnRectangleIcon
 } from '@heroicons/react/24/solid';
 
 export default function AuthenticatedLayout({ header, children, subnav }) {
@@ -64,33 +65,19 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         </div>
                     )}
 
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="flex justify-center hover:text-gray-300 text-sm px-2 py-2 rounded hover:bg-[#2A2D2F]"
-                    >
-                        <Cog8ToothIcon className="h-9 w-9" />
-                    </button>
+                    <div className="flex justify-center">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex justify-center hover:text-gray-300 text-sm px-2 py-2 rounded hover:bg-[#2A2D2F]"
+                        >
+                            <Cog8ToothIcon className="h-9 w-9" />
+                        </button>
+                    </div>
 
-                    <div>
-                        <Dropdown align="left" width="100%">
-                            <Dropdown.Trigger>
-                                <button className="w-full flex items-center justify-between text-sm hover:text-gray-300 px-2 py-2 rounded hover:bg-[#2A2D2F]">
-                                    {user.name}
-                                    <svg className="h-4 w-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
-                                </button>
-                            </Dropdown.Trigger>
-                            <Dropdown.Content>
-                                <Dropdown.Link href={route('logout')} method="post" as="button">
-                                    Log Out
-                                </Dropdown.Link>
-                            </Dropdown.Content>
-                        </Dropdown>
+                    <div className="flex justify-center">
+                        <NavLink href={route('logout')} method="post" className="flex justify-center">
+                                <ArrowLeftStartOnRectangleIcon className="h-9 w-9" />
+                        </NavLink>
                     </div>
                 </div>
             </aside>
