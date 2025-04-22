@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Album;
 use App\Models\Post;
 use App\Models\User;
@@ -13,6 +14,8 @@ use Inertia\Inertia;
 
 class AlbumController extends Controller
 {
+
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
@@ -127,6 +130,8 @@ class AlbumController extends Controller
      */
     public function destroy(Album $album)
     {
-        //
+
+        $this->authorize('delete', $album);
+        $album->delete();
     }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import Edit from '@/Components/Albums/Edit'; // Importamos el modal de edición
 import FlipBook from '@/Components/Albums/FlipBook'; // Importamos el modal FlipBook
 
@@ -9,6 +9,7 @@ const Album = ({ album }) => {
   // Estado para controlar la apertura del modal de edición
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isFlipBookOpen, setIsFlipBookOpen] = useState(false); // Estado para FlipBook
+  const [isDeleting, setIsDeleting] = useState(false); // Estado para manejar el proceso de eliminación
 
   // Verificar si el usuario puede editar o eliminar el álbum
   const canEditOrDelete = auth.user.id === album.user.id || auth.user.is_admin;
@@ -24,6 +25,23 @@ const Album = ({ album }) => {
   if (!coverPhotoUrl) {
     coverPhotoUrl = 'Sin portada'; // Texto alternativo
   }
+
+  const handleDeleteAlbum = async () => {
+      if (window.confirm('¿Estás seguro de que quieres eliminar este álbum?')) {
+        setIsDeleting(true); // Activar el estado de "eliminando" mientras la solicitud se procesa
+
+        try {
+          // Enviar solicitud DELETE a posts.destroy utilizando Inertia.js
+          await router.delete(route('albums.destroy', album.id), {
+            preserveScroll: true, // Mantener el scroll de la página
+          });
+        } catch (error) {
+          console.error('Error al eliminar el álbum:', error);
+        } finally {
+          setIsDeleting(false); // Desactivar el estado de "eliminando"
+        }
+      }
+    };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
@@ -60,8 +78,13 @@ const Album = ({ album }) => {
           <button onClick={() => setIsEditModalOpen(true)} className="text-green-500">
             Editar
           </button>
-          <button className="text-red-500" onClick={() => alert('Eliminar álbum')}>
-            Eliminar
+          {/* Botón para eliminar la publicación */}
+          <button
+            onClick={handleDeleteAlbum}
+            className="text-red-500 mt-2 ml-4"
+            disabled={isDeleting} // Desactivar el botón mientras se está eliminando
+          >
+            {isDeleting ? 'Eliminando...' : 'Eliminar'}
           </button>
         </div>
       )}

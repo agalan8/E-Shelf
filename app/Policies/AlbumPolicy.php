@@ -45,7 +45,7 @@ class AlbumPolicy
      */
     public function delete(User $user, Album $album): bool
     {
-        return false;
+        return $user->id === $album->user->id;
     }
 
     /**
