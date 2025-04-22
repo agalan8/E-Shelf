@@ -7,12 +7,15 @@ use App\Http\Requests\UpdateSocialRequest;
 use App\Models\Social;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class SocialController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+     use AuthorizesRequests;
     public function index()
     {
         return Inertia::render('Socials/Index', [
@@ -81,6 +84,7 @@ class SocialController extends Controller
      */
     public function destroy(Social $social)
     {
+        $this->authorize('delete', $social);
         $social->delete();
     }
 }
