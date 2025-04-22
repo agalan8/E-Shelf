@@ -36,5 +36,20 @@ class Post extends Model
         return $this->belongsToMany(Album::class);
     }
 
+    protected static function booted()
+    {
+        static::deleting(function ($post) {
+            if (! $post->isForceDeleting()) {
+
+                $post->photo->each(function ($photo) {
+                    $photo->delete();
+                });
+
+                $post->tags()->detach();
+                $post->albums()->detach();
+            }
+        });
+    }
+
 
 }
