@@ -69,8 +69,13 @@ class User extends Authenticatable
     static::deleting(function ($user) {
         if (! $user->isForceDeleting()) {
 
-            $user->posts()->delete();
-            $user->albums()->delete();
+            $user->posts->each(function ($post) {
+                $post->delete();
+            });
+
+            $user->albums->each(function ($album) {
+                $album->delete();
+            });
 
             $user->socials()->detach();
         }
