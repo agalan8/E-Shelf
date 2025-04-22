@@ -45,7 +45,7 @@ class SocialPolicy
      */
     public function delete(User $user, Social $social): bool
     {
-        return false;
+        return $user->is_admin;
     }
 
     /**

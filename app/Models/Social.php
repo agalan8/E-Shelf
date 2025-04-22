@@ -18,4 +18,11 @@ class Social extends Model
     {
         return $this->belongsToMany(User::class)->withPivot('perfil');
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($social) {
+            $social->users()->detach();
+        });
+    }
 }
