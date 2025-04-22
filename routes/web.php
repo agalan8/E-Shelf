@@ -47,6 +47,7 @@ Route::get('/', function () {
 Route::get('/explorar', function () {
     return Inertia::render('Explorar', [
         'posts' => Post::with('photo', 'tags', 'user')->inRandomOrder()->get(),
+        'tags' => Tag::all(),
     ]);
 })->name('explorar');
 
