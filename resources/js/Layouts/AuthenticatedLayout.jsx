@@ -1,249 +1,130 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import Busqueda from '@/Components/Busqueda';
+import Edit from '@/Components/Users/Edit';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import {
+    GlobeAsiaAustraliaIcon,
+    ArrowUpTrayIcon,
+    UserIcon,
+    UserGroupIcon,
+    RectangleStackIcon,
+    SwatchIcon,
+    AtSymbolIcon,
+    Cog8ToothIcon
+} from '@heroicons/react/24/solid';
 
-export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+export default function AuthenticatedLayout({ header, children, subnav }) {
+    const { auth: { user }, mustVerifyEmail, status, socials } = usePage().props;
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSearch = (query, filter) => {
         console.log("Buscando:", query, "Filtro:", filter);
-        // Aquí puedes manejar la búsqueda como una petición a tu backend
     };
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
-
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('explorar')}
-                                    active={route().current('explorar')}
-                                >
-                                    Explorar
-                                </NavLink>
-                            </div>
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                    <NavLink
-                                        href={route('mis-posts')}
-                                        active={route().current('mis-posts')}
-                                    >
-                                        Mis publicaciones
-                                    </NavLink>
-                            </div>
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                    <NavLink
-                                        href={route('mis-albums')}
-                                        active={route().current('mis-albums')}
-                                    >
-                                        Mis álbumes
-                                    </NavLink>
-                            </div>
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                    <NavLink
-                                        href={route('posts.create')}
-                                        active={route().current('posts.create')}
-                                    >
-                                        Crear Publicación
-                                    </NavLink>
-                            </div>
-                            {user.is_admin && (
-                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                    <NavLink
-                                        href={route('users.index')}
-                                        active={route().current('users.index')}
-                                    >
-                                        Gestión de Usuarios
-                                    </NavLink>
-                                </div>
-                            )}
-                            {user.is_admin && (
-                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                    <NavLink
-                                        href={route('posts.index')}
-                                        active={route().current('posts.index')}
-                                    >
-                                        Gestión de Publicaciones
-                                    </NavLink>
-                                </div>
-                            )}
-                            {user.is_admin && (
-                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                    <NavLink
-                                        href={route('tags.index')}
-                                        active={route().current('tags.index')}
-                                    >
-                                        Gestión de Categorías
-                                    </NavLink>
-                                </div>
-                            )}
-                            {user.is_admin && (
-                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                    <NavLink
-                                        href={route('socials.index')}
-                                        active={route().current('socials.index')}
-                                    >
-                                        Gestión de Redes Sociales
-                                    </NavLink>
-                                </div>
-                            )}
-
-                            <Busqueda search={handleSearch} />
-
-                        </div>
-
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
-                                        </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+        <div className="h-screen flex bg-gray-100">
+            {/* Sidebar fijo */}
+            <aside className="bg-[#1A1D1F] text-white w-20 h-full border-r border-gray-800 hidden sm:flex flex-col z-50">
+                <div className="flex items-center justify-center h-16 border-b border-gray-700 px-4">
+                    <Link href="/">
+                        <ApplicationLogo className="block h-9 w-auto fill-current text-white" />
+                    </Link>
                 </div>
 
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('explorar')}
-                            active={route().current('explorar')}
-                        >
-                            Explorar
-                        </ResponsiveNavLink>
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div className="flex flex-col space-y-3">
+                        <NavLink href={route('explorar')} active={route().current('explorar')} className="flex justify-center">
+                            <GlobeAsiaAustraliaIcon className="h-9 w-9" />
+                        </NavLink>
+                        <NavLink href={route('users.show', { user: user.id })} active={route().current('users.show') || route().current('mis-posts') || route().current('mis-albums')} className="flex justify-center">
+                            <UserIcon className="h-9 w-9" />
+                        </NavLink>
+                        <NavLink href={route('posts.create')} active={route().current('posts.create')} className="flex justify-center">
+                            <ArrowUpTrayIcon className="h-9 w-9" />
+                        </NavLink>
                     </div>
 
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
+                    {user.is_admin && (
+                        <div className="flex flex-col space-y-3 border-t border-gray-700 pt-3">
+                            <NavLink href={route('users.index')} active={route().current('users.index')} className="flex justify-center">
+                                <UserGroupIcon className="h-9 w-9" />
+                            </NavLink>
+                            <NavLink href={route('posts.index')} active={route().current('posts.index')} className="flex justify-center">
+                                <RectangleStackIcon className="h-9 w-9" />
+                            </NavLink>
+                            <NavLink href={route('tags.index')} active={route().current('tags.index')} className="flex justify-center">
+                                <SwatchIcon className="h-9 w-9" />
+                            </NavLink>
+                            <NavLink href={route('socials.index')} active={route().current('socials.index')} className="flex justify-center">
+                                <AtSymbolIcon className="h-9 w-9" />
+                            </NavLink>
                         </div>
+                    )}
 
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex justify-center hover:text-gray-300 text-sm px-2 py-2 rounded hover:bg-[#2A2D2F]"
+                    >
+                        <Cog8ToothIcon className="h-9 w-9" />
+                    </button>
+
+                    <div>
+                        <Dropdown align="left" width="100%">
+                            <Dropdown.Trigger>
+                                <button className="w-full flex items-center justify-between text-sm hover:text-gray-300 px-2 py-2 rounded hover:bg-[#2A2D2F]">
+                                    {user.name}
+                                    <svg className="h-4 w-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
+                            </Dropdown.Trigger>
+                            <Dropdown.Content>
+                                <Dropdown.Link href={route('logout')} method="post" as="button">
+                                    Log Out
+                                </Dropdown.Link>
+                            </Dropdown.Content>
+                        </Dropdown>
                     </div>
                 </div>
-            </nav>
+            </aside>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
-                    </div>
-                </header>
+            {subnav && (
+                <div className="w-[265px] bg-[#2F3136] border-r border-gray-300 p-4 space-y-2 hidden sm:flex flex-col text-white h-full">
+                    {subnav}
+                </div>
             )}
 
-            <main>{children}</main>
+            {/* Contenido principal con scroll solo aquí */}
+            <div className="flex-1 flex flex-col h-full">
+                {/* Header */}
+                <div className="bg-white shadow px-4 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    {header && <div className="text-lg font-semibold">{header}</div>}
+                    <div className="w-full sm:w-1/2">
+                        <Busqueda search={handleSearch} />
+                    </div>
+                </div>
+
+                {/* Main con scroll */}
+                <main className="flex-1 overflow-y-auto p-4">
+                    {children}
+                </main>
+            </div>
+
+            <Edit
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                mustVerifyEmail={mustVerifyEmail}
+                status={status}
+                user={user}
+                socials={socials}
+            />
         </div>
     );
 }

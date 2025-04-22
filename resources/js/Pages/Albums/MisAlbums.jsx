@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Album from '@/Components/Albums/Album';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Create from '@/Components/Albums/Create';
+import UsersSubnav from '@/Components/Subnavs/UsersSubnav'; // Asegúrate de importar UsersSubnav
 
 const MisAlbums = ({ albums, posts }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -10,6 +11,7 @@ const MisAlbums = ({ albums, posts }) => {
   return (
     <AuthenticatedLayout
       header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Mis Álbumes</h2>}
+      subnav={<UsersSubnav />} // Asegúrate de importar UsersSubnav
     >
       <Head title="Mis Álbumes" />
       <div className="container mx-auto p-4">

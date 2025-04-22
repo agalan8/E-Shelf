@@ -2,10 +2,11 @@ import { router } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
 
 const Edit = ({ post, onClose, tags }) => {
-  const [titulo, setTitulo] = useState(post.titulo);
-  const [descripcion, setDescripcion] = useState(post.descripcion);
-  const [localizacion, setLocalizacion] = useState(post.localizacion);
-  const [selectedTags, setSelectedTags] = useState(post.tags || []);
+  // Asegurando que nunca haya valores undefined
+  const [titulo, setTitulo] = useState(post?.titulo || '');
+  const [descripcion, setDescripcion] = useState(post?.descripcion || '');
+  const [localizacion, setLocalizacion] = useState(post?.photo.localizacion || '');
+  const [selectedTags, setSelectedTags] = useState(post?.tags || []);
   const [imageFile, setImageFile] = useState(null); // Estado para manejar la nueva imagen
   const [imageUploaded, setImageUploaded] = useState(false); // Estado para verificar si se subió una nueva imagen
 
@@ -14,10 +15,10 @@ const Edit = ({ post, onClose, tags }) => {
 
   useEffect(() => {
     // Reset form fields if post data changes
-    setTitulo(post.titulo);
-    setDescripcion(post.descripcion);
-    setLocalizacion(post.photo.localizacion);
-    setSelectedTags(post.tags || []);
+    setTitulo(post?.titulo || '');
+    setDescripcion(post?.descripcion || '');
+    setLocalizacion(post?.photo.localizacion || '');
+    setSelectedTags(post?.tags || []);
     setImageUploaded(false);
     setImageFile(null);
   }, [post]);
@@ -71,6 +72,9 @@ const Edit = ({ post, onClose, tags }) => {
     onClose();
   };
 
+  // Asegurando que `tags` no sea undefined
+  const tagsList = tags || []; // Si tags no está disponible, usar un array vacío
+
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 md:w-1/2 relative max-h-[90vh] overflow-y-auto">
@@ -89,7 +93,7 @@ const Edit = ({ post, onClose, tags }) => {
           ) : (
             <div>
               <img
-                src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
+                src={`/storage/${post?.photo?.url}?t=${new Date().getTime()}`}
                 alt="Imagen actual"
                 className="w-32 h-32 object-cover rounded-lg mb-4"
               />
@@ -131,7 +135,6 @@ const Edit = ({ post, onClose, tags }) => {
               value={localizacion}
               onChange={(e) => setLocalizacion(e.target.value)}
               className="w-full mt-2 p-2 border rounded"
-              required
             />
           </div>
 
@@ -166,7 +169,7 @@ const Edit = ({ post, onClose, tags }) => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full p-2 border-b"
                 />
-                {tags.filter(tag => tag.nombre.toLowerCase().includes(searchTerm.toLowerCase())).map(tag => (
+                {tagsList.filter(tag => tag.nombre.toLowerCase().includes(searchTerm.toLowerCase())).map(tag => (
                   <div
                     key={tag.id}
                     className="cursor-pointer p-2 hover:bg-gray-200"

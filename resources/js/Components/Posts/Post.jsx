@@ -61,7 +61,7 @@ const Post = ({ post, tags }) => {
       <div className="flex items-center space-x-3 mb-4">
         <Link href={route('users.show', post.user.id)}>
           <img
-            src={`/storage/${post.user.profile_image}`}
+            src={`/storage/${post.user.profile_image}?t=${new Date().getTime()}`}
             alt={post.user.name}
             className="w-10 h-10 rounded-full"
           />
