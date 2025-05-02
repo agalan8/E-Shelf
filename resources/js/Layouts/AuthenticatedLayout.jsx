@@ -14,7 +14,8 @@ import {
     SwatchIcon,
     AtSymbolIcon,
     Cog8ToothIcon,
-    ArrowLeftStartOnRectangleIcon
+    ArrowLeftStartOnRectangleIcon,
+    HomeIcon
 } from '@heroicons/react/24/solid';
 
 export default function AuthenticatedLayout({ header, children, subnav }) {
@@ -37,6 +38,9 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     <div className="flex flex-col space-y-3">
+                        <NavLink href={route('posts-seguidos')} active={route().current('posts-seguidos')} className="flex justify-center">
+                            <HomeIcon className="h-9 w-9" />
+                        </NavLink>
                         <NavLink href={route('explorar')} active={route().current('explorar')} className="flex justify-center">
                             <GlobeAsiaAustraliaIcon className="h-9 w-9" />
                         </NavLink>

@@ -1,10 +1,14 @@
-// resources/js/Components/Posts/Show.jsx
 import React, { useEffect, useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
 
 const Show = ({ post, onClose }) => {
+  const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
   const [isVisible, setIsVisible] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false); // Estado para controlar si la imagen está ampliada
+  const [following, setFollowing] = useState(auth.user?.following?.some(f => f.id === post.user.id)); // Verifica si el usuario está siguiendo al autor
+  const [hovering, setHovering] = useState(false); // Para manejar el estado de hover del icono
 
   // Al montar el componente, activamos la visibilidad con la transición
   useEffect(() => {
@@ -12,6 +16,23 @@ const Show = ({ post, onClose }) => {
   }, []);
 
   if (!post) return null;
+
+  // Función para manejar el cambio de seguir/dejar de seguir
+  const handleFollowToggle = () => {
+    if (!auth.user) return; // Si no hay un usuario autenticado, no hacer nada.
+
+    if (following) {
+      router.delete(`/unfollow/${post.user.id}`, {
+        onSuccess: () => setFollowing(false),
+        preserveScroll: true
+      });
+    } else {
+      router.post('/follow', { followed_user_id: post.user.id }, {
+        onSuccess: () => setFollowing(true),
+        preserveScroll: true
+      });
+    }
+  };
 
   // Función para abrir la imagen en pantalla completa
   const handleImageClick = () => {
@@ -21,6 +42,32 @@ const Show = ({ post, onClose }) => {
   // Función para cerrar la vista de la imagen
   const closeImageView = () => {
     setIsImageOpen(false);
+  };
+
+  // Función para renderizar el icono de seguir o dejar de seguir
+  const renderFollowIcon = () => {
+    if (!auth.user || auth.user.id === post.user.id) return null; // Si el usuario autenticado es el mismo que el autor de la publicación no renderiza el ícono
+
+    let icon = faUserPlus;
+    let color = 'text-blue-500';
+    let title = 'Seguir';
+
+    if (following) {
+      icon = hovering ? faUserMinus : faUserCheck;
+      color = hovering ? 'text-red-500' : 'text-green-500';
+      title = hovering ? 'Dejar de seguir' : 'Siguiendo';
+    }
+
+    return (
+      <FontAwesomeIcon
+        icon={icon}
+        onClick={handleFollowToggle}
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+        className={`text-2xl cursor-pointer transition-colors duration-200 ${color}`}
+        title={title}
+      />
+    );
   };
 
   return (
@@ -53,6 +100,7 @@ const Show = ({ post, onClose }) => {
           >
             {post.user.name}
           </Link>
+          {renderFollowIcon()} {/* Aquí se agrega el icono de seguir/dejar de seguir */}
         </div>
 
         {/* Imagen de la publicación */}
