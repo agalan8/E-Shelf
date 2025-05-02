@@ -82,6 +82,24 @@ Route::get('/mis-posts', function () {
     ]);
 })->middleware('auth')->name('mis-posts');
 
+Route::get('/posts-seguidos', function () {
+    $user = User::findOrFail(Auth::id());
+
+    // Obtener IDs de usuarios seguidos
+    $followingIds = $user->following()->pluck('followed_user_id');
+
+    // Obtener posts de esos usuarios, ordenados por los más recientes
+    $posts = Post::with('photo', 'tags', 'user')
+        ->whereIn('user_id', $followingIds)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return Inertia::render('Posts/PostsSeguidos', [
+        'posts' => $posts,
+        'tags' => Tag::all(),
+    ]);
+})->middleware('auth')->name('posts-seguidos');
+
 Route::get('/mis-albums', function () {
 
     $userId = Auth::user()->id;
