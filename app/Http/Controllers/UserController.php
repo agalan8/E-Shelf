@@ -68,6 +68,8 @@ class UserController extends Controller
     {
         return Inertia::render('Users/Show', [
             'user' => $user,
+            'followers' => $user->getTotalFollowers(),
+            'following' => $user->getTotalFollowing(),
         ]);
     }
 

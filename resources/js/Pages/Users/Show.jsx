@@ -6,17 +6,17 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
 
-const Show = ({ user, auth }) => {
+const Show = ({ user, auth, followers, following }) => {
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
     const isFollowingInitial = auth.user?.following?.some(f => f.id === user.id);
-    const [following, setFollowing] = useState(isFollowingInitial);
+    const [followingState, setFollowing] = useState(isFollowingInitial);
     const [hovering, setHovering] = useState(false);
 
     const handleFollowToggle = () => {
         if (!auth.user) return;
 
-        if (following) {
+        if (followingState) {
             router.delete(`/unfollow/${user.id}`, {
                 onSuccess: () => setFollowing(false),
                 preserveScroll: true
@@ -36,7 +36,7 @@ const Show = ({ user, auth }) => {
         let color = 'text-blue-500';
         let title = 'Seguir';
 
-        if (following) {
+        if (followingState) {
             icon = hovering ? faUserMinus : faUserCheck;
             color = hovering ? 'text-red-500' : 'text-green-500';
             title = hovering ? 'Dejar de seguir' : 'Siguiendo';
@@ -73,6 +73,7 @@ const Show = ({ user, auth }) => {
                 <div className="profile-details" style={{ padding: '20px' }}>
                     <div className="profile-header" style={{ position: 'relative', marginTop: '-75px' }}>
                         <div className="flex items-center gap-6">
+                            {/* Imagen de perfil */}
                             <img
                                 src={`/storage/${user.profile_image}?t=${new Date().getTime()}`}
                                 alt={user.name}
@@ -85,13 +86,27 @@ const Show = ({ user, auth }) => {
                                     objectFit: 'cover',
                                 }}
                             />
-                            {/* Icono a la derecha de la imagen */}
-                            <div className="flex items-center ml-8">
+
+                            {/* Contadores de Seguidores y Seguidos uno al lado del otro */}
+                            <div className="flex items-center gap-8 ml-6">
+                                <div className="text-center">
+                                    <p className="font-semibold">{followers}</p>
+                                    <p className="text-sm text-gray-500">Seguidores</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="font-semibold">{following}</p>
+                                    <p className="text-sm text-gray-500">Seguidos</p>
+                                </div>
+                            </div>
+
+                            {/* Icono de seguir */}
+                            <div className="flex items-center ml-6">
                                 {renderIcon()}
                             </div>
                         </div>
                     </div>
 
+                    {/* Información adicional del perfil */}
                     <div className="profile-info text-center mt-4">
                         <h1 className="text-2xl font-bold text-gray-800">{user.name}</h1>
                         <p className="text-gray-600 mt-2">
