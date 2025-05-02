@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AlbumController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
@@ -63,6 +64,11 @@ Route::resource('users', UserController::class)->middleware(AdminMiddleware::cla
 Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
 Route::resource('socials', SocialController::class)->middleware(AdminMiddleware::class);
+Route::middleware(['auth'])->group(function () {
+    Route::post('/follow', [FollowController::class, 'store'])->name('follow');
+    Route::delete('/unfollow/{id}', [FollowController::class, 'destroy'])->name('unfollow');
+});
+
 
 Route::get('/mis-posts', function () {
 

@@ -64,6 +64,19 @@ class User extends Authenticatable
         return $this->hasMany(Album::class);
     }
 
+    // Usuarios que este usuario sigue
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'user_id', 'followed_user_id');
+    }
+
+    // Usuarios que siguen a este usuario
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followed_user_id', 'user_id');
+    }
+
+
     protected static function booted()
 {
     static::deleting(function ($user) {
