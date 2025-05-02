@@ -4,22 +4,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
 
 const Show = ({ post, onClose }) => {
-  const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
+  const { auth } = usePage().props;
   const [isVisible, setIsVisible] = useState(false);
-  const [isImageOpen, setIsImageOpen] = useState(false); // Estado para controlar si la imagen está ampliada
-  const [following, setFollowing] = useState(auth.user?.following?.some(f => f.id === post.user.id)); // Verifica si el usuario está siguiendo al autor
-  const [hovering, setHovering] = useState(false); // Para manejar el estado de hover del icono
+  const [isImageOpen, setIsImageOpen] = useState(false);
+  const [following, setFollowing] = useState(auth.user?.following?.some(f => f.id === post.user.id));
+  const [hovering, setHovering] = useState(false);
+  const [commentBody, setCommentBody] = useState('');
+  const [comments, setComments] = useState(post.comments || []);
 
-  // Al montar el componente, activamos la visibilidad con la transición
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
   if (!post) return null;
 
-  // Función para manejar el cambio de seguir/dejar de seguir
   const handleFollowToggle = () => {
-    if (!auth.user) return; // Si no hay un usuario autenticado, no hacer nada.
+    if (!auth.user) return;
 
     if (following) {
       router.delete(`/unfollow/${post.user.id}`, {
@@ -34,19 +34,16 @@ const Show = ({ post, onClose }) => {
     }
   };
 
-  // Función para abrir la imagen en pantalla completa
   const handleImageClick = () => {
     setIsImageOpen(true);
   };
 
-  // Función para cerrar la vista de la imagen
   const closeImageView = () => {
     setIsImageOpen(false);
   };
 
-  // Función para renderizar el icono de seguir o dejar de seguir
   const renderFollowIcon = () => {
-    if (!auth.user || auth.user.id === post.user.id) return null; // Si el usuario autenticado es el mismo que el autor de la publicación no renderiza el ícono
+    if (!auth.user || auth.user.id === post.user.id) return null;
 
     let icon = faUserPlus;
     let color = 'text-blue-500';
@@ -70,22 +67,37 @@ const Show = ({ post, onClose }) => {
     );
   };
 
-  return (
-    <div
-      className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-    >
-      <div
-        className={`bg-white p-6 rounded-lg shadow-lg w-3/4 md:w-1/2 relative transition-transform duration-500 transform ${isVisible ? 'scale-100' : 'scale-90'}`}
-      >
-        {/* Botón para cerrar el modal */}
-        <button
-          onClick={onClose}
-          className="text-red-500 hover:text-red-700 absolute top-2 right-2"
-        >
-          X
-        </button>
+  const handleSubmitComment = () => {
+    if (!commentBody.trim()) return;
 
-        {/* Foto de perfil y nombre del usuario */}
+    router.post(route('comments.store'), {
+      contenido: commentBody,
+      commentable_type: 'App\\Models\\Post',
+      commentable_id: post.id,
+    }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        const newComment = {
+          id: Date.now(),
+          contenido: commentBody,
+          created_at: new Date().toISOString(),
+          user: {
+            name: auth.user.name,
+          },
+        };
+
+        setComments([newComment, ...comments]);
+        setCommentBody('');
+      },
+    });
+  };
+
+  return (
+    <div className={`fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`bg-white p-6 rounded-lg shadow-lg w-3/4 md:w-1/2 relative transition-transform duration-500 transform ${isVisible ? 'scale-100' : 'scale-90'} max-h-[80vh] overflow-y-auto`}>
+        <button onClick={onClose} className="text-red-500 hover:text-red-700 absolute top-2 right-2">X</button>
+
+        {/* Usuario */}
         <div className="flex items-center space-x-3 mb-4">
           <Link href={route('users.show', post.user.id)}>
             <img
@@ -100,10 +112,10 @@ const Show = ({ post, onClose }) => {
           >
             {post.user.name}
           </Link>
-          {renderFollowIcon()} {/* Aquí se agrega el icono de seguir/dejar de seguir */}
+          {renderFollowIcon()}
         </div>
 
-        {/* Imagen de la publicación */}
+        {/* Imagen */}
         <div className="relative">
           <img
             src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
@@ -113,30 +125,69 @@ const Show = ({ post, onClose }) => {
           />
         </div>
 
-        {/* Título, descripción y localización */}
+        {/* Info */}
         <h2 className="text-2xl font-semibold">{post.titulo}</h2>
         <p className="text-sm text-gray-500 mb-2">Localización: {post.photo.localizacion}</p>
         <p className="text-lg">{post.descripcion}</p>
 
+        {/* Categorías */}
         <div>
           <h3 className="text-lg font-medium text-gray-900">Categorías</h3>
           {post.tags.map((tag) => (
             <p key={tag.id}>{tag.nombre}</p>
           ))}
         </div>
+
+        {/* Comentario input */}
+        <div className="mt-4">
+          <textarea
+            rows={1}
+            value={commentBody}
+            onChange={(e) => setCommentBody(e.target.value)}
+            placeholder="Escribe un comentario..."
+            className="w-full p-2 border border-gray-300 rounded resize-none overflow-hidden"
+            onInput={(e) => {
+              e.target.style.height = 'auto';
+              e.target.style.height = `${e.target.scrollHeight}px`;
+            }}
+          />
+          <button
+            onClick={handleSubmitComment}
+            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Comentar
+          </button>
+        </div>
+
+        {/* Comentarios */}
+        <div className="mt-6 max-h-[300px] overflow-y-auto">
+          <h4 className="text-md font-semibold mb-2">Comentarios</h4>
+          {comments.length === 0 ? (
+            <p className="text-sm text-gray-500">No hay comentarios todavía.</p>
+          ) : (
+            comments.map((comment) => (
+              <div key={comment.id} className="mb-3 border-b pb-2">
+                <p className="text-sm text-gray-700">
+                  <strong>{comment.user.name}</strong>: {comment.contenido}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {new Date(comment.created_at).toLocaleString()}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
-      {/* Vista en pantalla completa de la imagen */}
+      {/* Imagen full-screen */}
       {isImageOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
-          {/* Botón para cerrar la vista de imagen */}
           <button
             onClick={closeImageView}
             className="absolute top-4 right-4 text-white text-3xl font-bold"
           >
             X
           </button>
-
           <img
             src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
             alt={post.titulo}
