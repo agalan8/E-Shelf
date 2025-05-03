@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
+import Comment from '@/Components/Comments/Comment';
 
 const Show = ({ post, onClose }) => {
   const { auth } = usePage().props;
@@ -166,14 +167,7 @@ const Show = ({ post, onClose }) => {
             <p className="text-sm text-gray-500">No hay comentarios todavía.</p>
           ) : (
             comments.map((comment) => (
-              <div key={comment.id} className="mb-3 border-b pb-2">
-                <p className="text-sm text-gray-700">
-                  <strong>{comment.user.name}</strong>: {comment.contenido}
-                </p>
-                <p className="text-xs text-gray-400">
-                  {new Date(comment.created_at).toLocaleString()}
-                </p>
-              </div>
+              <Comment key={comment.id} comment={comment} />
             ))
           )}
         </div>

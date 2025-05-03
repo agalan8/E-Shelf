@@ -11,9 +11,13 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
+
+
+
     public function index()
     {
         //
@@ -35,9 +39,8 @@ class CommentController extends Controller
         $request->validate([
             'contenido' => 'required|string|max:1000',
             'commentable_id' => 'required|integer',
-            'commentable_type' => 'required|string|in:App\Models\Post, App\Models\Comment', // Solo post o comment
+            'commentable_type' => 'required|string|in:App\Models\Post,App\Models\Comment', // Solo post o comment
         ]);
-
 
                 // Validación condicional del commentable_id según el tipo de comentario
         if ($request->commentable_type === Post::class) {
@@ -74,6 +77,26 @@ class CommentController extends Controller
 
         // Guardar el comentario
         $comment->save();
+
+            // Buscar menciones en el contenido
+        preg_match_all('/@(\w+)/', $request->contenido, $matches);
+
+        // Si hay menciones
+        if (isset($matches[1])) {
+            foreach ($matches[1] as $username) {
+                // Buscar al usuario mencionado
+                $user = User::where('name', $username)->first();
+                if ($user) {
+                    // Guardar la mención en la tabla pivote
+                    $comment->mentionedUsers()->attach($user->id);
+                }
+            }
+        }
+
+        // Guardar el comentario
+        $comment->save();
+
+
 
         return back();
 

@@ -84,6 +84,11 @@ class User extends Authenticatable
         return $this->following()->count();
     }
 
+    public function mentionedComments()
+    {
+        return $this->belongsToMany(Comment::class, 'comment_mentions', 'user_id', 'comment_id');
+    }
+
 
     protected static function booted()
 {
