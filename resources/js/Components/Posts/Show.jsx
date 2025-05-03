@@ -84,6 +84,7 @@ const Show = ({ post, onClose }) => {
           created_at: new Date().toISOString(),
           user: {
             name: auth.user.name,
+            id: auth.user.id,
           },
         };
 
