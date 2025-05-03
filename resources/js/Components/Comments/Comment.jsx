@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
 
 const Comment = ({ comment, onReplySubmitted }) => {
-  const { auth, users } = usePage().props; // Se asume que `users` es una lista de usuarios
+  const { auth, users } = usePage().props;
   const [activeReply, setActiveReply] = useState(null);
   const [mentionName, setMentionName] = useState('');
   const [replyText, setReplyText] = useState('');
@@ -20,9 +20,7 @@ const Comment = ({ comment, onReplySubmitted }) => {
       setActiveReply(replyId);
       setMentionName(userName);
       const mention = `@${userName} `;
-      setReplyText((prev) =>
-        prev.startsWith(mention) ? prev : mention
-      );
+      setReplyText((prev) => prev.startsWith(mention) ? prev : mention);
     }
   };
 
@@ -36,25 +34,21 @@ const Comment = ({ comment, onReplySubmitted }) => {
     }
   }, [replyText]);
 
-  // Maneja la búsqueda de usuarios cuando se escribe "@" en el comentario
   const handleInputChange = (e) => {
     const value = e.target.value;
     setReplyText(value);
-
-    // Detectamos la palabra que sigue al "@"
     const lastWord = value.split(' ').pop();
 
     if (lastWord.startsWith('@')) {
-      const query = lastWord.slice(1); // Remover el "@" para obtener el nombre
+      const query = lastWord.slice(1);
       if (query.length >= 2) {
-        // Filtrar usuarios que coincidan con el texto
         const filteredSuggestions = users.filter(user =>
           user.name.toLowerCase().includes(query.toLowerCase())
         );
         setSuggestions(filteredSuggestions);
       }
     } else {
-      setSuggestions([]); // Si no estamos escribiendo una mención, vaciar las sugerencias
+      setSuggestions([]);
     }
   };
 
@@ -64,7 +58,7 @@ const Comment = ({ comment, onReplySubmitted }) => {
       const lastSpaceIndex = prev.lastIndexOf(' ');
       return prev.slice(0, lastSpaceIndex + 1) + mention;
     });
-    setSuggestions([]); // Limpiar las sugerencias después de seleccionar una
+    setSuggestions([]);
   };
 
   const handleReplySubmit = () => {
@@ -73,12 +67,12 @@ const Comment = ({ comment, onReplySubmitted }) => {
     router.post(route('comments.store'), {
       contenido: replyText,
       commentable_type: 'App\\Models\\Comment',
-      commentable_id: comment.id, // ✅ Siempre responder al comentario del post
+      commentable_id: comment.id,
     }, {
       preserveScroll: true,
       onSuccess: () => {
         const newReply = {
-          id: Date.now(), // ID temporal
+          id: Date.now(),
           contenido: replyText,
           user: auth.user,
           created_at: new Date().toISOString(),
@@ -109,26 +103,19 @@ const Comment = ({ comment, onReplySubmitted }) => {
     setShowReplies(!showReplies);
   };
 
-  // Función para renderizar el contenido con menciones como enlaces
   const renderCommentWithMentions = (content) => {
-    // Expresión regular para encontrar menciones (ej. @usuario)
     const mentionRegex = /@([a-zA-Z0-9_]+)/g;
-
     let lastIndex = 0;
     const parts = [];
-
     let match;
+
     while ((match = mentionRegex.exec(content)) !== null) {
-      const beforeMention = content.slice(lastIndex, match.index); // Texto antes de la mención
-      const username = match[1]; // Obtener el nombre de usuario
-      const user = users.find((user) => user.name === username); // Buscar el usuario
+      const beforeMention = content.slice(lastIndex, match.index);
+      const username = match[1];
+      const user = users.find((user) => user.name === username);
 
-      // Añadir la parte anterior al arreglo
-      if (beforeMention) {
-        parts.push(beforeMention);
-      }
+      if (beforeMention) parts.push(beforeMention);
 
-      // Si encontramos el usuario, generar el enlace
       if (user) {
         parts.push(
           <a key={match.index} href={route('users.show', user.id)} className="text-blue-500 hover:underline">
@@ -136,15 +123,12 @@ const Comment = ({ comment, onReplySubmitted }) => {
           </a>
         );
       } else {
-        // Si no encontramos el usuario, no agregar el "@" nuevamente
         parts.push(`@${username}`);
       }
 
-      // Actualizar el índice para la próxima mención
       lastIndex = mentionRegex.lastIndex;
     }
 
-    // Agregar el resto del texto después de la última mención
     if (lastIndex < content.length) {
       parts.push(content.slice(lastIndex));
     }
@@ -164,12 +148,15 @@ const Comment = ({ comment, onReplySubmitted }) => {
         {new Date(comment.created_at).toLocaleString()}
       </p>
 
-      <button
-        onClick={() => toggleReply(comment.id, comment.user.name)}
-        className="text-blue-500 text-sm hover:underline mt-1"
-      >
-        {activeReply === comment.id ? 'Cancelar' : 'Responder'}
-      </button>
+      {/* Ocultar botón si el comentario es del mismo usuario */}
+      {auth.user.id !== comment.user.id && (
+        <button
+          onClick={() => toggleReply(comment.id, comment.user.name)}
+          className="text-blue-500 text-sm hover:underline mt-1"
+        >
+          {activeReply === comment.id ? 'Cancelar' : 'Responder'}
+        </button>
+      )}
 
       {comment.commentable_type === 'App\\Models\\Post' && replies.length > 0 && (
         <button
@@ -195,12 +182,16 @@ const Comment = ({ comment, onReplySubmitted }) => {
               <p className="text-xs text-gray-400">
                 {new Date(reply.created_at).toLocaleString()}
               </p>
-              <button
-                onClick={() => toggleReply(reply.id, reply.user.name)}
-                className="text-blue-500 text-sm hover:underline mt-1"
-              >
-                {activeReply === reply.id ? 'Cancelar' : 'Responder'}
-              </button>
+
+              {/* Ocultar botón si la respuesta es del mismo usuario */}
+              {auth.user.id !== reply.user.id && (
+                <button
+                  onClick={() => toggleReply(reply.id, reply.user.name)}
+                  className="text-blue-500 text-sm hover:underline mt-1"
+                >
+                  {activeReply === reply.id ? 'Cancelar' : 'Responder'}
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -220,7 +211,6 @@ const Comment = ({ comment, onReplySubmitted }) => {
               e.target.style.height = `${e.target.scrollHeight}px`;
             }}
           />
-          {/* Mostrar las sugerencias de usuarios para mencionar */}
           {suggestions.length > 0 && (
             <ul className="suggestions-list bg-white border border-gray-300 mt-1">
               {suggestions.map((user) => (
