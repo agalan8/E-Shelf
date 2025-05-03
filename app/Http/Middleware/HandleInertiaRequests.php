@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'userEdit' => $user ?? null,
             'socials' => Social::all(),
+            'users' => User::all(),
         ];
     }
 }

@@ -36,6 +36,11 @@ class Post extends Model
         return $this->belongsToMany(Album::class);
     }
 
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
     protected static function booted()
     {
         static::deleting(function ($post) {

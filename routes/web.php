@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AlbumController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
@@ -30,7 +31,7 @@ Route::get('/', function () {
 
     if(Auth::check()){
         return Inertia::render('Explorar', [
-            'posts' => Post::with('photo', 'tags', 'user')->inRandomOrder()->get(),
+            'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user')->inRandomOrder()->get(),
         ]);
     }
 
@@ -46,8 +47,12 @@ Route::get('/', function () {
 });
 
 Route::get('/explorar', function () {
+
+    // $user = User::findOrFail(Auth::id());
+    // dd(Post::with('photo', 'tags', 'user', 'comments')->inRandomOrder()->get());
+
     return Inertia::render('Explorar', [
-        'posts' => Post::with('photo', 'tags', 'user')->inRandomOrder()->get(),
+        'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->inRandomOrder()->get(),
         'tags' => Tag::all(),
     ]);
 })->name('explorar');
@@ -68,6 +73,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/follow', [FollowController::class, 'store'])->name('follow');
     Route::delete('/unfollow/{id}', [FollowController::class, 'destroy'])->name('unfollow');
 });
+Route::resource('comments', CommentController::class)->middleware('auth');
+// Ruta para obtener las respuestas de un comentario
+Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies'])->middleware('auth');
+
 
 
 Route::get('/mis-posts', function () {
@@ -75,9 +84,11 @@ Route::get('/mis-posts', function () {
     $userId = Auth::user()->id;
     $user = User::findOrFail($userId);
 
+    // dd($user->posts()->with('photo', 'tags', 'user', 'comments')->get());
     return Inertia::render('Posts/MisPosts', [
 
-        'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
+
+        'posts' => $user->posts()->with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->get(),
         'tags' => Tag::all(),
     ]);
 })->middleware('auth')->name('mis-posts');
@@ -89,7 +100,7 @@ Route::get('/posts-seguidos', function () {
     $followingIds = $user->following()->pluck('followed_user_id');
 
     // Obtener posts de esos usuarios, ordenados por los más recientes
-    $posts = Post::with('photo', 'tags', 'user')
+    $posts = Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')
         ->whereIn('user_id', $followingIds)
         ->orderBy('created_at', 'desc')
         ->get();
