@@ -52,7 +52,11 @@ Route::get('/explorar', function () {
     // dd(Post::with('photo', 'tags', 'user', 'comments')->inRandomOrder()->get());
 
     return Inertia::render('Explorar', [
-        'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->inRandomOrder()->get(),
+        'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->inRandomOrder()->get()->map(function ($post) {
+            $post->getTotalLikes = $post->getTotalLikes();
+            $post->isLikedByUser = $post->isLikedByUser();
+            return $post;
+        }),
         'tags' => Tag::all(),
     ]);
 })->name('explorar');
@@ -88,7 +92,11 @@ Route::get('/mis-posts', function () {
     return Inertia::render('Posts/MisPosts', [
 
 
-        'posts' => $user->posts()->with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->get(),
+        'posts' => $user->posts()->with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->get()->map(function ($post) {
+            $post->getTotalLikes = $post->getTotalLikes();
+            $post->isLikedByUser = $post->isLikedByUser();
+            return $post;
+        }),
         'tags' => Tag::all(),
     ]);
 })->middleware('auth')->name('mis-posts');
@@ -103,7 +111,11 @@ Route::get('/posts-seguidos', function () {
     $posts = Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')
         ->whereIn('user_id', $followingIds)
         ->orderBy('created_at', 'desc')
-        ->get();
+        ->get()->map(function ($post) {
+            $post->getTotalLikes = $post->getTotalLikes();
+            $post->isLikedByUser = $post->isLikedByUser();
+            return $post;
+        });
 
     return Inertia::render('Posts/PostsSeguidos', [
         'posts' => $posts,
@@ -211,7 +223,19 @@ Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $image
 })->name('images.destroy');
 
 
+Route::post('/like', function (Request $request) {
 
+    $user = User::findOrFail(Auth::id());
+    $post = Post::findOrFail($request->post_id);
+
+    if ($post->isLikedByUser()) {
+        $post->likedBy()->detach($user->id);
+    } else {
+        $post->likedBy()->attach($user->id);
+    }
+
+    return back();
+})->name('like');
 
 
 Route::get('/buscar', function (Request $request) {
