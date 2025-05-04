@@ -55,7 +55,7 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                   onClick={() => togglePostSelection(post.id)}
                 >
                   <img
-                    src={`/storage/${post.photo.url}`}
+                    src={`${post.photo.url}`}
                     alt={post.titulo}
                     className="object-cover w-full h-64 rounded-md"
                   />

@@ -90,7 +90,7 @@ const Edit = ({ album, onClose }) => {
               name="portada"
               label="Imagen de Portada"
               onChange={handleImageChange}
-              initialImage={album.portada ? `/storage/${album.portada}` : null}  // Mostrar la imagen actual
+              initialImage={album.portada ? `${album.portada}` : null}  // Mostrar la imagen actual
             />
           </div>
 

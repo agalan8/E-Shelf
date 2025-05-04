@@ -58,14 +58,14 @@ export default function User({ user }) {
         {/* Imagen de fondo */}
         <img
           className="w-full h-32 object-cover"
-          src={`/storage/${user.background_image}?t=${new Date().getTime()}`}
+          src={`${user.background_image}?t=${new Date().getTime()}`}
           alt="Background"
         />
         {/* Imagen de perfil */}
         <div className="absolute top-16 left-4">
           <img
             className="w-24 h-24 rounded-full border-4 border-white shadow-md"
-            src={`/storage/${user.profile_image}?t=${new Date().getTime()}`}
+            src={`${user.profile_image}?t=${new Date().getTime()}`}
             alt="Profile Image"
           />
         </div>

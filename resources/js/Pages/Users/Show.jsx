@@ -61,7 +61,7 @@ const Show = ({ user, auth, followers, following }) => {
                 <div
                     className="background-image"
                     style={{
-                        backgroundImage: `url(/storage/${user.background_image}?t=${new Date().getTime()})`,
+                        backgroundImage: `url(${user.background_image}?t=${new Date().getTime()})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         height: '300px',
@@ -75,7 +75,7 @@ const Show = ({ user, auth, followers, following }) => {
                         <div className="flex items-center gap-6">
                             {/* Imagen de perfil */}
                             <img
-                                src={`/storage/${user.profile_image}?t=${new Date().getTime()}`}
+                                src={`${user.profile_image}?t=${new Date().getTime()}`}
                                 alt={user.name}
                                 className="profile-image"
                                 style={{

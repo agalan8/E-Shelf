@@ -201,7 +201,7 @@ export default function PostIndex() {
                                 <td className="border px-2 py-2">
                                     {post.photo && (
                                         <img
-                                            src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
+                                            src={`${post.photo.url}?t=${new Date().getTime()}`}
                                             alt="Post Photo"
                                             className="w-40 h-40 object-contain mx-auto"
                                         />

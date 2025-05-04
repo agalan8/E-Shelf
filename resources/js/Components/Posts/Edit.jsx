@@ -93,7 +93,7 @@ const Edit = ({ post, onClose, tags }) => {
           ) : (
             <div>
               <img
-                src={`/storage/${post?.photo?.url}?t=${new Date().getTime()}`}
+                src={`${post?.photo?.url}?t=${new Date().getTime()}`}
                 alt="Imagen actual"
                 className="w-32 h-32 object-cover rounded-lg mb-4"
               />

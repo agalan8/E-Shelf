@@ -163,7 +163,6 @@ Route::delete('albums/{album}/posts/{post}', function (Album $album, Post $post)
     return redirect()->route('albums.show', $album->id);
 })->name('albums.posts.destroy')->middleware('auth');
 
-
 Route::post('/images/update', function (Request $request) {
     $request->validate([
         'user' => 'required|array',
@@ -172,30 +171,35 @@ Route::post('/images/update', function (Request $request) {
         'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
-    // Obtener el usuario desde la request
     $user = User::findOrFail($request->input('user.id'));
 
-    // Subir imagen de perfil con el nombre basado en la ID del usuario
+    // Subir imagen de perfil
     if ($request->hasFile('profile_image')) {
+
         if ($user->profile_image) {
-            Storage::delete($user->profile_image);
+            $path = parse_url($user->profile_image, PHP_URL_PATH); // /public/profile_images/123.jpg
+            $path = ltrim($path, '/'); // public/profile_images/123.jpg
+
+            // Eliminar del bucket S3
+            Storage::disk('s3')->delete($path);
         }
-        // $extension = $request->file('profile_image')->getClientOriginalExtension();
-        $profilePath = "profile_images/{$user->id}.jpg";
-        Storage::put($profilePath, file_get_contents($request->file('profile_image')));
-        $user->profile_image = $profilePath;
-        //prueba
+
+        $path = $request->file('profile_image')->storePublicly('public/users/profile_images');
+        $user->profile_image = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
     }
 
-    // Subir imagen de portada con el nombre basado en la ID del usuario
+    // Subir imagen de portada
     if ($request->hasFile('background_image')) {
         if ($user->background_image) {
-            Storage::delete($user->background_image);
+            $path = parse_url($user->backgroun_image, PHP_URL_PATH); // /public/profile_images/123.jpg
+            $path = ltrim($path, '/'); // public/profile_images/123.jpg
+
+            // Eliminar del bucket S3
+            Storage::disk('s3')->delete($path);
         }
-        // $extension = $request->file('background_image')->getClientOriginalExtension();
-        $backgroundPath = "background_images/{$user->id}.jpg";
-        Storage::put($backgroundPath, file_get_contents($request->file('background_image')));
-        $user->background_image = $backgroundPath;
+
+        $path = $request->file('background_image')->storePublicly('public/users/background_images');
+        $user->background_image = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
     }
 
     $user->save();
@@ -203,15 +207,27 @@ Route::post('/images/update', function (Request $request) {
     return redirect()->back()->with('message', 'Imágenes actualizadas exitosamente');
 })->name('images.update');
 
+
 Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $imageType) {
     // Verificar el tipo de imagen a eliminar (profile_image o background_image)
     if ($imageType === 'profile_image' && $user->profile_image) {
-        Storage::delete($user->profile_image);
+
+        $path = parse_url($user->profile_image, PHP_URL_PATH); // /public/profile_images/123.jpg
+        $path = ltrim($path, '/'); // public/profile_images/123.jpg
+
+        // Eliminar del bucket S3
+        Storage::disk('s3')->delete($path);
         $user->profile_image = null;
     }
 
     if ($imageType === 'background_image' && $user->background_image) {
-        Storage::delete($user->background_image);
+
+        $path = parse_url($user->background_image, PHP_URL_PATH); // /public/profile_images/123.jpg
+        $path = ltrim($path, '/'); // public/profile_images/123.jpg
+
+        // Eliminar del bucket S3
+        Storage::disk('s3')->delete($path);
+
         $user->background_image = null;
     }
 

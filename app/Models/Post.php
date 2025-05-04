@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
@@ -63,6 +64,12 @@ class Post extends Model
             if (! $post->isForceDeleting()) {
 
                 $post->photo->each(function ($photo) {
+
+                    $path = parse_url($photo->url, PHP_URL_PATH); // /public/profile_images/123.jpg
+                    $path = ltrim($path, '/'); // public/profile_images/123.jpg
+
+                    // Eliminar del bucket S3
+                    Storage::disk('s3')->delete($path);
                     $photo->delete();
                 });
 

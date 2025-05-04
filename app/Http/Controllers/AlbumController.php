@@ -53,10 +53,9 @@ class AlbumController extends Controller
 
         if ($request->hasFile('portada')) {
 
-            // $extension = $request->file('profile_image')->getClientOriginalExtension();
-            $path = "albums_images/{$album->id}_{$user->id}.jpg";
-            Storage::put($path, file_get_contents($request->file('portada')));
-            $album->portada = $path;
+            $path = $request->file('portada')->storePublicly('public/albums/portadas');
+
+            $album->portada = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
 
         }
 
@@ -115,9 +114,16 @@ class AlbumController extends Controller
         ]);
 
         if ($request->hasFile('portada')) {
-            $path = "albums_images/{$album->id}_" . Auth::user()->id . ".jpg";
-            Storage::put($path, file_get_contents($request->file('portada')));
-            $album->portada = $path;
+
+            $path = parse_url($album->portada, PHP_URL_PATH); // /public/profile_images/123.jpg
+            $path = ltrim($path, '/'); // public/profile_images/123.jpg
+
+            // Eliminar del bucket S3
+            Storage::disk('s3')->delete($path);
+
+            $path = $request->file('portada')->storePublicly('public/albums/portadas');
+
+            $album->portada = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
         }
 
         $album->save();

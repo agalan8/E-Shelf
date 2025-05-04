@@ -24,6 +24,7 @@ class User extends Authenticatable
         'biografia',
         'is_admin',
         'password',
+        'profile_image',
     ];
 
     /**
