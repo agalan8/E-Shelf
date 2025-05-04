@@ -161,7 +161,7 @@ const Create = ({ onClose, posts }) => {
                     onClick={() => handleTogglePost(post.id)} // Alternar selección de post
                   >
                     <img
-                      src={`/storage/${post.photo.url}`}
+                      src={`${post.photo.url}`}
                       alt={post.titulo}
                       className="object-cover w-full h-64 rounded-md"
                     />

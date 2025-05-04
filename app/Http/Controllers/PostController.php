@@ -66,13 +66,11 @@ class PostController extends Controller
 
         if ($request->hasFile('imagen')) {
 
-            // $extension = $request->file('profile_image')->getClientOriginalExtension();
-            $path = "posts_images/{$post->id}_{$user->id}.jpg";
-            Storage::put($path, file_get_contents($request->file('imagen')));
+            $path = $request->file('imagen')->storePublicly('public/posts/images');
 
             Photo::create([
                 'localizacion' => $request->localizacion,
-                'url' => $path,
+                'url' => "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}",
                 'post_id' => $post->id,
             ]);
 
@@ -130,13 +128,17 @@ class PostController extends Controller
 
         // Actualizar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
-            $path = "posts_images/{$post->id}_" . Auth::user()->id . ".jpg";
-            Storage::put($path, file_get_contents($request->file('imagen')));
+            $path = parse_url($post->photo->url, PHP_URL_PATH); // /public/profile_images/123.jpg
+            $path = ltrim($path, '/'); // public/profile_images/123.jpg
 
+            // Eliminar del bucket S3
+            Storage::disk('s3')->delete($path);
+
+            $path = $request->file('imagen')->storePublicly('public/posts/images');
             // Actualizamos la foto asociada al post
             $post->photo()->update([
                 'localizacion' => $request->localizacion,
-                'url' => $path,
+                'url' => "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}",
             ]);
         }
 

@@ -48,7 +48,7 @@ const Album = ({ album }) => {
       {/* Si hay una imagen de portada, mostrarla */}
       {coverPhotoUrl !== 'Sin portada' ? (
         <img
-          src={`/storage/${coverPhotoUrl}?t=${new Date().getTime()}`}
+          src={`${coverPhotoUrl}?t=${new Date().getTime()}`}
           alt={album.nombre}
           className="w-full h-48 object-cover rounded-lg mb-4"
         />

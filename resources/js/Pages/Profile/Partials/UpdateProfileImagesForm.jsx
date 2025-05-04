@@ -48,7 +48,7 @@ const UpdateImagesProfileForm = () => {
                         name="profile_image"
                         label="Imagen de perfil"
                         onChange={(file) => setData('profile_image', file)}
-                        initialImage={user.profile_image ? `/storage/${user.profile_image}?t=${new Date().getTime()}` : null}
+                        initialImage={user.profile_image ? `${user.profile_image}?t=${new Date().getTime()}` : null}
                         previewClassName="rounded-full w-[145px] h-[145px] object-cover"
                         destroyUrl={route('images.destroy', { user: user.id, imageType: 'profile_image' })}
                     />
@@ -60,7 +60,7 @@ const UpdateImagesProfileForm = () => {
                         name="background_image"
                         label="Imagen de fondo"
                         onChange={(file) => setData('background_image', file)}
-                        initialImage={user.background_image ? `/storage/${user.background_image}?t=${new Date().getTime()}` : null}
+                        initialImage={user.background_image ? `${user.background_image}?t=${new Date().getTime()}` : null}
                         previewClassName="w-[325px] h-[145px] object-cover rounded-md"
                         destroyUrl={route('images.destroy', { user: user.id, imageType: 'background_image' })}
                     />

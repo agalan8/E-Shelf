@@ -93,7 +93,7 @@ export default function FlipBook({ isOpen, onClose, album }) {
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
                 <img
-                  src={`/storage/${currentAlbum.portada}?t=${new Date().getTime()}`}
+                  src={`${currentAlbum.portada}?t=${new Date().getTime()}`}
                   alt={currentAlbum.nombre}
                   className="w-full h-full object-cover"
                 />
@@ -106,7 +106,7 @@ export default function FlipBook({ isOpen, onClose, album }) {
                 <div key={index} className="w-full h-full flex items-center justify-center">
                   <div className="page-content w-full h-full">
                     <img
-                      src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
+                      src={`${post.photo.url}?t=${new Date().getTime()}`}
                       alt={post.photo.localizacion || `Photo ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -124,7 +124,7 @@ export default function FlipBook({ isOpen, onClose, album }) {
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
                 <img
-                  src={`/storage/${currentAlbum.portada}?t=${new Date().getTime()}`}
+                  src={`${currentAlbum.portada}?t=${new Date().getTime()}`}
                   alt={currentAlbum.nombre}
                   className="w-full h-full object-cover"
                 />

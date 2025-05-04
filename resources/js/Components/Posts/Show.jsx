@@ -127,7 +127,7 @@ const Show = ({ post, onClose }) => {
         <div className="flex items-center space-x-3 mb-4">
           <Link href={route('users.show', post.user.id)}>
             <img
-              src={`/storage/${post.user.profile_image}`}
+              src={`${post.user.profile_image}`}
               alt={post.user.name}
               className="w-10 h-10 rounded-full"
             />
@@ -144,7 +144,7 @@ const Show = ({ post, onClose }) => {
         {/* Imagen */}
         <div className="relative">
           <img
-            src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
+            src={`${post.photo.url}?t=${new Date().getTime()}`}
             alt={post.titulo}
             className="w-full h-64 object-cover rounded-lg mb-4 cursor-pointer"
             onClick={handleImageClick}
@@ -232,7 +232,7 @@ const Show = ({ post, onClose }) => {
             X
           </button>
           <img
-            src={`/storage/${post.photo.url}?t=${new Date().getTime()}`}
+            src={`${post.photo.url}?t=${new Date().getTime()}`}
             alt={post.titulo}
             className="max-w-full max-h-full object-contain cursor-pointer"
             onClick={closeImageView}
