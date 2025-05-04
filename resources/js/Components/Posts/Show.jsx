@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Comment from '@/Components/Comments/Comment';
 
 const Show = ({ post, onClose }) => {
@@ -13,7 +15,11 @@ const Show = ({ post, onClose }) => {
   const [commentBody, setCommentBody] = useState('');
   const [comments, setComments] = useState(post.comments || []);
   const [commentId, setCommentId] = useState(null);
-  console.log('newComment', newCommentId);
+
+  // Estado para Me gusta
+  const [isLiked, setIsLiked] = useState(post.isLikedByUser || false);
+  const [hoveredLike, setHoveredLike] = useState(false);
+  const [totalLikes, setTotalLikes] = useState(post.getTotalLikes || 0);
 
   useEffect(() => {
     setIsVisible(true);
@@ -80,25 +86,36 @@ const Show = ({ post, onClose }) => {
     }, {
       preserveScroll: true,
       onSuccess: () => {
-          console.log('newCommentSuccess', newCommentId);
-          const newComment = {
-              id: newCommentId + 1,
-              contenido: commentBody,
-              created_at: new Date().toISOString(),
-              user: {
-                  name: auth.user.name,
-                  id: auth.user.id,
-                },
-            };
+        const newComment = {
+          id: newCommentId + 1,
+          contenido: commentBody,
+          created_at: new Date().toISOString(),
+          user: {
+            name: auth.user.name,
+            id: auth.user.id,
+          },
+        };
 
-
-            setCommentId(newCommentId);
-            setComments([newComment, ...comments]);
-            console.log('newComment', comments);
+        setCommentId(newCommentId);
+        setComments([newComment, ...comments]);
         setCommentBody('');
-
       },
     });
+  };
+
+  // Función para manejar el like
+  const toggleLike = (postId) => {
+    router.post(
+      route('like'),
+      { post_id: postId },
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          setIsLiked((prev) => !prev);
+          setTotalLikes((prev) => (isLiked ? prev - 1 : prev + 1));
+        },
+      }
+    );
   };
 
   return (
@@ -147,8 +164,32 @@ const Show = ({ post, onClose }) => {
           ))}
         </div>
 
+        {/* Botón de me gusta */}
+        <div className="mt-4 flex items-center space-x-2">
+          <button
+            onClick={() => toggleLike(post.id)}
+            onMouseEnter={() => setHoveredLike(true)}
+            onMouseLeave={() => setHoveredLike(false)}
+            className="text-xl focus:outline-none"
+          >
+            <FontAwesomeIcon
+              icon={
+                isLiked
+                  ? hoveredLike
+                    ? faHeartCrack
+                    : faHeartSolid
+                  : faHeartRegular
+              }
+              className={`transition duration-200 ${
+                isLiked ? 'text-red-600' : 'text-gray-500'
+              }`}
+            />
+          </button>
+          <span className="text-sm text-gray-700">{totalLikes}</span>
+        </div>
+
         {/* Comentario input */}
-        <div className="mt-4">
+        <div className="mt-2">
           <textarea
             rows={1}
             value={commentBody}

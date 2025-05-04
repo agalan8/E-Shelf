@@ -1,13 +1,24 @@
 import { Head, router } from '@inertiajs/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Post from '@/Components/Posts/Post';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import HomeSubnav from '@/Components/Subnavs/HomeSubnav';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+
 const PostsSeguidos = ({ posts, tags }) => {
-  // Comentarios por post (usamos un estado por post ID)
   const [comments, setComments] = useState({});
   const textareaRefs = useRef({});
+
+  const [likes, setLikes] = useState({});
+  const [hoveredLike, setHoveredLike] = useState({});
+
+  // Sincroniza estado local de likes con los posts cuando cambian
+  useEffect(() => {
+    setLikes(Object.fromEntries(posts.map((post) => [post.id, post.isLikedByUser])));
+  }, [posts]);
 
   const handleCommentChange = (postId, value) => {
     setComments((prev) => ({ ...prev, [postId]: value }));
@@ -26,14 +37,31 @@ const PostsSeguidos = ({ posts, tags }) => {
     const contenido = comments[postId]?.trim();
     if (!contenido) return;
 
-    router.post(route('comments.store'), {
-      contenido,
-      commentable_id: postId,
-      commentable_type: 'App\\Models\\Post',
-    }, {
-      onSuccess: () =>
-        setComments((prev) => ({ ...prev, [postId]: '' })),
-    });
+    router.post(
+      route('comments.store'),
+      {
+        contenido,
+        commentable_id: postId,
+        commentable_type: 'App\\Models\\Post',
+      },
+      {
+        onSuccess: () =>
+          setComments((prev) => ({ ...prev, [postId]: '' })),
+      }
+    );
+  };
+
+  const toggleLike = (postId) => {
+    router.post(
+      route('like'),
+      { post_id: postId },
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          setLikes((prev) => ({ ...prev, [postId]: !prev[postId] }));
+        },
+      }
+    );
   };
 
   return (
@@ -52,6 +80,30 @@ const PostsSeguidos = ({ posts, tags }) => {
             {posts.map((post) => (
               <div key={post.id} className="space-y-2">
                 <Post post={post} tags={tags} />
+
+                {/* Botón de me gusta */}
+                <div className="px-4">
+                  <button
+                    onClick={() => toggleLike(post.id)}
+                    onMouseEnter={() => setHoveredLike((prev) => ({ ...prev, [post.id]: true }))}
+                    onMouseLeave={() => setHoveredLike((prev) => ({ ...prev, [post.id]: false }))}
+                    className="text-xl focus:outline-none"
+                  >
+                    <FontAwesomeIcon
+                      icon={
+                        likes[post.id]
+                          ? hoveredLike[post.id]
+                            ? faHeartCrack
+                            : faHeartSolid
+                          : faHeartRegular
+                      }
+                      className={`transition duration-200 ${
+                        likes[post.id] ? 'text-red-600' : 'text-gray-500'
+                      }`}
+                    />
+                  </button>
+                  <span className="ml-2 text-sm text-gray-700">{post.getTotalLikes}</span>
+                </div>
 
                 {/* Campo para comentarios */}
                 <div className="px-4">
