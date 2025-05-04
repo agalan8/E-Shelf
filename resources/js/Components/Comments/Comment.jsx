@@ -149,14 +149,14 @@ const Comment = ({ comment, onReplySubmitted }) => {
       </p>
 
       {/* Ocultar botón si el comentario es del mismo usuario */}
-      {auth.user.id !== comment.user.id && (
+
         <button
           onClick={() => toggleReply(comment.id, comment.user.name)}
           className="text-blue-500 text-sm hover:underline mt-1"
         >
           {activeReply === comment.id ? 'Cancelar' : 'Responder'}
         </button>
-      )}
+
 
       {comment.commentable_type === 'App\\Models\\Post' && replies.length > 0 && (
         <button
@@ -184,14 +184,14 @@ const Comment = ({ comment, onReplySubmitted }) => {
               </p>
 
               {/* Ocultar botón si la respuesta es del mismo usuario */}
-              {auth.user.id !== reply.user.id && (
+
                 <button
                   onClick={() => toggleReply(reply.id, reply.user.name)}
                   className="text-blue-500 text-sm hover:underline mt-1"
                 >
                   {activeReply === reply.id ? 'Cancelar' : 'Responder'}
                 </button>
-              )}
+
             </div>
           ))}
         </div>

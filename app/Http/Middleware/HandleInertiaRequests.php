@@ -39,6 +39,8 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
+        $newCommentId = session('newCommentId');
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -47,6 +49,7 @@ class HandleInertiaRequests extends Middleware
             'userEdit' => $user ?? null,
             'socials' => Social::all(),
             'users' => User::all(),
+            'newCommentId' => $newCommentId,
         ];
     }
 }

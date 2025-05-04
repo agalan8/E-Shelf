@@ -5,13 +5,15 @@ import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-sv
 import Comment from '@/Components/Comments/Comment';
 
 const Show = ({ post, onClose }) => {
-  const { auth } = usePage().props;
+  const { auth, newCommentId } = usePage().props;
   const [isVisible, setIsVisible] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
   const [following, setFollowing] = useState(auth.user?.following?.some(f => f.id === post.user.id));
   const [hovering, setHovering] = useState(false);
   const [commentBody, setCommentBody] = useState('');
   const [comments, setComments] = useState(post.comments || []);
+  const [commentId, setCommentId] = useState(null);
+  console.log('newComment', newCommentId);
 
   useEffect(() => {
     setIsVisible(true);
@@ -78,18 +80,23 @@ const Show = ({ post, onClose }) => {
     }, {
       preserveScroll: true,
       onSuccess: () => {
-        const newComment = {
-          id: Date.now(),
-          contenido: commentBody,
-          created_at: new Date().toISOString(),
-          user: {
-            name: auth.user.name,
-            id: auth.user.id,
-          },
-        };
+          console.log('newCommentSuccess', newCommentId);
+          const newComment = {
+              id: newCommentId + 1,
+              contenido: commentBody,
+              created_at: new Date().toISOString(),
+              user: {
+                  name: auth.user.name,
+                  id: auth.user.id,
+                },
+            };
 
-        setComments([newComment, ...comments]);
+
+            setCommentId(newCommentId);
+            setComments([newComment, ...comments]);
+            console.log('newComment', comments);
         setCommentBody('');
+
       },
     });
   };
@@ -168,7 +175,7 @@ const Show = ({ post, onClose }) => {
             <p className="text-sm text-gray-500">No hay comentarios todavía.</p>
           ) : (
             comments.map((comment) => (
-              <Comment key={comment.id} comment={comment} />
+              comment ? <Comment key={comment.id} comment={comment} /> : null // Verificar si el comentario es válido antes de renderizarlo
             ))
           )}
         </div>

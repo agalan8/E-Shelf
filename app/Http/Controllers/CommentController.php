@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class CommentController extends Controller
 {
@@ -96,6 +97,7 @@ class CommentController extends Controller
         // Guardar el comentario
         $comment->save();
 
+        session(['newCommentId' => $comment->id]);
 
 
         return back();
