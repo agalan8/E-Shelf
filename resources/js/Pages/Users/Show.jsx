@@ -5,6 +5,8 @@ import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-sv
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
+import Image from '@/Components/Image';
+
 
 const Show = ({ user, auth, followers, following }) => {
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
@@ -58,34 +60,25 @@ const Show = ({ user, auth, followers, following }) => {
         <Layout subnav={<UsersSubnav />}>
             <div className="user-profile">
                 {/* Fondo de portada */}
-                <div
-                    className="background-image"
-                    style={{
-                        backgroundImage: `url(${user.background_image}?t=${new Date().getTime()})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        height: '300px',
-                        width: '100%',
-                    }}
-                ></div>
+                <div className="w-full h-[300px] overflow-hidden flex items-center justify-center">
+                    <Image
+                        path={`${user.background_image}?t=${new Date().getTime()}`}
+                        alt="Fondo"
+                        className="w-full h-full object-cover"
+                    />
+                </div>
 
                 {/* Detalles del perfil */}
                 <div className="profile-details" style={{ padding: '20px' }}>
                     <div className="profile-header" style={{ position: 'relative', marginTop: '-75px' }}>
                         <div className="flex items-center gap-6">
                             {/* Imagen de perfil */}
-                            <img
-                                src={`${user.profile_image}?t=${new Date().getTime()}`}
+                            <Image
+                                path={`${user.profile_image}?t=${new Date().getTime()}`}
                                 alt={user.name}
-                                className="profile-image"
-                                style={{
-                                    width: '150px',
-                                    height: '150px',
-                                    borderRadius: '50%',
-                                    border: '4px solid white',
-                                    objectFit: 'cover',
-                                }}
+                                className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
                             />
+
 
                             {/* Contadores de Seguidores y Seguidos uno al lado del otro */}
                             <div className="flex items-center gap-8 ml-6">

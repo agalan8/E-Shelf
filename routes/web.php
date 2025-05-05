@@ -48,13 +48,14 @@ Route::get('/', function () {
 
 Route::get('/explorar', function () {
 
+
     // $user = User::findOrFail(Auth::id());
     // dd(Post::with('photo', 'tags', 'user', 'comments')->inRandomOrder()->get());
 
     return Inertia::render('Explorar', [
         'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->inRandomOrder()->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
-            $post->isLikedByUser = $post->isLikedByUser();
+            $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
         }),
         'tags' => Tag::all(),
@@ -185,7 +186,7 @@ Route::post('/images/update', function (Request $request) {
         }
 
         $path = $request->file('profile_image')->storePublicly('public/users/profile_images');
-        $user->profile_image = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
+        $user->profile_image = "{$path}";
     }
 
     // Subir imagen de portada
@@ -199,7 +200,7 @@ Route::post('/images/update', function (Request $request) {
         }
 
         $path = $request->file('background_image')->storePublicly('public/users/background_images');
-        $user->background_image = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
+        $user->background_image = "{$path}";
     }
 
     $user->save();
@@ -251,7 +252,7 @@ Route::post('/like', function (Request $request) {
     }
 
     return back();
-})->name('like');
+})->name('like')->middleware('auth');
 
 
 Route::get('/buscar', function (Request $request) {

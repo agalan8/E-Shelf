@@ -8,7 +8,9 @@ const ImageInput = ({ name, label, onChange, initialImage, previewClassName = ''
     const { delete: deleteRequest } = useForm(); // Use the correct `delete` method
 
     useEffect(() => {
-        setImagePreview(initialImage);
+        if (!imagePreview && initialImage) {
+            setImagePreview(initialImage);
+        }
     }, [initialImage]);
 
     const handleImageChange = (e) => {

@@ -70,7 +70,7 @@ class PostController extends Controller
 
             Photo::create([
                 'localizacion' => $request->localizacion,
-                'url' => "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}",
+                'url' => "{$path}",
                 'post_id' => $post->id,
             ]);
 
@@ -138,7 +138,7 @@ class PostController extends Controller
             // Actualizamos la foto asociada al post
             $post->photo()->update([
                 'localizacion' => $request->localizacion,
-                'url' => "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}",
+                'url' => "{$path}",
             ]);
         }
 

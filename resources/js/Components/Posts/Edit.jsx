@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
+import Image from '@/Components/Image';
 
 const Edit = ({ post, onClose, tags }) => {
   // Asegurando que nunca haya valores undefined
@@ -92,8 +93,8 @@ const Edit = ({ post, onClose, tags }) => {
             </div>
           ) : (
             <div>
-              <img
-                src={`${post?.photo?.url}?t=${new Date().getTime()}`}
+              <Image
+                path={`${post?.photo?.url}?t=${new Date().getTime()}`}
                 alt="Imagen actual"
                 className="w-32 h-32 object-cover rounded-lg mb-4"
               />
