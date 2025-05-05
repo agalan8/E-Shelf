@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
+import Image from '@/Components/Image';
 
 const Create = ({ onClose, posts }) => {
   // Estado para manejar los datos del formulario
@@ -160,8 +161,8 @@ const Create = ({ onClose, posts }) => {
                     }`}
                     onClick={() => handleTogglePost(post.id)} // Alternar selección de post
                   >
-                    <img
-                      src={`${post.photo.url}`}
+                    <Image
+                      path={`${post.photo.url}`}
                       alt={post.titulo}
                       className="object-cover w-full h-64 rounded-md"
                     />

@@ -55,7 +55,7 @@ class AlbumController extends Controller
 
             $path = $request->file('portada')->storePublicly('public/albums/portadas');
 
-            $album->portada = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
+            $album->portada = "{$path}";
 
         }
 
@@ -123,7 +123,7 @@ class AlbumController extends Controller
 
             $path = $request->file('portada')->storePublicly('public/albums/portadas');
 
-            $album->portada = "https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/{$path}";
+            $album->portada = "{$path}";
         }
 
         $album->save();

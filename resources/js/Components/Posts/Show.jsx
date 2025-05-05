@@ -5,18 +5,20 @@ import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-sv
 import { faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Comment from '@/Components/Comments/Comment';
+import Image from '@/Components/Image';
 
 const Show = ({ post, onClose }) => {
   const { auth, newCommentId } = usePage().props;
+  const user = auth?.user || null;
+
   const [isVisible, setIsVisible] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
-  const [following, setFollowing] = useState(auth.user?.following?.some(f => f.id === post.user.id));
+  const [following, setFollowing] = useState(user?.following?.some(f => f.id === post.user.id) || false);
   const [hovering, setHovering] = useState(false);
   const [commentBody, setCommentBody] = useState('');
   const [comments, setComments] = useState(post.comments || []);
   const [commentId, setCommentId] = useState(null);
 
-  // Estado para Me gusta
   const [isLiked, setIsLiked] = useState(post.isLikedByUser || false);
   const [hoveredLike, setHoveredLike] = useState(false);
   const [totalLikes, setTotalLikes] = useState(post.getTotalLikes || 0);
@@ -28,7 +30,7 @@ const Show = ({ post, onClose }) => {
   if (!post) return null;
 
   const handleFollowToggle = () => {
-    if (!auth.user) return;
+    if (!user) return;
 
     if (following) {
       router.delete(`/unfollow/${post.user.id}`, {
@@ -43,16 +45,11 @@ const Show = ({ post, onClose }) => {
     }
   };
 
-  const handleImageClick = () => {
-    setIsImageOpen(true);
-  };
-
-  const closeImageView = () => {
-    setIsImageOpen(false);
-  };
+  const handleImageClick = () => setIsImageOpen(true);
+  const closeImageView = () => setIsImageOpen(false);
 
   const renderFollowIcon = () => {
-    if (!auth.user || auth.user.id === post.user.id) return null;
+    if (!user || user.id === post.user.id) return null;
 
     let icon = faUserPlus;
     let color = 'text-blue-500';
@@ -77,7 +74,7 @@ const Show = ({ post, onClose }) => {
   };
 
   const handleSubmitComment = () => {
-    if (!commentBody.trim()) return;
+    if (!user || !commentBody.trim()) return;
 
     router.post(route('comments.store'), {
       contenido: commentBody,
@@ -91,8 +88,8 @@ const Show = ({ post, onClose }) => {
           contenido: commentBody,
           created_at: new Date().toISOString(),
           user: {
-            name: auth.user.name,
-            id: auth.user.id,
+            name: user.name,
+            id: user.id,
           },
         };
 
@@ -103,19 +100,16 @@ const Show = ({ post, onClose }) => {
     });
   };
 
-  // Función para manejar el like
   const toggleLike = (postId) => {
-    router.post(
-      route('like'),
-      { post_id: postId },
-      {
-        preserveScroll: true,
-        onSuccess: () => {
-          setIsLiked((prev) => !prev);
-          setTotalLikes((prev) => (isLiked ? prev - 1 : prev + 1));
-        },
-      }
-    );
+    if (!user) return;
+
+    router.post(route('like'), { post_id: postId }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        setIsLiked(prev => !prev);
+        setTotalLikes(prev => isLiked ? prev - 1 : prev + 1);
+      },
+    });
   };
 
   return (
@@ -126,8 +120,8 @@ const Show = ({ post, onClose }) => {
         {/* Usuario */}
         <div className="flex items-center space-x-3 mb-4">
           <Link href={route('users.show', post.user.id)}>
-            <img
-              src={`${post.user.profile_image}`}
+            <Image
+              path={`${post.user.profile_image}`}
               alt={post.user.name}
               className="w-10 h-10 rounded-full"
             />
@@ -143,8 +137,8 @@ const Show = ({ post, onClose }) => {
 
         {/* Imagen */}
         <div className="relative">
-          <img
-            src={`${post.photo.url}?t=${new Date().getTime()}`}
+          <Image
+            path={`${post.photo.url}?t=${new Date().getTime()}`}
             alt={post.titulo}
             className="w-full h-64 object-cover rounded-lg mb-4 cursor-pointer"
             onClick={handleImageClick}
@@ -171,6 +165,7 @@ const Show = ({ post, onClose }) => {
             onMouseEnter={() => setHoveredLike(true)}
             onMouseLeave={() => setHoveredLike(false)}
             className="text-xl focus:outline-none"
+            disabled={!user}
           >
             <FontAwesomeIcon
               icon={
@@ -194,8 +189,9 @@ const Show = ({ post, onClose }) => {
             rows={1}
             value={commentBody}
             onChange={(e) => setCommentBody(e.target.value)}
-            placeholder="Escribe un comentario..."
+            placeholder={user ? "Escribe un comentario..." : "Debes iniciar sesión para comentar"}
             className="w-full p-2 border border-gray-300 rounded resize-none overflow-hidden"
+            disabled={!user}
             onInput={(e) => {
               e.target.style.height = 'auto';
               e.target.style.height = `${e.target.scrollHeight}px`;
@@ -203,7 +199,8 @@ const Show = ({ post, onClose }) => {
           />
           <button
             onClick={handleSubmitComment}
-            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            disabled={!user}
+            className={`mt-2 px-4 py-2 rounded ${user ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-700 cursor-not-allowed'}`}
           >
             Comentar
           </button>
@@ -216,7 +213,7 @@ const Show = ({ post, onClose }) => {
             <p className="text-sm text-gray-500">No hay comentarios todavía.</p>
           ) : (
             comments.map((comment) => (
-              comment ? <Comment key={comment.id} comment={comment} /> : null // Verificar si el comentario es válido antes de renderizarlo
+              comment ? <Comment key={comment.id} comment={comment} /> : null
             ))
           )}
         </div>
@@ -231,8 +228,8 @@ const Show = ({ post, onClose }) => {
           >
             X
           </button>
-          <img
-            src={`${post.photo.url}?t=${new Date().getTime()}`}
+          <Image
+            path={`${post.photo.url}?t=${new Date().getTime()}`}
             alt={post.titulo}
             className="max-w-full max-h-full object-contain cursor-pointer"
             onClick={closeImageView}

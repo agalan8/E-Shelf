@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import Edit from '@/Components/Albums/Edit'; // Importamos el modal de edición
 import FlipBook from '@/Components/Albums/FlipBook'; // Importamos el modal FlipBook
+import Image from '@/Components/Image'; // Importamos el componente de imagen
 
 const Album = ({ album }) => {
   const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
@@ -47,8 +48,8 @@ const Album = ({ album }) => {
     <div className="bg-white p-4 rounded-lg shadow-md">
       {/* Si hay una imagen de portada, mostrarla */}
       {coverPhotoUrl !== 'Sin portada' ? (
-        <img
-          src={`${coverPhotoUrl}?t=${new Date().getTime()}`}
+        <Image
+          path={`${coverPhotoUrl}?t=${new Date().getTime()}`}
           alt={album.nombre}
           className="w-full h-48 object-cover rounded-lg mb-4"
         />

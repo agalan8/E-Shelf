@@ -50,7 +50,7 @@ const Edit = ({ album, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-20">
       <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-96">
         <h3 className="text-xl font-semibold mb-4">Editar Álbum</h3>
 
@@ -90,7 +90,7 @@ const Edit = ({ album, onClose }) => {
               name="portada"
               label="Imagen de Portada"
               onChange={handleImageChange}
-              initialImage={album.portada ? `${album.portada}` : null}  // Mostrar la imagen actual
+              initialImage={album.portada ? `https://ik.imagekit.io/eshelf/${album.portada}` : null}  // Mostrar la imagen actual
             />
           </div>
 
