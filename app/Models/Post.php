@@ -25,8 +25,13 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function photo(){
-        return $this->hasOne(Photo::class);
+    // public function photo(){
+    //     return $this->hasOne(Photo::class);
+    // }
+
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'post');
     }
 
     public function tags()

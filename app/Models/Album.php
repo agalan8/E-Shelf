@@ -23,6 +23,11 @@ class Album extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function coverImage()
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'cover');
+    }
+
     public function posts(){
         return $this->belongsToMany(Post::class);
     }
