@@ -44,6 +44,8 @@ class Album extends Model
             // Eliminar del bucket S3
             Storage::disk('s3')->delete($path);
 
+            $album->coverImage->delete();
+
 
         });
     }

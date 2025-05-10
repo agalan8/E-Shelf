@@ -75,8 +75,6 @@ class AlbumController extends Controller
                 'path_original' => $path_aws . $path_original,
                 'path_medium' => $path_aws . $path_medium,
                 'type' => 'cover',
-                'localizacion' => $request->localizacion,
-
             ]);
 
             $image->imageable()->associate($album)->save();
@@ -177,8 +175,6 @@ class AlbumController extends Controller
                     'path_original' => $path_aws . $path_original,
                     'path_medium' => $path_aws . $path_medium,
                     'type' => 'cover',
-                    'localizacion' => $request->localizacion,
-
                 ]);
 
                 $image->imageable()->associate($album)->save();

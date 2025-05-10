@@ -61,7 +61,7 @@ const Show = ({ user, auth, followers, following }) => {
                 {/* Fondo de portada */}
                 <div className="w-full h-[300px] overflow-hidden flex items-center justify-center">
                     <img
-                        src={`${user.background_image}?t=${new Date().getTime()}`}
+                        src={`${user.background_image.path_original}?t=${new Date().getTime()}`}
                         alt="Fondo"
                         className="w-full h-full object-cover"
                     />
@@ -73,7 +73,7 @@ const Show = ({ user, auth, followers, following }) => {
                         <div className="flex items-center gap-6">
                             {/* Imagen de perfil */}
                             <img
-                                src={`${user.profile_image}?t=${new Date().getTime()}`}
+                                src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
                                 alt={user.name}
                                 className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
                             />

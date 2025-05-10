@@ -120,7 +120,7 @@ const Show = ({ post, onClose }) => {
         <div className="flex items-center space-x-3 mb-4">
           <Link href={route('users.show', post.user.id)}>
             <img
-              src={`${post.user.profile_image}`}
+              src={`${post.user.profile_image.path_small}`}
               alt={post.user.name}
               className="w-10 h-10 rounded-full"
             />
