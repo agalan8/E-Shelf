@@ -25,8 +25,9 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function photo(){
-        return $this->hasOne(Photo::class);
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'post');
     }
 
     public function tags()
@@ -63,14 +64,17 @@ class Post extends Model
         static::deleting(function ($post) {
             if (! $post->isForceDeleting()) {
 
-                $post->photo->each(function ($photo) {
+                $post->image->each(function ($image) {
 
-                    $path = parse_url($photo->url, PHP_URL_PATH); // /public/profile_images/123.jpg
-                    $path = ltrim($path, '/'); // public/profile_images/123.jpg
+                    $paths = [
+                        ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                        ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                    ];
+
+                    Storage::disk('s3')->delete($paths);
 
                     // Eliminar del bucket S3
-                    Storage::disk('s3')->delete($path);
-                    $photo->delete();
+                    $image->delete();
                 });
 
                 $post->tags()->detach();

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Models\Photo;
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-
+use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
 class PostController extends Controller
 {
     /**
@@ -23,7 +23,7 @@ class PostController extends Controller
      use AuthorizesRequests;
     public function index()
     {
-        $posts = Post::orderBy('created_at')->with('user', 'photo', 'tags')->get();
+        $posts = Post::orderBy('created_at')->with('user', 'image', 'tags')->get();
 
         return Inertia::render('Posts/Index', [
             'posts' => $posts,
@@ -62,18 +62,32 @@ class PostController extends Controller
             'user_id' => Auth::user()->id,
         ]);
 
-        $user = Auth::user();
-
         if ($request->hasFile('imagen')) {
 
-            $path = $request->file('imagen')->storePublicly('public/posts/images');
+            $imagen = $request->file('imagen');
+            $extension = $imagen->getClientOriginalExtension();
+            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+            $path_original = "public/posts/{$post->id}/original/{$post->id}.{$extension}";
+            $path_medium = "public/posts/{$post->id}/medium/{$post->id}.{$extension}";
+            $path_small = "public/posts/{$post->id}/small/{$post->id}.{$extension}";
 
-            Photo::create([
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+
+
+            Storage::disk('s3')->put($path_original, $imagen, 'public');
+            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+
+
+            $image = new Image([
+                'path_original' => $path_aws . $path_original,
+                'path_medium' => $path_aws . $path_medium,
+                'type' => 'post',
                 'localizacion' => $request->localizacion,
-                'url' => "{$path}",
-                'post_id' => $post->id,
+
             ]);
 
+            $image->imageable()->associate($post)->save();
         }
 
         $tags = $request->input('tags');
@@ -124,21 +138,36 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         $post->titulo = $request->titulo;
         $post->descripcion = $request->descripcion;
-        $post->photo->localizacion = $request->localizacion;
+        $post->image->localizacion = $request->localizacion;
 
         // Actualizar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
-            $path = parse_url($post->photo->url, PHP_URL_PATH); // /public/profile_images/123.jpg
-            $path = ltrim($path, '/'); // public/profile_images/123.jpg
+
+            $imagen = $request->file('imagen');
+            $extension = $imagen->getClientOriginalExtension();
+            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+            $path_original = "public/posts/{$post->id}/original/{$post->id}.{$extension}";
+            $path_medium = "public/posts/{$post->id}/medium/{$post->id}.{$extension}";
+            $path_small = "public/posts/{$post->id}/small/{$post->id}.{$extension}";
+
+            $paths = [
+                ltrim(parse_url($post->image->path_original, PHP_URL_PATH), '/'),
+                ltrim(parse_url($post->image->path_medium, PHP_URL_PATH), '/'),
+            ];
 
             // Eliminar del bucket S3
-            Storage::disk('s3')->delete($path);
+            Storage::disk('s3')->delete($paths);
 
-            $path = $request->file('imagen')->storePublicly('public/posts/images');
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+
+            Storage::disk('s3')->put($path_original, $imagen, 'public');
+            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+
             // Actualizamos la foto asociada al post
-            $post->photo()->update([
-                'localizacion' => $request->localizacion,
-                'url' => "{$path}",
+            $post->image()->update([
+                'path_original' => $path_aws . $path_original,
+                'path_medium' =>$path_aws . $path_medium,
             ]);
         }
 
@@ -155,7 +184,7 @@ class PostController extends Controller
         }
 
         $post->save();
-        $post->photo->save();
+        $post->image->save();
 
 
         DB::commit();

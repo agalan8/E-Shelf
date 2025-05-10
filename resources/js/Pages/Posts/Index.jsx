@@ -2,7 +2,6 @@ import { Link, Head, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Show from '@/Components/Posts/Show';
-import Image from '@/Components/Image';
 
 export default function PostIndex() {
     const { posts, tags } = usePage().props;
@@ -200,9 +199,9 @@ export default function PostIndex() {
                                 <td className="border px-2 py-2">{post.titulo}</td>
                                 <td className="border px-2 py-2">{post.descripcion}</td>
                                 <td className="border px-2 py-2">
-                                    {post.photo && (
-                                        <Image
-                                            path={`${post.photo.url}?t=${new Date().getTime()}`}
+                                    {post.image && (
+                                        <img
+                                            src={`${post.image.path_medium}?t=${new Date().getTime()}`}
                                             alt="Post Photo"
                                             className="w-40 h-40 object-contain mx-auto"
                                         />

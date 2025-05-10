@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::select('id', 'profile_image', 'name', 'email', 'is_admin', 'created_at')->orderBy('name')->get();
+        $users = User::select('id', 'name', 'email', 'is_admin', 'created_at')->with('profileImage', 'backgroundImage')->orderBy('name')->get();
 
         return Inertia::render('Users/Index', [
             'users' => $users,
@@ -67,7 +67,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         return Inertia::render('Users/Show', [
-            'user' => $user,
+            'user' => $user->load('profileImage', 'backgroundImage'),
             'followers' => $user->getTotalFollowers(),
             'following' => $user->getTotalFollowing(),
         ]);

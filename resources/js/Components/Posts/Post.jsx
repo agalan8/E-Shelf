@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react'; // usePage para obtener información de la página
 import Show from '@/Components/Posts/Show'; // Asegúrate de importar el componente Show
 import Edit from '@/Components/Posts/Edit'; // Importa el componente Edit
-import Image from '@/Components/Image'; // Importa el componente de imagen
 
 
 const Post = ({ post, tags }) => {
@@ -62,8 +61,8 @@ const Post = ({ post, tags }) => {
       {/* Foto de perfil y nombre del usuario */}
       <div className="flex items-center space-x-3 mb-4">
         <Link href={route('users.show', post.user.id)}>
-          <Image
-            path={`${post.user.profile_image}?t=${new Date().getTime()}`}
+          <img
+            src={`${post.user.profile_image.path_small}?t=${new Date().getTime()}`}
             alt={post.user.name}
             className="w-10 h-10 rounded-full"
           />
@@ -77,8 +76,8 @@ const Post = ({ post, tags }) => {
       </div>
 
       {/* Imagen y contenido de la publicación */}
-      <Image
-        path={`${post.photo.url}?t=${new Date().getTime()}`}
+      <img
+        src={`${post.image.path_medium}?t=${new Date().getTime()}`}
         alt={post.titulo}
         className="w-full h-48 object-cover rounded-lg mb-4"
       />

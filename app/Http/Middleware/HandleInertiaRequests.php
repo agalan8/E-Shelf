@@ -35,7 +35,7 @@ class HandleInertiaRequests extends Middleware
         if (Auth::check()) {
             $user = User::find(Auth::user()->id);
             if ($user) {
-                $user->load('socials');
+                $user->load('socials', 'profileImage', 'backgroundImage');
             }
         }
 
@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-            'user' => $request->user() ? $request->user()->load('following') : null,  // Verificamos si hay un usuario autenticado
+            'user' => $request->user() ? $request->user()->load('following', 'profileImage', 'backgroundImage') : null,  // Verificamos si hay un usuario autenticado
             ],
             'userEdit' => $user ?? null,
             'socials' => Social::all(),

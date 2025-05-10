@@ -50,6 +50,17 @@ class User extends Authenticatable
         ];
     }
 
+    public function profileImage()
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'profile');
+    }
+
+
+    public function backgroundImage()
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'background');
+    }
+
     public function socials()
     {
         return $this->belongsToMany(Social::class)->withPivot('perfil');

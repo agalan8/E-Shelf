@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUpTrayIcon, TrashIcon } from '@heroicons/react/24/solid';
-import { useForm } from '@inertiajs/react';
 
-const ImageInput = ({ name, label, onChange, initialImage, previewClassName = '', destroyUrl }) => {
+const ImageInput = ({ name, label, onChange, onDelete, initialImage, previewClassName = '' }) => {
     const [imagePreview, setImagePreview] = useState(initialImage);
     const fileInputRef = useRef();
-    const { delete: deleteRequest } = useForm(); // Use the correct `delete` method
 
     useEffect(() => {
         if (!imagePreview && initialImage) {
@@ -26,13 +24,9 @@ const ImageInput = ({ name, label, onChange, initialImage, previewClassName = ''
     };
 
     const handleDelete = () => {
-        if (destroyUrl) {
-            // Make sure delete is being called correctly
-            deleteRequest(destroyUrl, {
-                preserveScroll: true, // Keep the scroll position
-            });
-            setImagePreview(null); // Clear the preview of the image
-        }
+        setImagePreview(null);
+        onChange(null);
+        if (onDelete) onDelete(); // llamar a función del padre si está definida
     };
 
     return (
@@ -40,10 +34,9 @@ const ImageInput = ({ name, label, onChange, initialImage, previewClassName = ''
             {label && <label className="block font-medium text-base text-white">{label}</label>}
 
             <div className="relative inline-block">
-                {/* Image Preview */}
                 <div
                     className={`image-preview ${previewClassName} ${!imagePreview ? 'bg-[#2A2C32]' : ''}`}
-                    style={{ height: previewClassName ? undefined : '145px', width: previewClassName ? undefined : '145px'}}
+                    style={{ height: previewClassName ? undefined : '145px', width: previewClassName ? undefined : '145px' }}
                 >
                     {imagePreview && (
                         <img
@@ -54,7 +47,6 @@ const ImageInput = ({ name, label, onChange, initialImage, previewClassName = ''
                     )}
                 </div>
 
-                {/* Hidden file input */}
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -64,7 +56,6 @@ const ImageInput = ({ name, label, onChange, initialImage, previewClassName = ''
                     className="hidden"
                 />
 
-                {/* Upload button */}
                 <button
                     type="button"
                     onClick={triggerFileSelect}
@@ -74,7 +65,6 @@ const ImageInput = ({ name, label, onChange, initialImage, previewClassName = ''
                     <ArrowUpTrayIcon className="h-7 w-7 text-gray-800" />
                 </button>
 
-                {/* Delete button */}
                 {imagePreview && (
                     <button
                         type="button"

@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Photo;
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class PhotoPolicy
+class ImagePolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class PhotoPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Photo $photo): bool
+    public function view(User $user, Image $image): bool
     {
         return false;
     }
@@ -35,7 +35,7 @@ class PhotoPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Photo $photo): bool
+    public function update(User $user, Image $image): bool
     {
         return false;
     }
@@ -43,7 +43,7 @@ class PhotoPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Photo $photo): bool
+    public function delete(User $user, Image $image): bool
     {
         return false;
     }
@@ -51,7 +51,7 @@ class PhotoPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Photo $photo): bool
+    public function restore(User $user, Image $image): bool
     {
         return false;
     }
@@ -59,7 +59,7 @@ class PhotoPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Photo $photo): bool
+    public function forceDelete(User $user, Image $image): bool
     {
         return false;
     }

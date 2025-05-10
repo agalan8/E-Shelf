@@ -10,6 +10,7 @@ use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\Album;
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
+
 
 Route::get('/', function () {
 
@@ -31,7 +34,7 @@ Route::get('/', function () {
 
     if(Auth::check()){
         return Inertia::render('Explorar', [
-            'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user')->inRandomOrder()->get(),
+            'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->inRandomOrder()->get(),
         ]);
     }
 
@@ -49,11 +52,8 @@ Route::get('/', function () {
 Route::get('/explorar', function () {
 
 
-    // $user = User::findOrFail(Auth::id());
-    // dd(Post::with('photo', 'tags', 'user', 'comments')->inRandomOrder()->get());
-
     return Inertia::render('Explorar', [
-        'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->inRandomOrder()->get()->map(function ($post) {
+        'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->inRandomOrder()->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
@@ -70,6 +70,8 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('posts', PostController::class)->middleware('auth');
 Route::resource('albums', AlbumController::class)->middleware('auth');
+Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])
+    ->name('albums.eliminar-portada');
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
 Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
@@ -89,11 +91,10 @@ Route::get('/mis-posts', function () {
     $userId = Auth::user()->id;
     $user = User::findOrFail($userId);
 
-    // dd($user->posts()->with('photo', 'tags', 'user', 'comments')->get());
     return Inertia::render('Posts/MisPosts', [
 
 
-        'posts' => $user->posts()->with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->get()->map(function ($post) {
+        'posts' => $user->posts()->with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = $post->isLikedByUser();
             return $post;
@@ -109,7 +110,7 @@ Route::get('/posts-seguidos', function () {
     $followingIds = $user->following()->pluck('followed_user_id');
 
     // Obtener posts de esos usuarios, ordenados por los más recientes
-    $posts = Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')
+    $posts = Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')
         ->whereIn('user_id', $followingIds)
         ->orderBy('created_at', 'desc')
         ->get()->map(function ($post) {
@@ -130,8 +131,8 @@ Route::get('/mis-albums', function () {
     $user = User::findOrFail($userId);
 
     return Inertia::render('Albums/MisAlbums', [
-        'albums' => $user->albums()->with('posts', 'user', 'posts.photo')->orderBy('created_at', 'desc')->get(),
-        'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
+        'albums' => $user->albums()->with('posts', 'user', 'user.profileImage', 'user.backgroundImage', 'coverImage', 'posts.image')->orderBy('created_at', 'desc')->get(),
+        'posts' => $user->posts()->with('image', 'tags', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
 
@@ -177,30 +178,90 @@ Route::post('/images/update', function (Request $request) {
     // Subir imagen de perfil
     if ($request->hasFile('profile_image')) {
 
-        if ($user->profile_image) {
-            $path = parse_url($user->profile_image, PHP_URL_PATH); // /public/profile_images/123.jpg
-            $path = ltrim($path, '/'); // public/profile_images/123.jpg
+        $imagen = $request->file('profile_image');
+        $extension = $imagen->getClientOriginalExtension();
+        $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+        $path_original = "public/users/{$user->id}/profile_image/original/{$user->id}.{$extension}";
+        $path_medium = "public/users/{$user->id}/profile_image/medium/{$user->id}.{$extension}";
+        $path_small = "public/users/{$user->id}/profile_image/small/{$user->id}.{$extension}";
 
-            // Eliminar del bucket S3
-            Storage::disk('s3')->delete($path);
+        if($user->profileImage){
+            $paths = [
+                ltrim(parse_url($user->profileImage->path_small, PHP_URL_PATH), '/'),
+            ];
+
+            Storage::disk('s3')->delete($paths);
         }
 
-        $path = $request->file('profile_image')->storePublicly('public/users/profile_images');
-        $user->profile_image = "{$path}";
+
+        $smallImage = ImageIntervention::read($imagen)->scale( height: 350)->encode();
+
+        Storage::disk('s3')->put($path_small, $smallImage, 'public');
+
+        if($user->profileImage){
+            // Actualizamos la foto asociada al post
+            $user->profileImage()->update([
+                'path_small' => $path_aws . $path_small,
+            ]);
+        } else {
+
+            $image = new Image([
+                'path_small' => $path_aws . $path_small,
+                'type' => 'profile',
+
+            ]);
+
+            $image->imageable()->associate($user)->save();
+
+        }
+
     }
 
-    // Subir imagen de portada
     if ($request->hasFile('background_image')) {
-        if ($user->background_image) {
-            $path = parse_url($user->backgroun_image, PHP_URL_PATH); // /public/profile_images/123.jpg
-            $path = ltrim($path, '/'); // public/profile_images/123.jpg
 
-            // Eliminar del bucket S3
-            Storage::disk('s3')->delete($path);
+        $imagen = $request->file('background_image');
+        $extension = $imagen->getClientOriginalExtension();
+        $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+        $path_original = "public/users/{$user->id}/background_image/original/{$user->id}.{$extension}";
+        $path_medium = "public/users/{$user->id}/background_image/medium/{$user->id}.{$extension}";
+        $path_small = "public/users/{$user->id}/background_image/small/{$user->id}.{$extension}";
+
+        if($user->backgroundImage){
+            $paths = [
+                ltrim(parse_url($user->backgroundImage->path_original, PHP_URL_PATH), '/'),
+                ltrim(parse_url($user->backgroundImage->path_medium, PHP_URL_PATH), '/'),
+            ];
+
+            Storage::disk('s3')->delete($paths);
         }
 
-        $path = $request->file('background_image')->storePublicly('public/users/background_images');
-        $user->background_image = "{$path}";
+
+        $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+        $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+
+        Storage::disk('s3')->put($path_original, $imagen, 'public');
+        Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+
+        if($user->backgrounImage){
+            // Actualizamos la foto asociada al post
+            $user->backgroundImage()->update([
+                'path_original' => $path_aws . $path_original,
+                'path_medium' => $path_aws . $path_medium,
+
+            ]);
+        } else {
+
+            $image = new Image([
+                'path_original' => $path_aws . $path_original,
+                'path_medium' => $path_aws . $path_medium,
+                'type' => 'background',
+
+            ]);
+
+            $image->imageable()->associate($user)->save();
+
+        }
+
     }
 
     $user->save();
@@ -210,26 +271,29 @@ Route::post('/images/update', function (Request $request) {
 
 
 Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $imageType) {
-    // Verificar el tipo de imagen a eliminar (profile_image o background_image)
-    if ($imageType === 'profile_image' && $user->profile_image) {
 
-        $path = parse_url($user->profile_image, PHP_URL_PATH); // /public/profile_images/123.jpg
+    // Verificar el tipo de imagen a eliminar (profile_image o background_image)
+    if ($imageType === 'profile_image' && $user->profileImage) {
+
+        $path = parse_url($user->profileImage->path_small, PHP_URL_PATH); // /public/profile_images/123.jpg
         $path = ltrim($path, '/'); // public/profile_images/123.jpg
 
         // Eliminar del bucket S3
         Storage::disk('s3')->delete($path);
-        $user->profile_image = null;
+        $user->profileImage->delete();
     }
 
-    if ($imageType === 'background_image' && $user->background_image) {
+    if ($imageType === 'background_image' && $user->backgroundImage) {
 
-        $path = parse_url($user->background_image, PHP_URL_PATH); // /public/profile_images/123.jpg
-        $path = ltrim($path, '/'); // public/profile_images/123.jpg
+        $paths = [
+            ltrim(parse_url($user->backgroundImage->path_original, PHP_URL_PATH), '/'),
+            ltrim(parse_url($user->backgroundImage->path_medium, PHP_URL_PATH), '/'),
+        ];
 
         // Eliminar del bucket S3
-        Storage::disk('s3')->delete($path);
+        Storage::disk('s3')->delete($paths);
 
-        $user->background_image = null;
+        $user->backgroundImage->delete();
     }
 
     // Guardar los cambios en el usuario (vaciar la ruta de la imagen)
@@ -261,7 +325,7 @@ Route::get('/buscar', function (Request $request) {
 
 
     if ($filter === 'Usuarios') {
-        $results = User::where('name', 'like', "%{$query}%")->get();
+        $results = User::where('name', 'like', "%{$query}%")->with('user.profileImage', 'user.backgroundImage')->get();
     } else {
         $results = [];
     }
