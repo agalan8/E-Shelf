@@ -5,7 +5,6 @@ import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-sv
 import { faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Comment from '@/Components/Comments/Comment';
-import Image from '@/Components/Image';
 
 const Show = ({ post, onClose }) => {
   const { auth, newCommentId } = usePage().props;
@@ -120,8 +119,8 @@ const Show = ({ post, onClose }) => {
         {/* Usuario */}
         <div className="flex items-center space-x-3 mb-4">
           <Link href={route('users.show', post.user.id)}>
-            <Image
-              path={`${post.user.profile_image}`}
+            <img
+              src={`${post.user.profile_image}`}
               alt={post.user.name}
               className="w-10 h-10 rounded-full"
             />
@@ -137,8 +136,8 @@ const Show = ({ post, onClose }) => {
 
         {/* Imagen */}
         <div className="relative">
-          <Image
-            path={`${post.photo.url}?t=${new Date().getTime()}`}
+          <img
+            src={`${post.image.path_original}?t=${new Date().getTime()}`}
             alt={post.titulo}
             className="w-full h-64 object-cover rounded-lg mb-4 cursor-pointer"
             onClick={handleImageClick}
@@ -147,7 +146,7 @@ const Show = ({ post, onClose }) => {
 
         {/* Info */}
         <h2 className="text-2xl font-semibold">{post.titulo}</h2>
-        <p className="text-sm text-gray-500 mb-2">Localización: {post.photo.localizacion}</p>
+        <p className="text-sm text-gray-500 mb-2">Localización: {post.image.localizacion}</p>
         <p className="text-lg">{post.descripcion}</p>
 
         {/* Categorías */}
@@ -228,8 +227,8 @@ const Show = ({ post, onClose }) => {
           >
             X
           </button>
-          <Image
-            path={`${post.photo.url}?t=${new Date().getTime()}`}
+          <img
+            src={`${post.image.path_original}?t=${new Date().getTime()}`}
             alt={post.titulo}
             className="max-w-full max-h-full object-contain cursor-pointer"
             onClick={closeImageView}

@@ -1,12 +1,11 @@
 import { router } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
-import Image from '@/Components/Image';
 
 const Edit = ({ post, onClose, tags }) => {
   // Asegurando que nunca haya valores undefined
   const [titulo, setTitulo] = useState(post?.titulo || '');
   const [descripcion, setDescripcion] = useState(post?.descripcion || '');
-  const [localizacion, setLocalizacion] = useState(post?.photo.localizacion || '');
+  const [localizacion, setLocalizacion] = useState(post?.image.localizacion || '');
   const [selectedTags, setSelectedTags] = useState(post?.tags || []);
   const [imageFile, setImageFile] = useState(null); // Estado para manejar la nueva imagen
   const [imageUploaded, setImageUploaded] = useState(false); // Estado para verificar si se subió una nueva imagen
@@ -18,7 +17,7 @@ const Edit = ({ post, onClose, tags }) => {
     // Reset form fields if post data changes
     setTitulo(post?.titulo || '');
     setDescripcion(post?.descripcion || '');
-    setLocalizacion(post?.photo.localizacion || '');
+    setLocalizacion(post?.image.localizacion || '');
     setSelectedTags(post?.tags || []);
     setImageUploaded(false);
     setImageFile(null);
@@ -93,8 +92,8 @@ const Edit = ({ post, onClose, tags }) => {
             </div>
           ) : (
             <div>
-              <Image
-                path={`${post?.photo?.url}?t=${new Date().getTime()}`}
+              <img
+                src={`${post?.image?.path_medium}?t=${new Date().getTime()}`}
                 alt="Imagen actual"
                 className="w-32 h-32 object-cover rounded-lg mb-4"
               />

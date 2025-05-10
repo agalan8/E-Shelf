@@ -81,9 +81,9 @@ class AlbumController extends Controller
     {
         $userId = Auth::user()->id;
         $user = User::findOrFail($userId);
-        $posts = Post::where('user_id', $userId)->with('photo', 'tags', 'user')->get();
+        $posts = Post::where('user_id', $userId)->with('image', 'tags', 'user')->get();
         return Inertia::render('Albums/Show', [
-            'album' => $album->with('posts', 'user', 'posts.photo', 'posts.user', 'posts.tags')->find($album->id),
+            'album' => $album->with('posts', 'user', 'posts.image', 'posts.user', 'posts.tags')->find($album->id),
             'userPosts' => $posts,
         ]);
     }

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import React from 'react';
 import HTMLFlipBook from "react-pageflip";
-import Image from "@/Components/Image";
 
 export default function FlipBook({ isOpen, onClose, album }) {
 
@@ -93,8 +92,8 @@ export default function FlipBook({ isOpen, onClose, album }) {
             {/* Portada del álbum */}
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
-                <Image
-                  path={`${currentAlbum.portada}?t=${new Date().getTime()}`}
+                <img
+                  src={`${currentAlbum.portada}?t=${new Date().getTime()}`}
                   alt={currentAlbum.nombre}
                   className="w-full h-full object-cover"
                 />
@@ -106,9 +105,9 @@ export default function FlipBook({ isOpen, onClose, album }) {
               post ? (
                 <div key={index} className="w-full h-full flex items-center justify-center">
                   <div className="page-content w-full h-full">
-                    <Image
-                      path={`${post.photo.url}?t=${new Date().getTime()}`}
-                      alt={post.photo.localizacion || `Photo ${index + 1}`}
+                    <img
+                      src={`${post.image.path_original}?t=${new Date().getTime()}`}
+                      alt={post.image.localizacion || `Photo ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -124,8 +123,8 @@ export default function FlipBook({ isOpen, onClose, album }) {
             {/* Contraportada del álbum */}
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
-                <Image
-                  path={`${currentAlbum.portada}?t=${new Date().getTime()}`}
+                <img
+                  src={`${currentAlbum.portada}?t=${new Date().getTime()}`}
                   alt={currentAlbum.nombre}
                   className="w-full h-full object-cover"
                 />

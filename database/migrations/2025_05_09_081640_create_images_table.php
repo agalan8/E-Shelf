@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('path_small')->nullable();
             $table->morphs('imageable');
             $table->string('type');
+            $table->string('localizacion')->nullable();
             $table->timestamps();
         });
     }

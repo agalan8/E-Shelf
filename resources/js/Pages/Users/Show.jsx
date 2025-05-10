@@ -5,7 +5,6 @@ import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-sv
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
-import Image from '@/Components/Image';
 
 
 const Show = ({ user, auth, followers, following }) => {
@@ -61,8 +60,8 @@ const Show = ({ user, auth, followers, following }) => {
             <div className="user-profile">
                 {/* Fondo de portada */}
                 <div className="w-full h-[300px] overflow-hidden flex items-center justify-center">
-                    <Image
-                        path={`${user.background_image}?t=${new Date().getTime()}`}
+                    <img
+                        src={`${user.background_image}?t=${new Date().getTime()}`}
                         alt="Fondo"
                         className="w-full h-full object-cover"
                     />
@@ -73,8 +72,8 @@ const Show = ({ user, auth, followers, following }) => {
                     <div className="profile-header" style={{ position: 'relative', marginTop: '-75px' }}>
                         <div className="flex items-center gap-6">
                             {/* Imagen de perfil */}
-                            <Image
-                                path={`${user.profile_image}?t=${new Date().getTime()}`}
+                            <img
+                                src={`${user.profile_image}?t=${new Date().getTime()}`}
                                 alt={user.name}
                                 className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
                             />

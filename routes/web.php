@@ -31,7 +31,7 @@ Route::get('/', function () {
 
     if(Auth::check()){
         return Inertia::render('Explorar', [
-            'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user')->inRandomOrder()->get(),
+            'posts' => Post::with('image', 'tags', 'user', 'comments', 'comments.user')->inRandomOrder()->get(),
         ]);
     }
 
@@ -49,11 +49,8 @@ Route::get('/', function () {
 Route::get('/explorar', function () {
 
 
-    // $user = User::findOrFail(Auth::id());
-    // dd(Post::with('photo', 'tags', 'user', 'comments')->inRandomOrder()->get());
-
     return Inertia::render('Explorar', [
-        'posts' => Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->inRandomOrder()->get()->map(function ($post) {
+        'posts' => Post::with('image', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->inRandomOrder()->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
@@ -89,11 +86,10 @@ Route::get('/mis-posts', function () {
     $userId = Auth::user()->id;
     $user = User::findOrFail($userId);
 
-    // dd($user->posts()->with('photo', 'tags', 'user', 'comments')->get());
     return Inertia::render('Posts/MisPosts', [
 
 
-        'posts' => $user->posts()->with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->get()->map(function ($post) {
+        'posts' => $user->posts()->with('image', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = $post->isLikedByUser();
             return $post;
@@ -109,7 +105,7 @@ Route::get('/posts-seguidos', function () {
     $followingIds = $user->following()->pluck('followed_user_id');
 
     // Obtener posts de esos usuarios, ordenados por los más recientes
-    $posts = Post::with('photo', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')
+    $posts = Post::with('image', 'tags', 'user', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user')
         ->whereIn('user_id', $followingIds)
         ->orderBy('created_at', 'desc')
         ->get()->map(function ($post) {
@@ -130,8 +126,8 @@ Route::get('/mis-albums', function () {
     $user = User::findOrFail($userId);
 
     return Inertia::render('Albums/MisAlbums', [
-        'albums' => $user->albums()->with('posts', 'user', 'posts.photo')->orderBy('created_at', 'desc')->get(),
-        'posts' => $user->posts()->with('photo', 'tags', 'user')->get(),
+        'albums' => $user->albums()->with('posts', 'user', 'posts.image')->orderBy('created_at', 'desc')->get(),
+        'posts' => $user->posts()->with('image', 'tags', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
 

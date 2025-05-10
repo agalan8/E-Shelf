@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react'; // Asegúrate de importar Link
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
-import Image from '@/Components/Image'; // Asegúrate de importar el componente de imagen
 
 export default function User({ user }) {
   const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
@@ -57,16 +56,16 @@ export default function User({ user }) {
     <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white cursor-pointer">
       <div className="relative">
         {/* Imagen de fondo */}
-        <Image
+        <img
           className="w-full h-32 object-cover"
-          path={`${user.background_image}?t=${new Date().getTime()}`}
+          src={`${user.background_image}?t=${new Date().getTime()}`}
           alt="Background"
         />
         {/* Imagen de perfil */}
         <div className="absolute top-16 left-4">
-          <Image
+          <img
             className="w-24 h-24 rounded-full border-4 border-white shadow-md"
-            path={`${user.profile_image}?t=${new Date().getTime()}`}
+            src={`${user.profile_image}?t=${new Date().getTime()}`}
             alt="Profile Image"
           />
         </div>

@@ -17,6 +17,7 @@ class Image extends Model
         'imageable_id',
         'imageable_type',
         'type',
+        'localizacion',
     ];
 
     public function imageable()
