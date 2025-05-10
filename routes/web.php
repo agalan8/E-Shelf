@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('posts', PostController::class)->middleware('auth');
 Route::resource('albums', AlbumController::class)->middleware('auth');
+Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])
+    ->name('albums.eliminar-portada');
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
 Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
@@ -126,7 +128,7 @@ Route::get('/mis-albums', function () {
     $user = User::findOrFail($userId);
 
     return Inertia::render('Albums/MisAlbums', [
-        'albums' => $user->albums()->with('posts', 'user', 'posts.image')->orderBy('created_at', 'desc')->get(),
+        'albums' => $user->albums()->with('posts', 'user', 'coverImage', 'posts.image')->orderBy('created_at', 'desc')->get(),
         'posts' => $user->posts()->with('image', 'tags', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');

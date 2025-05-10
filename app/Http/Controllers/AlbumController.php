@@ -6,11 +6,14 @@ use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Album;
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
+
 
 class AlbumController extends Controller
 {
@@ -53,9 +56,30 @@ class AlbumController extends Controller
 
         if ($request->hasFile('portada')) {
 
-            $path = $request->file('portada')->storePublicly('public/albums/portadas');
+            $imagen = $request->file('portada');
+            $extension = $imagen->getClientOriginalExtension();
+            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+            $path_original = "public/albums/{$album->id}/original/{$album->id}.{$extension}";
+            $path_medium = "public/albums/{$album->id}/medium/{$album->id}.{$extension}";
+            $path_small = "public/albums/{$album->id}/small/{$album->id}.{$extension}";
 
-            $album->portada = "{$path}";
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+
+
+            Storage::disk('s3')->put($path_original, $imagen, 'public');
+            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+
+
+            $image = new Image([
+                'path_original' => $path_aws . $path_original,
+                'path_medium' => $path_aws . $path_medium,
+                'type' => 'cover',
+                'localizacion' => $request->localizacion,
+
+            ]);
+
+            $image->imageable()->associate($album)->save();
 
         }
 
@@ -115,15 +139,52 @@ class AlbumController extends Controller
 
         if ($request->hasFile('portada')) {
 
-            $path = parse_url($album->portada, PHP_URL_PATH); // /public/profile_images/123.jpg
-            $path = ltrim($path, '/'); // public/profile_images/123.jpg
+            $imagen = $request->file('portada');
+            $extension = $imagen->getClientOriginalExtension();
+            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+            $path_original = "public/albums/{$album->id}/original/{$album->id}.{$extension}";
+            $path_medium = "public/albums/{$album->id}/medium/{$album->id}.{$extension}";
+            $path_small = "public/albums/{$album->id}/small/{$album->id}.{$extension}";
+
+            if($album->coverImage){
+
+                $paths = [
+                    ltrim(parse_url($album->coverImage->path_original, PHP_URL_PATH), '/'),
+                    ltrim(parse_url($album->coverImage->path_medium, PHP_URL_PATH), '/'),
+                ];
+                Storage::disk('s3')->delete($paths);
+            }
+
 
             // Eliminar del bucket S3
-            Storage::disk('s3')->delete($path);
 
-            $path = $request->file('portada')->storePublicly('public/albums/portadas');
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
 
-            $album->portada = "{$path}";
+            Storage::disk('s3')->put($path_original, $imagen, 'public');
+            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+
+
+            if($album->coverImage){
+                // Actualizamos la foto asociada al post
+                $album->coverImage()->update([
+                    'path_original' => $path_aws . $path_original,
+                    'path_medium' =>$path_aws . $path_medium,
+                ]);
+            } else {
+
+                $image = new Image([
+                    'path_original' => $path_aws . $path_original,
+                    'path_medium' => $path_aws . $path_medium,
+                    'type' => 'cover',
+                    'localizacion' => $request->localizacion,
+
+                ]);
+
+                $image->imageable()->associate($album)->save();
+
+            }
+
         }
 
         $album->save();
@@ -140,4 +201,20 @@ class AlbumController extends Controller
         $this->authorize('delete', $album);
         $album->delete();
     }
+
+    public function eliminarPortada(Album $album)
+{
+    if ($album->coverImage) {
+
+        $paths = [
+            ltrim(parse_url($album->coverImage->path_original, PHP_URL_PATH), '/'),
+            ltrim(parse_url($album->coverImage->path_medium, PHP_URL_PATH), '/'),
+        ];
+        // Eliminar archivos de AWS S3
+        Storage::disk('s3')->delete($paths);
+
+        // Eliminar el registro de la base de datos
+        $album->coverImage->delete();
+    }
+}
 }

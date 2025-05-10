@@ -15,7 +15,6 @@ class Album extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'portada',
         'user_id',
     ];
 
@@ -39,7 +38,7 @@ class Album extends Model
                 $album->posts()->detach();
             }
 
-            $path = parse_url($album->portada, PHP_URL_PATH); // /public/profile_images/123.jpg
+            $path = parse_url($album->coverImage, PHP_URL_PATH); // /public/profile_images/123.jpg
             $path = ltrim($path, '/'); // public/profile_images/123.jpg
 
             // Eliminar del bucket S3

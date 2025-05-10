@@ -150,9 +150,13 @@ class PostController extends Controller
             $path_medium = "public/posts/{$post->id}/medium/{$post->id}.{$extension}";
             $path_small = "public/posts/{$post->id}/small/{$post->id}.{$extension}";
 
+            $paths = [
+                ltrim(parse_url($post->image->path_original, PHP_URL_PATH), '/'),
+                ltrim(parse_url($post->image->path_medium, PHP_URL_PATH), '/'),
+            ];
 
             // Eliminar del bucket S3
-            Storage::disk('s3')->delete([$path_original, $path_medium]);
+            Storage::disk('s3')->delete($paths);
 
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();

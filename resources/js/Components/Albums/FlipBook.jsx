@@ -3,7 +3,6 @@ import React from 'react';
 import HTMLFlipBook from "react-pageflip";
 
 export default function FlipBook({ isOpen, onClose, album }) {
-
   if (!isOpen) return null;
 
   // Referencia para el flipbook
@@ -63,6 +62,9 @@ export default function FlipBook({ isOpen, onClose, album }) {
   const width = window.innerWidth;
   const height = width * (2 / 3);
 
+  // Verificar si cover_image está disponible o no
+  const coverImageUrl = currentAlbum.cover_image ? `${currentAlbum.cover_image.path_original}?t=${new Date().getTime()}` : null;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-hidden">
       <div className="bg-white p-0 rounded-lg shadow-xl w-full h-full flex flex-col items-center overflow-hidden">
@@ -92,11 +94,17 @@ export default function FlipBook({ isOpen, onClose, album }) {
             {/* Portada del álbum */}
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
-                <img
-                  src={`${currentAlbum.portada}?t=${new Date().getTime()}`}
-                  alt={currentAlbum.nombre}
-                  className="w-full h-full object-cover"
-                />
+                {coverImageUrl ? (
+                  <img
+                    src={coverImageUrl}
+                    alt={currentAlbum.nombre}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-white flex items-center justify-center">
+                    <span className="text-gray-500">Sin portada</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -123,11 +131,17 @@ export default function FlipBook({ isOpen, onClose, album }) {
             {/* Contraportada del álbum */}
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
-                <img
-                  src={`${currentAlbum.portada}?t=${new Date().getTime()}`}
-                  alt={currentAlbum.nombre}
-                  className="w-full h-full object-cover"
-                />
+                {coverImageUrl ? (
+                  <img
+                    src={coverImageUrl}
+                    alt={currentAlbum.nombre}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-white flex items-center justify-center">
+                    <span className="text-gray-500">Sin portada</span>
+                  </div>
+                )}
               </div>
             </div>
 
