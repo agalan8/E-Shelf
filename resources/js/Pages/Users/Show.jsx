@@ -6,7 +6,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
 
-
 const Show = ({ user, auth, followers, following }) => {
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
@@ -59,12 +58,16 @@ const Show = ({ user, auth, followers, following }) => {
         <Layout subnav={<UsersSubnav />}>
             <div className="user-profile">
                 {/* Fondo de portada */}
-                <div className="w-full h-[300px] overflow-hidden flex items-center justify-center">
-                    <img
-                        src={`${user.background_image.path_original}?t=${new Date().getTime()}`}
-                        alt="Fondo"
-                        className="w-full h-full object-cover"
-                    />
+                <div className="w-full h-[300px] overflow-hidden flex items-center justify-center bg-white">
+                    {user.background_image?.path_original ? (
+                        <img
+                            src={`${user.background_image.path_original}?t=${new Date().getTime()}`}
+                            alt="Fondo"
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-white" />
+                    )}
                 </div>
 
                 {/* Detalles del perfil */}
@@ -72,14 +75,22 @@ const Show = ({ user, auth, followers, following }) => {
                     <div className="profile-header" style={{ position: 'relative', marginTop: '-75px' }}>
                         <div className="flex items-center gap-6">
                             {/* Imagen de perfil */}
-                            <img
-                                src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
-                                alt={user.name}
-                                className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
-                            />
+                            {user.profile_image?.path_small ? (
+                                <img
+                                    src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
+                                    alt={user.name}
+                                    className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
+                                />
+                            ) : (
+                                <div
+                                    className="w-[150px] h-[150px] rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-gray-500 text-4xl"
+                                    title="Sin imagen"
+                                >
+                                    ?
+                                </div>
+                            )}
 
-
-                            {/* Contadores de Seguidores y Seguidos uno al lado del otro */}
+                            {/* Contadores de Seguidores y Seguidos */}
                             <div className="flex items-center gap-8 ml-6">
                                 <div className="text-center">
                                     <p className="font-semibold">{followers}</p>

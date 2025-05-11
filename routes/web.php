@@ -325,7 +325,7 @@ Route::get('/buscar', function (Request $request) {
 
 
     if ($filter === 'Usuarios') {
-        $results = User::where('name', 'like', "%{$query}%")->with('user.profileImage', 'user.backgroundImage')->get();
+        $results = User::where('name', 'like', "%{$query}%")->with('profileImage', 'backgroundImage')->get();
     } else {
         $results = [];
     }

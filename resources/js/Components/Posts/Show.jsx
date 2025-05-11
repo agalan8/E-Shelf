@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
+import { faUserPlus, faUserMinus, faUserCheck, faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Comment from '@/Components/Comments/Comment';
 
@@ -119,11 +118,17 @@ const Show = ({ post, onClose }) => {
         {/* Usuario */}
         <div className="flex items-center space-x-3 mb-4">
           <Link href={route('users.show', post.user.id)}>
-            <img
-              src={`${post.user.profile_image.path_small}`}
-              alt={post.user.name}
-              className="w-10 h-10 rounded-full"
-            />
+            {post.user.profile_image?.path_small ? (
+              <img
+                src={`${post.user.profile_image.path_small}?t=${new Date().getTime()}`}
+                alt={post.user.name}
+                className="w-10 h-10 rounded-full"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm">
+                ?
+              </div>
+            )}
           </Link>
           <Link
             href={route('users.show', post.user.id)}
