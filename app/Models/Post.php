@@ -60,28 +60,32 @@ class Post extends Model
     }
 
     protected static function booted()
-    {
-        static::deleting(function ($post) {
-            if (! $post->isForceDeleting()) {
+{
+    static::deleting(function ($post) {
+        if (! $post->isForceDeleting()) {
+            // Verifica si el post tiene una imagen asociada antes de intentar eliminarla
+            if ($post->image) {
+                $image = $post->image;
 
-                $post->image->each(function ($image) {
+                $paths = [
+                    ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                    ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                ];
 
-                    $paths = [
-                        ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                        ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-                    ];
+                // Elimina las imágenes asociadas al post desde S3
+                Storage::disk('s3')->delete($paths);
 
-                    Storage::disk('s3')->delete($paths);
-
-                    // Eliminar del bucket S3
-                    $image->delete();
-                });
-
-                $post->tags()->detach();
-                $post->albums()->detach();
+                // Eliminar la imagen de la base de datos
+                $image->delete();
             }
-        });
-    }
+
+            // Desvincula los tags y álbumes del post
+            $post->tags()->detach();
+            $post->albums()->detach();
+        }
+    });
+}
+
 
 
 }

@@ -48,7 +48,7 @@ const Show = ({ album, userPosts }) => {
 
   return (
     <AuthenticatedLayout
-      header={<h2 className="text-xl font-semibold leading-tight text-gray-800">{album.titulo}</h2>}
+      header={<h2 className=" font-semibold leading-tight text-gray-800">{album.titulo}</h2>}
     >
       <Head title="Mis Álbumes" />
       <div className="container mx-auto p-4">

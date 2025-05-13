@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
+import Image from '../Image';
 
 const AddPosts = ({ album, userPosts, onClose }) => {
   const [selectedPosts, setSelectedPosts] = useState([]);
@@ -54,7 +55,7 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                   }`}
                   onClick={() => togglePostSelection(post.id)}
                 >
-                  <img
+                  <Image
                     src={`${post.image.path_medium}`}
                     alt={post.titulo}
                     className="object-cover w-full h-64 rounded-md"

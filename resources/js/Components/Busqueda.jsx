@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export default function Busqueda() {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,30 +9,32 @@ export default function Busqueda() {
 
   const toggleModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
-  const selectFilter = (type) => {
-    setFilter(type);
-  };
-  const clearFilter = () => {
-    setFilter(null);
-  };
+  const selectFilter = (type) => setFilter(type);
+  const clearFilter = () => setFilter(null);
   const handleSearch = () => {
     router.get("/buscar", { q: searchText, filter });
     setIsOpen(false);
   };
 
   return (
-    <div className="relative w-72">
-      <div className="flex items-center border border-gray-300 bg-white rounded-full px-4 py-2 w-full">
+    <div className="relative w-60">
+      <div className="relative w-full">
         <input
           type="text"
           placeholder="Buscar..."
-          className="flex-grow focus:outline-none"
+          className="w-full pl-4 pr-10 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none"
           onFocus={toggleModal}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
-        <button onClick={handleSearch} className="ml-2 text-blue-500">🔍</button>
+        <button
+          onClick={handleSearch}
+          className="absolute inset-y-0 right-2 flex items-center text-blue-500"
+        >
+          <MagnifyingGlassIcon className="h-4 w-4" />
+        </button>
       </div>
+
       {isOpen && (
         <div className="absolute left-0 mt-2 w-full bg-white border rounded-lg shadow-lg p-4 z-50">
           {filter ? (
@@ -50,7 +53,12 @@ export default function Busqueda() {
               </button>
             </>
           )}
-          <button className="mt-2 w-full bg-gray-100 text-gray-600 py-2 rounded-lg" onClick={closeModal}>Cerrar</button>
+          <button
+            className="mt-2 w-full bg-gray-100 text-gray-600 py-2 rounded-lg"
+            onClick={closeModal}
+          >
+            Cerrar
+          </button>
         </div>
       )}
     </div>

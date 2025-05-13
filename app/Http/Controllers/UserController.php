@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -70,6 +71,13 @@ class UserController extends Controller
             'user' => $user->load('profileImage', 'backgroundImage'),
             'followers' => $user->getTotalFollowers(),
             'following' => $user->getTotalFollowing(),
+            'posts' => $user->posts()->with('image','tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')
+            ->get()->map(function ($post) {
+            $post->getTotalLikes = $post->getTotalLikes();
+            $post->isLikedByUser = $post->isLikedByUser();
+            return $post;
+        }),
+        'tags' => Tag::all(),
         ]);
     }
 

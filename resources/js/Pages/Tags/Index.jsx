@@ -78,7 +78,7 @@ export default function TagIndex() {
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Gestión de Categorías</h2>}
+            header={<h2 className=" font-semibold leading-tight text-gray-800">Gestión de Categorías</h2>}
         >
             <Head title="Gestión de Categorías" />
 

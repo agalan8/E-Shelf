@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
+import { ChatBubbleOvalLeftIcon } from '@heroicons/react/24/solid'; // ✅ Importado
 
 const Comment = ({ comment, onReplySubmitted }) => {
   const { auth, users } = usePage().props;
@@ -136,27 +137,31 @@ const Comment = ({ comment, onReplySubmitted }) => {
     return parts;
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();  // Evita que se añada una nueva línea
+      handleReplySubmit();  // Envía la respuesta al presionar Enter
+    }
+  };
+
   return (
     <div className="mb-3 border-b pb-2">
-      <p className="text-sm text-gray-700">
+      <p className="text-sm text-white">
         <strong>{comment.user.name}</strong>
       </p>
-      <p className="text-sm text-gray-700">
+      <p className="text-sm text-white">
         {renderCommentWithMentions(comment.contenido)}
       </p>
       <p className="text-xs text-gray-400">
         {new Date(comment.created_at).toLocaleString()}
       </p>
 
-      {/* Ocultar botón si el comentario es del mismo usuario */}
-
-        <button
-          onClick={() => toggleReply(comment.id, comment.user.name)}
-          className="text-blue-500 text-sm hover:underline mt-1"
-        >
-          {activeReply === comment.id ? 'Cancelar' : 'Responder'}
-        </button>
-
+      <button
+        onClick={() => toggleReply(comment.id, comment.user.name)}
+        className="text-blue-500 text-sm hover:underline mt-1"
+      >
+        {activeReply === comment.id ? 'Cancelar' : 'Responder'}
+      </button>
 
       {comment.commentable_type === 'App\\Models\\Post' && replies.length > 0 && (
         <button
@@ -173,25 +178,22 @@ const Comment = ({ comment, onReplySubmitted }) => {
         <div className="ml-4 mt-2 border-l pl-3">
           {replies.map((reply) => (
             <div key={reply.id} className="mb-2">
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-white">
                 <strong>{reply.user.name}</strong>
               </p>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-white">
                 {renderCommentWithMentions(reply.contenido)}
               </p>
               <p className="text-xs text-gray-400">
                 {new Date(reply.created_at).toLocaleString()}
               </p>
 
-              {/* Ocultar botón si la respuesta es del mismo usuario */}
-
-                <button
-                  onClick={() => toggleReply(reply.id, reply.user.name)}
-                  className="text-blue-500 text-sm hover:underline mt-1"
-                >
-                  {activeReply === reply.id ? 'Cancelar' : 'Responder'}
-                </button>
-
+              <button
+                onClick={() => toggleReply(reply.id, reply.user.name)}
+                className="text-blue-500 text-sm hover:underline mt-1"
+              >
+                {activeReply === reply.id ? 'Cancelar' : 'Responder'}
+              </button>
             </div>
           ))}
         </div>
@@ -199,18 +201,22 @@ const Comment = ({ comment, onReplySubmitted }) => {
 
       {activeReply !== null && (
         <div className="mt-2">
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={replyText}
-            onChange={handleInputChange}
-            placeholder="Escribe una respuesta..."
-            className="w-full p-2 border border-gray-300 rounded resize-none overflow-hidden text-sm"
-            onInput={(e) => {
-              e.target.style.height = 'auto';
-              e.target.style.height = `${e.target.scrollHeight}px`;
-            }}
-          />
+          <div className="flex items-center space-x-3 bg-[#2a2b2f] px-2 py-1">
+            <ChatBubbleOvalLeftIcon className="w-7 h-7 text-[#656769]" />
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={replyText}
+              onChange={handleInputChange}
+              placeholder="Escribe una respuesta..."
+              className="w-full border-none bg-[#2a2b2f] text-white rounded resize-none overflow-hidden ml-2"
+              onInput={(e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = `${e.target.scrollHeight}px`;
+              }}
+              onKeyDown={handleKeyDown} // Detecta el presionar Enter
+            />
+          </div>
           {suggestions.length > 0 && (
             <ul className="suggestions-list bg-white border border-gray-300 mt-1">
               {suggestions.map((user) => (
@@ -224,12 +230,6 @@ const Comment = ({ comment, onReplySubmitted }) => {
               ))}
             </ul>
           )}
-          <button
-            onClick={handleReplySubmit}
-            className="mt-1 bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
-          >
-            Enviar respuesta
-          </button>
         </div>
       )}
     </div>

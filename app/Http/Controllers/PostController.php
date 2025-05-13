@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -100,8 +101,9 @@ class PostController extends Controller
 
         DB::commit();
 
-        return redirect()->route('mis-posts');
+        $user = User::findOrFail(Auth::id());
 
+        return redirect()->route('users.show', $user );
     }
 
     /**
@@ -189,7 +191,9 @@ class PostController extends Controller
 
         DB::commit();
 
-        return redirect()->route('mis-posts');
+        $user = User::findOrFail(Auth::id());
+
+        return redirect()->to(url()->previous());
     }
 
 

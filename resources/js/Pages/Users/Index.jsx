@@ -1,6 +1,7 @@
 import { Link, Head, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Image from '@/Components/Image';
 
 export default function UserIndex() {
     const { users } = usePage().props;
@@ -55,7 +56,7 @@ export default function UserIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className=" font-semibold leading-tight text-gray-800">
                     Gestión de Usuarios
                 </h2>
             }
@@ -115,7 +116,7 @@ export default function UserIndex() {
                             <tr key={user.id} className="text-center">
                                 <td className="border p-2">
                                     {user.profile_image?.path_small ? (
-                                        <img
+                                        <Image
                                             src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
                                             alt="Perfil"
                                             className="w-10 h-10 rounded-full mx-auto"

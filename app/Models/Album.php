@@ -32,23 +32,31 @@ class Album extends Model
     }
 
     protected static function booted()
-    {
-        static::deleting(function ($album) {
-            if (! $album->isForceDeleting()) {
-                $album->posts()->detach();
-            }
+{
+    static::deleting(function ($album) {
+        if (! $album->isForceDeleting()) {
+            $album->posts()->detach();
+        }
 
-            $path = parse_url($album->coverImage, PHP_URL_PATH); // /public/profile_images/123.jpg
-            $path = ltrim($path, '/'); // public/profile_images/123.jpg
+        // Verifica si el álbum tiene una imagen asociada
+        if ($album->coverImage) {
+            $image = $album->coverImage;
 
-            // Eliminar del bucket S3
-            Storage::disk('s3')->delete($path);
+            // Asumiendo que `path_original` es el campo que almacena la ruta de la imagen original
+            $paths = [
+                ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+            ];
 
-            $album->coverImage->delete();
+            // Eliminar la imagen asociada al álbum desde S3
+            Storage::disk('s3')->delete($paths);
 
+            // Eliminar la imagen de la base de datos
+            $image->delete();
+        }
+    });
+}
 
-        });
-    }
 
 
 }

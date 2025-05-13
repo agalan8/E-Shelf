@@ -34,7 +34,7 @@ Route::get('/', function () {
 
     if(Auth::check()){
         return Inertia::render('Explorar', [
-            'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->inRandomOrder()->get(),
+            'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get(),
         ]);
     }
 
@@ -53,7 +53,7 @@ Route::get('/explorar', function () {
 
 
     return Inertia::render('Explorar', [
-        'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->inRandomOrder()->get()->map(function ($post) {
+        'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
@@ -86,22 +86,23 @@ Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies
 
 
 
-Route::get('/mis-posts', function () {
+// Route::get('/mis-posts', function () {
 
-    $userId = Auth::user()->id;
-    $user = User::findOrFail($userId);
+//     $userId = Auth::user()->id;
+//     $user = User::findOrFail($userId);
 
-    return Inertia::render('Posts/MisPosts', [
+//     return Inertia::render('Posts/MisPosts', [
 
 
-        'posts' => $user->posts()->with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->get()->map(function ($post) {
-            $post->getTotalLikes = $post->getTotalLikes();
-            $post->isLikedByUser = $post->isLikedByUser();
-            return $post;
-        }),
-        'tags' => Tag::all(),
-    ]);
-})->middleware('auth')->name('mis-posts');
+//         'posts' => $user->posts()->with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')
+//         ->get()->map(function ($post) {
+//             $post->getTotalLikes = $post->getTotalLikes();
+//             $post->isLikedByUser = $post->isLikedByUser();
+//             return $post;
+//         }),
+//         'tags' => Tag::all(),
+//     ]);
+// })->middleware('auth')->name('mis-posts');
 
 Route::get('/posts-seguidos', function () {
     $user = User::findOrFail(Auth::id());
@@ -131,6 +132,7 @@ Route::get('/mis-albums', function () {
     $user = User::findOrFail($userId);
 
     return Inertia::render('Albums/MisAlbums', [
+        'user' => $user,
         'albums' => $user->albums()->with('posts', 'user', 'user.profileImage', 'user.backgroundImage', 'coverImage', 'posts.image')->orderBy('created_at', 'desc')->get(),
         'posts' => $user->posts()->with('image', 'tags', 'user')->get(),
     ]);
@@ -191,6 +193,8 @@ Route::post('/images/update', function (Request $request) {
             ];
 
             Storage::disk('s3')->delete($paths);
+
+            $user->profileImage()->delete();
         }
 
 
@@ -233,6 +237,8 @@ Route::post('/images/update', function (Request $request) {
             ];
 
             Storage::disk('s3')->delete($paths);
+
+            $user->backgroundImage()->delete();
         }
 
 
@@ -272,6 +278,7 @@ Route::post('/images/update', function (Request $request) {
 
 Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $imageType) {
 
+
     // Verificar el tipo de imagen a eliminar (profile_image o background_image)
     if ($imageType === 'profile_image' && $user->profileImage) {
 
@@ -293,7 +300,7 @@ Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $image
         // Eliminar del bucket S3
         Storage::disk('s3')->delete($paths);
 
-        $user->backgroundImage->delete();
+        $user->backgroundImage()->delete();
     }
 
     // Guardar los cambios en el usuario (vaciar la ruta de la imagen)

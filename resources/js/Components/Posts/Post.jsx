@@ -2,13 +2,38 @@ import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import Show from '@/Components/Posts/Show';
 import Edit from '@/Components/Posts/Edit';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import { PencilIcon as PencilOutline } from '@heroicons/react/24/outline';
+import { PencilIcon as PencilSolid } from '@heroicons/react/24/solid';
+import { TrashIcon as TrashOutline } from '@heroicons/react/24/outline';
+import { TrashIcon as TrashSolid } from '@heroicons/react/24/solid';
+import Image from '@/Components/Image';
 
 const Post = ({ post, tags }) => {
   const { auth } = usePage().props;
   const [showModalOpen, setShowModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isLiked, setIsLiked] = useState(post.isLikedByUser);
+  const [totalLikes, setTotalLikes] = useState(post.getTotalLikes || 0);
+  const [hovered, setHovered] = useState(false);
+  const [editHovered, setEditHovered] = useState(false);
+  const [deleteHovered, setDeleteHovered] = useState(false);
+
+  const toggleLike = (e) => {
+    e.stopPropagation();
+    if (!auth.user) return;
+
+    router.post(route('like'), { post_id: post.id }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        setIsLiked(prev => !prev);
+        setTotalLikes(prev => isLiked ? prev - 1 : prev + 1);
+      },
+    });
+  };
 
   const handleOpenShowModal = () => {
     setSelectedPost(post);
@@ -20,7 +45,8 @@ const Post = ({ post, tags }) => {
     setSelectedPost(null);
   };
 
-  const handleOpenEditModal = () => {
+  const handleOpenEditModal = (e) => {
+    e.stopPropagation();
     setSelectedPost(post);
     setEditModalOpen(true);
   };
@@ -30,87 +56,123 @@ const Post = ({ post, tags }) => {
     setSelectedPost(null);
   };
 
-  const handleDeletePost = async () => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
-      setIsDeleting(true);
-      try {
-        await router.delete(route('posts.destroy', post.id), {
-          preserveScroll: true,
-        });
-      } catch (error) {
-        console.error('Error al eliminar la publicación:', error);
-      } finally {
-        setIsDeleting(false);
-      }
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+      router.delete(route('posts.destroy', post.id), {
+        preserveScroll: true,
+      });
     }
   };
 
-  const canEditOrDelete = auth.user && (auth.user.id === post.user.id || auth.user.is_admin);
+  const canEdit = auth.user && (auth.user.id === post.user.id || auth.user.is_admin);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      {/* Foto de perfil y nombre del usuario */}
-      <div className="flex items-center space-x-3 mb-4">
-        <Link href={route('users.show', post.user.id)}>
-          {post.user.profile_image?.path_small ? (
-            <img
-              src={`${post.user.profile_image.path_small}?t=${new Date().getTime()}`}
-              alt={post.user.name}
-              className="w-10 h-10 rounded-full"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white">
-              ?
-            </div>
-          )}
-        </Link>
-        <Link
-          href={route('users.show', post.user.id)}
-          className="font-semibold text-blue-500"
-        >
-          {post.user.name}
-        </Link>
-      </div>
-
-      {/* Imagen y contenido de la publicación */}
-      <img
+    <div className="relative group cursor-pointer" style={{ display: 'inline-block', lineHeight: 0 }}>
+      <Image
         src={`${post.image.path_medium}?t=${new Date().getTime()}`}
         alt={post.titulo}
-        className="w-full h-48 object-cover rounded-lg mb-4"
+        className="w-full h-auto object-contain"
+        loading="lazy"
+        onClick={handleOpenShowModal}
       />
-      <h3 className="text-lg font-semibold">{post.titulo}</h3>
-      <p className="text-sm text-gray-500">{post.descripcion}</p>
-      <p className="text-sm text-gray-400">{post.localizacion}</p>
 
-      {/* Botón para abrir el modal de detalles */}
-      <button onClick={handleOpenShowModal} className="text-blue-500 mt-2">
-        Ver detalles
-      </button>
-
-      {/* Botones solo visibles si el usuario tiene permiso */}
-      {canEditOrDelete && (
-        <>
-          <button onClick={handleOpenEditModal} className="text-green-500 mt-2 ml-4">
-            Editar
-          </button>
-          <button
-            onClick={handleDeletePost}
-            className="text-red-500 mt-2 ml-4"
-            disabled={isDeleting}
+      {/* Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gray-800/60 backdrop-blur-sm text-white px-4 py-1 flex items-center justify-between opacity-0 group-hover:opacity-100 group-hover:py-2 transition-all duration-300 text-sm">
+        {/* Usuario */}
+        <div className="flex items-center space-x-2">
+          {post.user.profile_image?.path_small ? (
+            <Image
+              src={`${post.user.profile_image.path_small}?t=${new Date().getTime()}`}
+              alt={post.user.name}
+              className="w-9 h-9 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm">?</div>
+          )}
+          <Link
+            href={route('users.show', post.user.id)}
+            className="hover:underline text-base font-medium"
+            onClick={(e) => e.stopPropagation()}
           >
-            {isDeleting ? 'Eliminando...' : 'Eliminar'}
+            {post.user.name}
+          </Link>
+        </div>
+
+        {/* Likes y acciones */}
+        <div className="flex items-center space-x-3">
+          {/* Botón me gusta */}
+          <button
+            onClick={toggleLike}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            className="text-lg focus:outline-none"
+          >
+            <FontAwesomeIcon
+              icon={
+                isLiked
+                  ? hovered
+                    ? faHeartCrack
+                    : faHeartSolid
+                  : faHeartRegular
+              }
+              className={`transition duration-200 ${isLiked ? 'text-red-500' : 'text-white'}`}
+            />
           </button>
-        </>
-      )}
+          <span className="text-sm">{totalLikes}</span>
 
-      {/* Mostrar el modal con la publicación seleccionada */}
+          {/* Editar */}
+          {canEdit && (
+            <>
+              <button
+                onClick={handleOpenEditModal}
+                onMouseEnter={() => setEditHovered(true)}
+                onMouseLeave={() => setEditHovered(false)}
+                className="text-white"
+              >
+                {editHovered ? (
+                  <PencilSolid className="w-5 h-5 text-white" />
+                ) : (
+                  <PencilOutline className="w-5 h-5 text-white" />
+                )}
+              </button>
+
+              {/* Eliminar */}
+              <button
+                onClick={handleDelete}
+                onMouseEnter={() => setDeleteHovered(true)}
+                onMouseLeave={() => setDeleteHovered(false)}
+                className="text-white"
+              >
+                {deleteHovered ? (
+                  <TrashSolid className="w-5 h-5 text-red-500" />
+                ) : (
+                  <TrashOutline className="w-5 h-5 text-white" />
+                )}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Modales */}
       {showModalOpen && selectedPost && (
-        <Show post={selectedPost} onClose={handleCloseShowModal} />
+        <Show
+          post={selectedPost}
+          onClose={handleCloseShowModal}
+          isLiked={isLiked}
+          setIsLiked={setIsLiked}
+          totalLikes={totalLikes}
+          setTotalLikes={setTotalLikes}
+        />
       )}
-
-      {/* Mostrar el modal de edición */}
       {editModalOpen && selectedPost && (
-        <Edit post={selectedPost} tags={tags} onClose={handleCloseEditModal} />
+        <Edit
+          post={selectedPost}
+          tags={tags}
+          onClose={handleCloseEditModal}
+          isOpen={editModalOpen} // <-- Añade esta línea
+        />
       )}
     </div>
   );
