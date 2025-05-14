@@ -75,7 +75,7 @@ const Edit = ({ post, onClose, tags }) => {
       formData.append('tags[]', tag.id);
     });
     formData.append('_method', 'PUT');
-    router.post(route('posts.update', post.id), formData, {
+    router.post(route('regular-posts.update', post.id), formData, {
       preserveScroll: true,
     });
     handleClose(); // usa animación

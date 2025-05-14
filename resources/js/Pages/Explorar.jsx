@@ -7,6 +7,8 @@ export default function Explorar({ auth, posts, tags }) {
     // Condición para verificar si el usuario está autenticado
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
+    console.log(posts);
+
     return (
         <Layout
             header={
@@ -27,7 +29,7 @@ export default function Explorar({ auth, posts, tags }) {
                     {posts
                         .filter((_, index) => index % 3 === colIndex)
                         .map((post) => (
-                        <Post key={post.id} post={post} tags={tags} />
+                        <Post key={post.id} getTotalLikes={post.getTotalLikes} isLikedByUser={post.isLikedByUser} post={post} tags={tags} />
                         ))}
                     </div>
                 ))}

@@ -6,12 +6,14 @@ use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RegularPostController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\Album;
 use App\Models\Image;
 use App\Models\Post;
+use App\Models\RegularPost;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Application;
@@ -34,7 +36,7 @@ Route::get('/', function () {
 
     if(Auth::check()){
         return Inertia::render('Explorar', [
-            'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get(),
+            'posts' => RegularPost::with('image', 'post', 'post.user', 'tags', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get(),
         ]);
     }
 
@@ -53,7 +55,7 @@ Route::get('/explorar', function () {
 
 
     return Inertia::render('Explorar', [
-        'posts' => Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get()->map(function ($post) {
+        'posts' => RegularPost::with('image', 'tags','post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
@@ -68,7 +70,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('posts', PostController::class)->middleware('auth');
+// Route::resource('posts', PostController::class)->middleware('auth');
+Route::resource('regular-posts', RegularPostController::class)->middleware('auth');
 Route::resource('albums', AlbumController::class)->middleware('auth');
 Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])
     ->name('albums.eliminar-portada');
@@ -105,16 +108,26 @@ Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies
 // })->middleware('auth')->name('mis-posts');
 
 Route::get('/posts-seguidos', function () {
-    $user = User::findOrFail(Auth::id());
+    $userId = Auth::id();
+    $followingIds = User::findOrFail($userId)->following()->pluck('followed_user_id');
 
-    // Obtener IDs de usuarios seguidos
-    $followingIds = $user->following()->pluck('followed_user_id');
-
-    // Obtener posts de esos usuarios, ordenados por los más recientes
-    $posts = Post::with('image', 'tags', 'user', 'user.profileImage', 'user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')
-        ->whereIn('user_id', $followingIds)
+    $posts = RegularPost::whereHas('post', function ($query) use ($followingIds) {
+            $query->whereIn('user_id', $followingIds);
+        })
+        ->with([
+            'image',
+            'post.user.profileImage',
+            'post.user.backgroundImage',
+            'tags',
+            'comments.user.profileImage',
+            'comments.user.backgroundImage',
+            'comments.replies.user.profileImage',
+            'comments.replies.user.backgroundImage',
+            'likedBy' // Para evitar N+1 en likes
+        ])
         ->orderBy('created_at', 'desc')
-        ->get()->map(function ($post) {
+        ->get()
+        ->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = $post->isLikedByUser();
             return $post;
@@ -126,6 +139,7 @@ Route::get('/posts-seguidos', function () {
     ]);
 })->middleware('auth')->name('posts-seguidos');
 
+
 Route::get('/mis-albums', function () {
 
     $userId = Auth::user()->id;
@@ -134,7 +148,7 @@ Route::get('/mis-albums', function () {
     return Inertia::render('Albums/MisAlbums', [
         'user' => $user,
         'albums' => $user->albums()->with('posts', 'user', 'user.profileImage', 'user.backgroundImage', 'coverImage', 'posts.image')->orderBy('created_at', 'desc')->get(),
-        'posts' => $user->posts()->with('image', 'tags', 'user')->get(),
+        'posts' => $user->posts()->with('posteable','posteable.image', 'posteable.tags', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
 
@@ -314,7 +328,7 @@ Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $image
 Route::post('/like', function (Request $request) {
 
     $user = User::findOrFail(Auth::id());
-    $post = Post::findOrFail($request->post_id);
+    $post = RegularPost::findOrFail($request->post_id);
 
     if ($post->isLikedByUser()) {
         $post->likedBy()->detach($user->id);

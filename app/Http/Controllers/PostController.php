@@ -4,17 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Models\Image;
 use App\Models\Post;
-use App\Models\Tag;
-use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
-use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
+
 class PostController extends Controller
 {
     /**
@@ -24,12 +16,7 @@ class PostController extends Controller
      use AuthorizesRequests;
     public function index()
     {
-        $posts = Post::orderBy('created_at')->with('user', 'image', 'tags')->get();
 
-        return Inertia::render('Posts/Index', [
-            'posts' => $posts,
-            'tags' => Tag::all(),
-        ]);
     }
 
     /**
@@ -37,9 +24,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Posts/Create', [
-            'tags' => Tag::all(),
-        ]);
+
     }
 
     /**
@@ -48,62 +33,62 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
 
-        $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'localizacion' => 'required|string|max:255',
-        ]);
+        // $request->validate([
+        //     'titulo' => 'required|string|max:255',
+        //     'descripcion' => 'required|string',
+        //     'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        //     'localizacion' => 'required|string|max:255',
+        // ]);
 
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
-        $post = Post::create([
-            'titulo' => $request->titulo,
-            'descripcion' => $request->descripcion,
-            'user_id' => Auth::user()->id,
-        ]);
+        // $post = Post::create([
+        //     'titulo' => $request->titulo,
+        //     'descripcion' => $request->descripcion,
+        //     'user_id' => Auth::user()->id,
+        // ]);
 
-        if ($request->hasFile('imagen')) {
+        // if ($request->hasFile('imagen')) {
 
-            $imagen = $request->file('imagen');
-            $extension = $imagen->getClientOriginalExtension();
-            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
-            $path_original = "public/posts/{$post->id}/original/{$post->id}.{$extension}";
-            $path_medium = "public/posts/{$post->id}/medium/{$post->id}.{$extension}";
-            $path_small = "public/posts/{$post->id}/small/{$post->id}.{$extension}";
+        //     $imagen = $request->file('imagen');
+        //     $extension = $imagen->getClientOriginalExtension();
+        //     $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+        //     $path_original = "public/posts/{$post->id}/original/{$post->id}.{$extension}";
+        //     $path_medium = "public/posts/{$post->id}/medium/{$post->id}.{$extension}";
+        //     $path_small = "public/posts/{$post->id}/small/{$post->id}.{$extension}";
 
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
-            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
-
-
-            Storage::disk('s3')->put($path_original, $imagen, 'public');
-            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+        //     $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+        //     $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
 
 
-            $image = new Image([
-                'path_original' => $path_aws . $path_original,
-                'path_medium' => $path_aws . $path_medium,
-                'type' => 'post',
-                'localizacion' => $request->localizacion,
+        //     Storage::disk('s3')->put($path_original, $imagen, 'public');
+        //     Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
-            ]);
 
-            $image->imageable()->associate($post)->save();
-        }
+        //     $image = new Image([
+        //         'path_original' => $path_aws . $path_original,
+        //         'path_medium' => $path_aws . $path_medium,
+        //         'type' => 'post',
+        //         'localizacion' => $request->localizacion,
 
-        $tags = $request->input('tags');
+        //     ]);
 
-        if($tags != null) {
-            foreach ($tags as $tag) {
-                $post->tags()->attach(Tag::findOrFail($tag));
-            }
-        }
+        //     $image->imageable()->associate($post)->save();
+        // }
 
-        DB::commit();
+        // $tags = $request->input('tags');
 
-        $user = User::findOrFail(Auth::id());
+        // if($tags != null) {
+        //     foreach ($tags as $tag) {
+        //         $post->tags()->attach(Tag::findOrFail($tag));
+        //     }
+        // }
 
-        return redirect()->route('users.show', $user );
+        // DB::commit();
+
+        // $user = User::findOrFail(Auth::id());
+
+        // return redirect()->route('users.show', $user );
     }
 
     /**
@@ -127,73 +112,73 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, $id)
     {
-        $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'localizacion' => 'nullable|string|max:255',
-        ]);
+        // $request->validate([
+        //     'titulo' => 'required|string|max:255',
+        //     'descripcion' => 'required|string',
+        //     'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        //     'localizacion' => 'nullable|string|max:255',
+        // ]);
 
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
-        // Buscar el post que se quiere actualizar
-        $post = Post::findOrFail($id);
-        $post->titulo = $request->titulo;
-        $post->descripcion = $request->descripcion;
-        $post->image->localizacion = $request->localizacion;
+        // // Buscar el post que se quiere actualizar
+        // $post = Post::findOrFail($id);
+        // $post->titulo = $request->titulo;
+        // $post->descripcion = $request->descripcion;
+        // $post->image->localizacion = $request->localizacion;
 
-        // Actualizar la imagen si se sube una nueva
-        if ($request->hasFile('imagen')) {
+        // // Actualizar la imagen si se sube una nueva
+        // if ($request->hasFile('imagen')) {
 
-            $imagen = $request->file('imagen');
-            $extension = $imagen->getClientOriginalExtension();
-            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
-            $path_original = "public/posts/{$post->id}/original/{$post->id}.{$extension}";
-            $path_medium = "public/posts/{$post->id}/medium/{$post->id}.{$extension}";
-            $path_small = "public/posts/{$post->id}/small/{$post->id}.{$extension}";
+        //     $imagen = $request->file('imagen');
+        //     $extension = $imagen->getClientOriginalExtension();
+        //     $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+        //     $path_original = "public/posts/{$post->id}/original/{$post->id}.{$extension}";
+        //     $path_medium = "public/posts/{$post->id}/medium/{$post->id}.{$extension}";
+        //     $path_small = "public/posts/{$post->id}/small/{$post->id}.{$extension}";
 
-            $paths = [
-                ltrim(parse_url($post->image->path_original, PHP_URL_PATH), '/'),
-                ltrim(parse_url($post->image->path_medium, PHP_URL_PATH), '/'),
-            ];
+        //     $paths = [
+        //         ltrim(parse_url($post->image->path_original, PHP_URL_PATH), '/'),
+        //         ltrim(parse_url($post->image->path_medium, PHP_URL_PATH), '/'),
+        //     ];
 
-            // Eliminar del bucket S3
-            Storage::disk('s3')->delete($paths);
+        //     // Eliminar del bucket S3
+        //     Storage::disk('s3')->delete($paths);
 
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
-            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+        //     $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+        //     $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
 
-            Storage::disk('s3')->put($path_original, $imagen, 'public');
-            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+        //     Storage::disk('s3')->put($path_original, $imagen, 'public');
+        //     Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
-            // Actualizamos la foto asociada al post
-            $post->image()->update([
-                'path_original' => $path_aws . $path_original,
-                'path_medium' =>$path_aws . $path_medium,
-            ]);
-        }
+        //     // Actualizamos la foto asociada al post
+        //     $post->image()->update([
+        //         'path_original' => $path_aws . $path_original,
+        //         'path_medium' =>$path_aws . $path_medium,
+        //     ]);
+        // }
 
-        // Actualizar las etiquetas
-        $tags = $request->input('tags');
-        if ($tags != null) {
-            // Primero eliminar las etiquetas anteriores
-            $post->tags()->detach();
+        // // Actualizar las etiquetas
+        // $tags = $request->input('tags');
+        // if ($tags != null) {
+        //     // Primero eliminar las etiquetas anteriores
+        //     $post->tags()->detach();
 
-            // Luego asociamos las nuevas etiquetas
-            foreach ($tags as $tag) {
-                $post->tags()->attach(Tag::findOrFail($tag));
-            }
-        }
+        //     // Luego asociamos las nuevas etiquetas
+        //     foreach ($tags as $tag) {
+        //         $post->tags()->attach(Tag::findOrFail($tag));
+        //     }
+        // }
 
-        $post->save();
-        $post->image->save();
+        // $post->save();
+        // $post->image->save();
 
 
-        DB::commit();
+        // DB::commit();
 
-        $user = User::findOrFail(Auth::id());
+        // $user = User::findOrFail(Auth::id());
 
-        return redirect()->to(url()->previous());
+        // return redirect()->to(url()->previous());
     }
 
 

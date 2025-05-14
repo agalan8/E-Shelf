@@ -18,7 +18,7 @@ export default function PostIndex() {
 
     const deletePost = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar este post?")) {
-            router.delete(route('posts.destroy', id));
+            router.delete(route('regular-posts.destroy', id));
         }
     };
 

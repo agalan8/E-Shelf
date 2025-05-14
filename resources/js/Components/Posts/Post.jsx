@@ -11,13 +11,13 @@ import { TrashIcon as TrashOutline } from '@heroicons/react/24/outline';
 import { TrashIcon as TrashSolid } from '@heroicons/react/24/solid';
 import Image from '@/Components/Image';
 
-const Post = ({ post, tags }) => {
+const Post = ({ post, tags, isLikedByUser, getTotalLikes }) => {
   const { auth } = usePage().props;
   const [showModalOpen, setShowModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [isLiked, setIsLiked] = useState(post.isLikedByUser);
-  const [totalLikes, setTotalLikes] = useState(post.getTotalLikes || 0);
+  const [isLiked, setIsLiked] = useState(isLikedByUser);
+  const [totalLikes, setTotalLikes] = useState(getTotalLikes || 0);
   const [hovered, setHovered] = useState(false);
   const [editHovered, setEditHovered] = useState(false);
   const [deleteHovered, setDeleteHovered] = useState(false);
@@ -34,6 +34,11 @@ const Post = ({ post, tags }) => {
       },
     });
   };
+
+  console.log('post:', post);
+
+  console.log('isLiked:', isLiked);
+    console.log('totalLikes:', totalLikes);
 
   const handleOpenShowModal = () => {
     setSelectedPost(post);
@@ -59,13 +64,13 @@ const Post = ({ post, tags }) => {
   const handleDelete = (e) => {
     e.stopPropagation();
     if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
-      router.delete(route('posts.destroy', post.id), {
+      router.delete(route('regular-posts.destroy', post.id), {
         preserveScroll: true,
       });
     }
   };
 
-  const canEdit = auth.user && (auth.user.id === post.user.id || auth.user.is_admin);
+  const canEdit = auth.user && (auth.user.id === post.post.user.id || auth.user.is_admin);
 
   return (
     <div className="relative group cursor-pointer" style={{ display: 'inline-block', lineHeight: 0 }}>
@@ -81,21 +86,21 @@ const Post = ({ post, tags }) => {
       <div className="absolute bottom-0 left-0 right-0 bg-gray-800/60 backdrop-blur-sm text-white px-4 py-1 flex items-center justify-between opacity-0 group-hover:opacity-100 group-hover:py-2 transition-all duration-300 text-sm">
         {/* Usuario */}
         <div className="flex items-center space-x-2">
-          {post.user.profile_image?.path_small ? (
+          {post.post.user.profile_image?.path_small ? (
             <Image
-              src={`${post.user.profile_image.path_small}?t=${new Date().getTime()}`}
-              alt={post.user.name}
+              src={`${post.post.user.profile_image.path_small}?t=${new Date().getTime()}`}
+              alt={post.post.user.name}
               className="w-9 h-9 rounded-full object-cover"
             />
           ) : (
             <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm">?</div>
           )}
           <Link
-            href={route('users.show', post.user.id)}
+            href={route('users.show', post.post.user.id)}
             className="hover:underline text-base font-medium"
             onClick={(e) => e.stopPropagation()}
           >
-            {post.user.name}
+            {post.post.user.name}
           </Link>
         </div>
 

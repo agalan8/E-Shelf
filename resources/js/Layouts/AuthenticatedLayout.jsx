@@ -38,7 +38,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     <div className="flex flex-col space-y-3">
-                        <NavLink href={route('posts-seguidos')} active={route().current('posts-seguidos')} className="flex justify-center">
+                        <NavLink title="Home" href={route('posts-seguidos')} active={route().current('posts-seguidos')} className="flex justify-center">
                             <HomeIcon className="h-9 w-9" />
                         </NavLink>
                         <NavLink href={route('explorar')} active={route().current('explorar')} className="flex justify-center">
@@ -47,7 +47,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         <NavLink href={route('users.show', { user: user.id })} active={route().current('users.show') || route().current('mis-posts') || route().current('mis-albums')} className="flex justify-center">
                             <UserIcon className="h-9 w-9" />
                         </NavLink>
-                        <NavLink href={route('posts.create')} active={route().current('posts.create')} className="flex justify-center">
+                        <NavLink href={route('regular-posts.create')} active={route().current('regular-posts.create')} className="flex justify-center">
                             <ArrowUpTrayIcon className="h-9 w-9" />
                         </NavLink>
                     </div>
@@ -57,7 +57,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                             <NavLink href={route('users.index')} active={route().current('users.index')} className="flex justify-center">
                                 <UserGroupIcon className="h-9 w-9" />
                             </NavLink>
-                            <NavLink href={route('posts.index')} active={route().current('posts.index')} className="flex justify-center">
+                            <NavLink href={route('regular-posts.index')} active={route().current('regular-posts.index')} className="flex justify-center">
                                 <RectangleStackIcon className="h-9 w-9" />
                             </NavLink>
                             <NavLink href={route('tags.index')} active={route().current('tags.index')} className="flex justify-center">

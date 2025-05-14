@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('likes', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('post_id')->constrained();
+        Schema::create('album_regular_post', function (Blueprint $table) {
+            $table->foreignId('album_id')->constrained();
+            $table->foreignId('regular_post_id')->constrained();
+            $table->primary(['album_id', 'regular_post_id']);
             $table->timestamps();
-
-            $table->primary(['user_id', 'post_id']);
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('likes');
+        Schema::dropIfExists('album_regular_post');
     }
 };

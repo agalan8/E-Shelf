@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\RegularPost;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -40,14 +41,14 @@ class CommentController extends Controller
         $request->validate([
             'contenido' => 'required|string|max:1000',
             'commentable_id' => 'required|integer',
-            'commentable_type' => 'required|string|in:App\Models\Post,App\Models\Comment', // Solo post o comment
+            'commentable_type' => 'required|string|in:App\Models\RegularPost,App\Models\Comment', // Solo post o comment
         ]);
 
                 // Validación condicional del commentable_id según el tipo de comentario
-        if ($request->commentable_type === Post::class) {
+        if ($request->commentable_type === RegularPost::class) {
             // Si es un Post, aseguramos que commentable_id esté en la tabla posts
             $request->validate([
-                'commentable_id' => 'exists:posts,id',
+                'commentable_id' => 'exists:regular_posts,id',
             ]);
         } elseif ($request->commentable_type === Comment::class) {
             // Si es un comentario, aseguramos que commentable_id esté en la tabla comments
@@ -65,9 +66,9 @@ class CommentController extends Controller
         ]);
 
         // Asociar el comentario al modelo correspondiente (Post o Comentario)
-        if ($request->commentable_type === Post::class) {
+        if ($request->commentable_type === RegularPost::class) {
 
-            $post = Post::findOrFail($request->commentable_id);
+            $post = RegularPost::findOrFail($request->commentable_id);
             $comment->commentable()->associate($post);
 
         } else if ($request->commentable_type === Comment::class) {

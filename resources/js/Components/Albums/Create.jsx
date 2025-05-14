@@ -176,12 +176,12 @@ const Create = ({ onClose, posts }) => {
                                             }`}
                                         >
                                             <Image
-                                                src={post.image.path_original}
-                                                alt={post.titulo}
+                                                src={post.posteable.image.path_original}
+                                                alt={post.posteable.titulo}
                                                 className="object-cover w-full h-48 rounded"
                                             />
                                             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-center text-sm p-1">
-                                                {post.titulo}
+                                                {post.posteable.titulo}
                                             </div>
                                         </div>
                                     ))

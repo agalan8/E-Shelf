@@ -19,7 +19,7 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
 
   const [isVisible, setIsVisible] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
-  const [following, setFollowing] = useState(user?.following?.some(f => f.id === post.user.id) || false);
+  const [following, setFollowing] = useState(user?.following?.some(f => f.id === post.post.user.id) || false);
   const [hoveringFollow, setHoveringFollow] = useState(false); // Hover separado para el ícono de seguir
   const [hoveringImage, setHoveringImage] = useState(false); // Hover separado para la imagen
   const [commentBody, setCommentBody] = useState('');
@@ -46,12 +46,12 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
     if (!user) return;
 
     if (following) {
-      router.delete(`/unfollow/${post.user.id}`, {
+      router.delete(`/unfollow/${post.post.user.id}`, {
         onSuccess: () => setFollowing(false),
         preserveScroll: true,
       });
     } else {
-      router.post('/follow', { followed_user_id: post.user.id }, {
+      router.post('/follow', { followed_user_id: post.post.user.id }, {
         onSuccess: () => setFollowing(true),
         preserveScroll: true,
       });
@@ -78,7 +78,7 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
 
     router.post(route('comments.store'), {
       contenido: commentBody,
-      commentable_type: 'App\\Models\\Post',
+      commentable_type: 'App\\Models\\RegularPost',
       commentable_id: post.id,
     }, {
       preserveScroll: true,
@@ -101,7 +101,7 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
   };
 
   const renderFollowIcon = () => {
-    if (!user || user.id === post.user.id) return null;
+    if (!user || user.id === post.post.user.id) return null;
 
     let icon = faUserPlus;
     let color = 'text-blue-500';
@@ -165,11 +165,11 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
             <div
               className="flex items-center space-x-3 p-8 bg-[#292B2F]"
             >
-              <Link href={route('users.show', post.user.id)}>
-                {post.user.profile_image?.path_small ? (
+              <Link href={route('users.show', post.post.user.id)}>
+                {post.post.user.profile_image?.path_small ? (
                   <Image
-                    src={`${post.user.profile_image.path_small}?t=${new Date().getTime()}`}
-                    alt={post.user.name}
+                    src={`${post.post.user.profile_image.path_small}?t=${new Date().getTime()}`}
+                    alt={post.post.user.name}
                     className="w-14 h-14 rounded-full"
                   />
                 ) : (
@@ -178,8 +178,8 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
                   </div>
                 )}
               </Link>
-              <Link href={route('users.show', post.user.id)} className="font-semibold text-lg text-white">
-                {post.user.name}
+              <Link href={route('users.show', post.post.user.id)} className="font-semibold text-lg text-white">
+                {post.post.user.name}
               </Link>
               {renderFollowIcon()}
             </div>
@@ -292,7 +292,7 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={`${post.image.path_original}?t=${new Date().getTime()}`}
+              src={`${post.post.image.path_original}?t=${new Date().getTime()}`}
               alt={post.titulo}
               className="max-w-full max-h-full object-contain cursor-pointer"
             />

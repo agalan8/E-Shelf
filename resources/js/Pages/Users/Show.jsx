@@ -16,7 +16,7 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
   const [followingState, setFollowing] = useState(isFollowingInitial);
   const [hovering, setHovering] = useState(false);
 
-  console.log(user)
+  console.log('posts:',posts)
 
   const handleFollowToggle = () => {
     if (!auth.user) return;
@@ -125,7 +125,7 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
                 {posts
                   .filter((_, index) => index % 3 === colIndex)
                   .map((post) => (
-                    <Post key={post.id} post={post} tags={tags} />
+                    <Post key={post.posteable.id} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} post={post.posteable} tags={tags} />
                   ))}
               </div>
             ))}

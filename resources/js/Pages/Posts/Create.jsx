@@ -62,7 +62,7 @@ const PostCreate = () => {
         selectedTags.forEach(tag => {
             formData.append('tags[]', tag.id);
         });
-        router.post(route('posts.store'), formData);
+        router.post(route('regular-posts.store'), formData);
     };
 
     return (

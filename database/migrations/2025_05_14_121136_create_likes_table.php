@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
-            $table->id();
+        Schema::create('likes', function (Blueprint $table) {
             $table->foreignId('user_id')->constrained();
-            $table->morphs('posteable');
+            $table->foreignId('regular_post_id')->constrained();
             $table->timestamps();
-            $table->softDeletes();
+
+            $table->primary(['user_id', 'regular_post_id']);
         });
     }
 
@@ -25,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        Schema::dropIfExists('likes');
     }
 };

@@ -10,6 +10,8 @@ import { faPanorama, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 const MisAlbums = ({ albums, posts, user }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  console.log('posts:', posts);
+
   return (
     <AuthenticatedLayout
       header={<h2 className="font-base leading-tight text-white">Mis Álbumes</h2>}

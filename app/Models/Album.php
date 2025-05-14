@@ -28,7 +28,7 @@ class Album extends Model
     }
 
     public function posts(){
-        return $this->belongsToMany(Post::class);
+        return $this->belongsToMany(RegularPost::class);
     }
 
     protected static function booted()

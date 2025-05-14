@@ -69,7 +69,7 @@ class User extends Authenticatable
 
     public function posts()
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(Post::class)->where('posteable_type', RegularPost::class);
     }
 
     public function albums()
@@ -104,7 +104,7 @@ class User extends Authenticatable
 
     public function likedPosts()
     {
-        return $this->belongsToMany(Post::class, 'likes');
+        return $this->belongsToMany(RegularPost::class, 'likes');
     }
 
 

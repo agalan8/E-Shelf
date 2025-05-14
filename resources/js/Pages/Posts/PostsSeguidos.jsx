@@ -42,7 +42,7 @@ const PostsSeguidos = ({ posts, tags }) => {
       {
         contenido,
         commentable_id: postId,
-        commentable_type: 'App\\Models\\Post',
+        commentable_type: 'App\\Models\\RegularPost',
       },
       {
         onSuccess: () =>
@@ -79,7 +79,7 @@ const PostsSeguidos = ({ posts, tags }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {posts.map((post) => (
               <div key={post.id} className="space-y-2">
-                <Post post={post} tags={tags} />
+                <Post post={post} tags={tags} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} />
 
                 {/* Campo para comentarios */}
                 <div className="px-4">

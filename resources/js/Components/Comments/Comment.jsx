@@ -163,7 +163,7 @@ const Comment = ({ comment, onReplySubmitted }) => {
         {activeReply === comment.id ? 'Cancelar' : 'Responder'}
       </button>
 
-      {comment.commentable_type === 'App\\Models\\Post' && replies.length > 0 && (
+      {comment.commentable_type === 'App\\Models\\RegularPost' && replies.length > 0 && (
         <button
           onClick={loadReplies}
           className="text-indigo-500 text-sm hover:underline mt-1 ml-4"
