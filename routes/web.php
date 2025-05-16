@@ -84,11 +84,13 @@ Route::delete('/shared-posts/by-regular', function (Request $request) {
         ->first();
 
     if (!$sharedPost) {
-        return response()->json(['message' => 'No shared post found.'], 404);
+        return back();
     }
 
     $sharedPost->post()->delete();
     $sharedPost->delete();
+
+    return back();
 
 })->middleware('auth')->name('shared-posts.destroyByPostId');
 
