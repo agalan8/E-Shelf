@@ -45,6 +45,8 @@ class SharedPostController extends Controller
 
         $post->posteable()->associate($sharedPost);
         $post->save();
+
+        return back();
     }
 
     /**
