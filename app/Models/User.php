@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -68,7 +69,8 @@ class User extends Authenticatable
 
     public function posts()
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(Post::class)->where('posteable_type', RegularPost::class);
+
     }
 
     public function albums()
@@ -103,27 +105,60 @@ class User extends Authenticatable
 
     public function likedPosts()
     {
-        return $this->belongsToMany(Post::class, 'likes');
+        return $this->belongsToMany(RegularPost::class, 'likes');
     }
 
 
     protected static function booted()
-{
-    static::deleting(function ($user) {
-        if (! $user->isForceDeleting()) {
+    {
+        static::deleting(function ($user) {
+            if (! $user->isForceDeleting()) {
+                // Eliminar imágenes asociadas al perfil
+                if ($user->profileImage) {
+                    $user->profileImage->delete(); // Eliminar imagen del perfil
+                }
 
-            $user->posts->each(function ($post) {
-                $post->delete();
-            });
+                if ($user->backgroundImage) {
+                    $user->backgroundImage->delete(); // Eliminar imagen de fondo
+                }
 
-            $user->albums->each(function ($album) {
-                $album->delete();
-            });
+                // Eliminar publicaciones
+                $user->posts->each(function ($post) {
+                    if ($post->image) {
+                        $post->image->each(function ($image) {
+                            // Asegúrate de eliminar cada imagen asociada a la publicación desde el disco S3
+                            $paths = [
+                                ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                                ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                            ];
+                            Storage::disk('s3')->delete($paths);
+                            $image->delete();
+                        });
+                    }
+                    $post->delete();
+                });
 
-            $user->socials()->detach();
-        }
-    });
-}
+                // Eliminar álbumes
+                $user->albums->each(function ($album) {
+                    if ($album->coverImage) {
+                        // Eliminar imagen de portada del álbum desde S3
+                        $image = $album->coverImage;
+                        $paths = [
+                            ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                            ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                        ];
+                        Storage::disk('s3')->delete($paths);
+                        $image->delete();
+                    }
+                    $album->delete();
+                });
+
+                // Desvincular redes sociales
+                $user->socials()->detach();
+            }
+        });
+    }
+
 
 
 

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link, router, usePage } from '@inertiajs/react'; // Asegúrate de importar Link
+import { router, usePage, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
+import Image from '../Image'; // Asumiendo que Image es un componente personalizado
 
 export default function User({ user }) {
   const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
@@ -55,26 +56,38 @@ export default function User({ user }) {
   return (
     <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white cursor-pointer">
       <div className="relative">
-        {/* Imagen de fondo */}
-        <img
-          className="w-full h-32 object-cover"
-          src={`${user.background_image}?t=${new Date().getTime()}`}
-          alt="Background"
-        />
-        {/* Imagen de perfil */}
-        <div className="absolute top-16 left-4">
-          <img
-            className="w-24 h-24 rounded-full border-4 border-white shadow-md"
-            src={`${user.profile_image}?t=${new Date().getTime()}`}
-            alt="Profile Image"
+        {/* Fondo de portada con imagen predeterminada si background_image es null */}
+        {user.background_image && user.background_image.path_original ? (
+          <Image
+            className="w-full h-32 object-cover"
+            src={`${user.background_image.path_original}?t=${new Date().getTime()}`}
+            alt="Background"
           />
+        ) : (
+          <div className="w-full h-32 bg-gray-200" /> // Fondo gris si no hay imagen
+        )}
+
+        {/* Imagen de perfil con imagen predeterminada si profile_image es null */}
+        <div className="absolute top-16 left-4">
+          {user.profile_image && user.profile_image.path_small ? (
+            <Image
+              className="w-24 h-24 rounded-full border-4 border-white shadow-md"
+              src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
+              alt="Profile Image"
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full border-4 border-white bg-gray-300 flex items-center justify-center text-gray-500 text-2xl">
+              ?
+            </div>
+          )}
         </div>
       </div>
-      {/* Nombre del usuario y botón de seguir */}
+
       <div className="pt-10 pl-5 pb-5 flex items-center">
         <Link href={route('users.show', { user: user.id })}>
           <h2 className="text-xl font-semibold text-gray-800">{user.name}</h2>
         </Link>
+
         {/* Coloca el icono de seguir al lado de la imagen de perfil */}
         <div className="ml-8">
           {renderFollowIcon()}

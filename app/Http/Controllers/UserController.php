@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RegularPost;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -66,10 +68,20 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+
         return Inertia::render('Users/Show', [
             'user' => $user->load('profileImage', 'backgroundImage'),
             'followers' => $user->getTotalFollowers(),
             'following' => $user->getTotalFollowing(),
+            'posts' => $user->posts()->with('posteable.image','posteable.tags', 'posteable', 'user', 'user.profileImage', 'user.backgroundImage', 'posteable.post', 'posteable.post.user', 'posteable.post.user.profileImage', 'posteable.post.user.backgroundImage', 'posteable.comments', 'posteable.comments.user', 'posteable.comments.user.profileImage', 'posteable.comments.user.backgroundImage', 'posteable.comments.replies', 'posteable.comments.replies.user', 'posteable.comments.replies.user.profileImage', 'posteable.comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')
+            ->get()->map(function ($post) {
+            $post->getTotalLikes = $post->posteable->getTotalLikes();
+            $post->isLikedByUser = $post->posteable->isLikedByUser();
+            $post->getTotalShares = $post->posteable->getTotalShares();
+            $post->isSharedByUser = $post->posteable->isSharedByUser();
+            return $post;
+        }),
+        'tags' => Tag::all(),
         ]);
     }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import React from 'react';
 import HTMLFlipBook from "react-pageflip";
+import Image from "../Image";
 
 export default function FlipBook({ isOpen, onClose, album }) {
   if (!isOpen) return null;
@@ -95,7 +96,7 @@ export default function FlipBook({ isOpen, onClose, album }) {
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
                 {coverImageUrl ? (
-                  <img
+                  <Image
                     src={coverImageUrl}
                     alt={currentAlbum.nombre}
                     className="w-full h-full object-cover"
@@ -113,7 +114,7 @@ export default function FlipBook({ isOpen, onClose, album }) {
               post ? (
                 <div key={index} className="w-full h-full flex items-center justify-center">
                   <div className="page-content w-full h-full">
-                    <img
+                    <Image
                       src={`${post.image.path_original}?t=${new Date().getTime()}`}
                       alt={post.image.localizacion || `Photo ${index + 1}`}
                       className="w-full h-full object-cover"
@@ -132,7 +133,7 @@ export default function FlipBook({ isOpen, onClose, album }) {
             <div className="w-full h-full flex items-center justify-center">
               <div className="page-content w-full h-full">
                 {coverImageUrl ? (
-                  <img
+                  <Image
                     src={coverImageUrl}
                     alt={currentAlbum.nombre}
                     className="w-full h-full object-cover"

@@ -2,6 +2,7 @@ import { Link, Head, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Show from '@/Components/Posts/Show';
+import Image from '@/Components/Image';
 
 export default function PostIndex() {
     const { posts, tags } = usePage().props;
@@ -17,7 +18,7 @@ export default function PostIndex() {
 
     const deletePost = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar este post?")) {
-            router.delete(route('posts.destroy', id));
+            router.delete(route('regular-posts.destroy', id));
         }
     };
 
@@ -75,7 +76,7 @@ export default function PostIndex() {
         });
 
     return (
-        <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Gestión de Publicaciones</h2>}>
+        <AuthenticatedLayout header={<h2 className=" font-semibold leading-tight text-gray-800">Gestión de Publicaciones</h2>}>
             <Head title="Gestión de Publicaciones" />
             <div className="max-w-7xl mx-auto p-4">
                 <div className="flex justify-between items-center mb-4">
@@ -200,7 +201,7 @@ export default function PostIndex() {
                                 <td className="border px-2 py-2">{post.descripcion}</td>
                                 <td className="border px-2 py-2">
                                     {post.image && (
-                                        <img
+                                        <Image
                                             src={`${post.image.path_medium}?t=${new Date().getTime()}`}
                                             alt="Post Photo"
                                             className="w-40 h-40 object-contain mx-auto"

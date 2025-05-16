@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('album_post', function (Blueprint $table) {
+        Schema::create('album_regular_post', function (Blueprint $table) {
             $table->foreignId('album_id')->constrained();
-            $table->foreignId('post_id')->constrained();
-            $table->primary(['album_id', 'post_id']);
+            $table->foreignId('regular_post_id')->constrained();
+            $table->primary(['album_id', 'regular_post_id']);
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('album_post');
+        Schema::dropIfExists('album_regular_post');
     }
 };

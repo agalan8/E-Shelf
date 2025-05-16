@@ -5,7 +5,7 @@ import Post from '@/Components/Posts/Post';
 import Edit from '@/Components/Albums/Edit';
 import AddPosts from '@/Components/Albums/AddPosts'; // Importamos el modal AddPosts
 
-const Show = ({ album, userPosts }) => {
+const Show = ({ album, userPosts, tags }) => {
   const [posts, setPosts] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddPostsModalOpen, setIsAddPostsModalOpen] = useState(false); // Nuevo estado para el modal de AddPosts
@@ -46,9 +46,11 @@ const Show = ({ album, userPosts }) => {
 
   };
 
+  console.log(posts);
+
   return (
     <AuthenticatedLayout
-      header={<h2 className="text-xl font-semibold leading-tight text-gray-800">{album.titulo}</h2>}
+      header={<h2 className=" font-semibold leading-tight text-gray-800">{album.titulo}</h2>}
     >
       <Head title="Mis Álbumes" />
       <div className="container mx-auto p-4">
@@ -112,7 +114,7 @@ const Show = ({ album, userPosts }) => {
                 </button>
 
                 {/* Componente Post */}
-                <Post post={post} tags={post.tags || []} />
+                    <Post key={post.id} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} post={post} tags={tags} />
               </div>
             ))
           )}

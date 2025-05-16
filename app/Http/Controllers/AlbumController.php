@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Album;
 use App\Models\Image;
 use App\Models\Post;
+use App\Models\RegularPost;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -103,10 +105,32 @@ class AlbumController extends Controller
     {
         $userId = Auth::user()->id;
         $user = User::findOrFail($userId);
-        $posts = Post::where('user_id', $userId)->with('image', 'tags', 'user')->get();
+        $posts = RegularPost::whereHas('post', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->with(['image', 'tags','post', 'post.user', 'likedBy']) // Carga relaciones del Post
+            ->get();
+
+        $album = tap(Album::with([
+            'user',
+            'posts.comments.user',
+            'posts.image',
+            'posts.post.user',
+            'posts.tags',
+            'posts.likedBy'
+        ])->findOrFail($album->id), function ($album) {
+            $album->posts->each(function ($post) {
+                $post->getTotalLikes = $post->getTotalLikes();
+                $post->isLikedByUser = $post->isLikedByUser();
+            });
+        });
+
+
+
         return Inertia::render('Albums/Show', [
-            'album' => $album->with('posts', 'user', 'posts.image', 'posts.user', 'posts.tags')->find($album->id),
+            'album' => $album,
             'userPosts' => $posts,
+            'tags' => Tag::all(),
         ]);
     }
 

@@ -1,123 +1,228 @@
 import React, { useState } from 'react';
-import { Link, usePage, router } from '@inertiajs/react'; // usePage para obtener información de la página
-import Show from '@/Components/Posts/Show'; // Asegúrate de importar el componente Show
-import Edit from '@/Components/Posts/Edit'; // Importa el componente Edit
+import { Link, usePage, router } from '@inertiajs/react';
+import Show from '@/Components/Posts/Show';
+import Edit from '@/Components/Posts/Edit';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as faHeartSolid, faHeartCrack, faRetweet } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import { PencilIcon as PencilOutline } from '@heroicons/react/24/outline';
+import { PencilIcon as PencilSolid } from '@heroicons/react/24/solid';
+import { TrashIcon as TrashOutline } from '@heroicons/react/24/outline';
+import { TrashIcon as TrashSolid } from '@heroicons/react/24/solid';
+import Image from '@/Components/Image';
 
+const Post = ({ post, tags, isLikedByUser, getTotalLikes, isSharedByUser, getTotalShares, postType }) => {
+  const { auth } = usePage().props;
+  const [showModalOpen, setShowModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isLiked, setIsLiked] = useState(isLikedByUser);
+  const [totalLikes, setTotalLikes] = useState(getTotalLikes || 0);
+  const [hovered, setHovered] = useState(false);
+  const [editHovered, setEditHovered] = useState(false);
+  const [deleteHovered, setDeleteHovered] = useState(false);
+  const [isShared, setIsShared] = useState(isSharedByUser);
+  const [totalShares, setTotalShares] = useState(getTotalShares || 0);
 
-const Post = ({ post, tags }) => {
-  const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
-  const [showModalOpen, setShowModalOpen] = useState(false); // Estado para controlar el modal de detalles
-  const [editModalOpen, setEditModalOpen] = useState(false); // Estado para controlar el modal de edición
-  const [selectedPost, setSelectedPost] = useState(null); // Estado para almacenar la publicación seleccionada
-  const [isDeleting, setIsDeleting] = useState(false); // Estado para manejar el proceso de eliminación
+  console.log('Post:', post);
+  console.log('Post Type:', postType);
 
-  // Función para abrir el modal de detalles
-  const handleOpenShowModal = () => {
-    setSelectedPost(post); // Establece la publicación seleccionada
-    setShowModalOpen(true); // Abre el modal de detalles
+  const toggleLike = (e) => {
+    e.stopPropagation();
+    if (!auth.user) return;
+
+    router.post(route('like'), { post_id: post.id }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        setIsLiked(prev => !prev);
+        setTotalLikes(prev => isLiked ? prev - 1 : prev + 1);
+      },
+    });
   };
 
-  // Función para cerrar el modal de detalles
-  const handleCloseShowModal = () => {
-    setShowModalOpen(false); // Cierra el modal de detalles
-    setSelectedPost(null); // Limpia la publicación seleccionada
-  };
+  const toggleShare = (e) => {
+    e.stopPropagation();
+    if (!auth.user) return;
 
-  // Función para abrir el modal de edición
-  const handleOpenEditModal = () => {
-    setSelectedPost(post); // Establece la publicación seleccionada
-    setEditModalOpen(true); // Abre el modal de edición
-  };
-
-  // Función para cerrar el modal de edición
-  const handleCloseEditModal = () => {
-    setEditModalOpen(false); // Cierra el modal de edición
-    setSelectedPost(null); // Limpia la publicación seleccionada
-  };
-
-  // Función para eliminar la publicación
-  const handleDeletePost = async () => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
-      setIsDeleting(true); // Activar el estado de "eliminando" mientras la solicitud se procesa
-
-      try {
-        // Enviar solicitud DELETE a posts.destroy utilizando Inertia.js
-        await router.delete(route('posts.destroy', post.id), {
-          preserveScroll: true, // Mantener el scroll de la página
-        });
-      } catch (error) {
-        console.error('Error al eliminar la publicación:', error);
-      } finally {
-        setIsDeleting(false); // Desactivar el estado de "eliminando"
-      }
+    if (!isShared) {
+      router.post(route('shared-posts.store'), { post_id: post.id }, {
+        preserveScroll: true,
+        onSuccess: () => {
+          setIsShared(true);
+          setTotalShares(prev => isShared ? prev - 1 : prev + 1);
+        }
+      });
+    } else {
+      router.delete(route('shared-posts.destroyByPostId'), {
+        data: { regular_post_id: post.id },
+        preserveScroll: true,
+        onSuccess: () => {
+          setIsShared(false);
+          setTotalShares(prev => isShared ? prev - 1 : prev + 1);
+        }
+      });
     }
   };
 
+  const handleOpenShowModal = () => {
+    setSelectedPost(post);
+    setShowModalOpen(true);
+  };
 
-  const canEditOrDelete = auth.user && (auth.user.id === post.user.id || auth.user.is_admin);
+  const handleCloseShowModal = () => {
+    setShowModalOpen(false);
+    setSelectedPost(null);
+  };
+
+  const handleOpenEditModal = (e) => {
+    e.stopPropagation();
+    setSelectedPost(post);
+    setEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedPost(null);
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+      router.delete(route('regular-posts.destroy', post.id), {
+        preserveScroll: true,
+      });
+    }
+  };
+
+  const canEdit = auth.user && (auth.user.id === post.post.user.id || auth.user.is_admin);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      {/* Foto de perfil y nombre del usuario */}
-      <div className="flex items-center space-x-3 mb-4">
-        <Link href={route('users.show', post.user.id)}>
-          <img
-            src={`${post.user.profile_image.path_small}?t=${new Date().getTime()}`}
-            alt={post.user.name}
-            className="w-10 h-10 rounded-full"
-          />
-        </Link>
-        <Link
-          href={route('users.show', post.user.id)}
-          className="font-semibold text-blue-500"
-        >
-          {post.user.name}
-        </Link>
-      </div>
-
-      {/* Imagen y contenido de la publicación */}
-      <img
+    <div className="relative group cursor-pointer" style={{ display: 'inline-block', lineHeight: 0 }}>
+      <Image
         src={`${post.image.path_medium}?t=${new Date().getTime()}`}
         alt={post.titulo}
-        className="w-full h-48 object-cover rounded-lg mb-4"
+        className="w-full h-auto object-contain"
+        loading="lazy"
+        onClick={handleOpenShowModal}
       />
-      <h3 className="text-lg font-semibold">{post.titulo}</h3>
-      <p className="text-sm text-gray-500">{post.descripcion}</p>
-      <p className="text-sm text-gray-400">{post.localizacion}</p>
 
-      {/* Botón para abrir el modal de detalles */}
-      <button onClick={handleOpenShowModal} className="text-blue-500 mt-2">
-        Ver detalles
-      </button>
-
-      {/* Botones solo visibles si el usuario tiene permiso */}
-      {canEditOrDelete && (
-        <>
-          {/* Botón para abrir el modal de edición */}
-          <button onClick={handleOpenEditModal} className="text-green-500 mt-2 ml-4">
-            Editar
-          </button>
-
-          {/* Botón para eliminar la publicación */}
-          <button
-            onClick={handleDeletePost}
-            className="text-red-500 mt-2 ml-4"
-            disabled={isDeleting} // Desactivar el botón mientras se está eliminando
-          >
-            {isDeleting ? 'Eliminando...' : 'Eliminar'}
-          </button>
-        </>
-      )}
-
-      {/* Mostrar el modal con la publicación seleccionada */}
-      {showModalOpen && selectedPost && (
-        <Show post={selectedPost} onClose={handleCloseShowModal} />
+      {/* Indicador si es post compartido */}
+    {postType === 'shared' && (
+    <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg select-none z-10 max-w-[140px] text-center">
+        Compartido por <br />
+        <span className="font-bold">{post.post.user.name}</span>
+    </div>
     )}
 
 
-      {/* Mostrar el modal de edición */}
+      {/* Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gray-800/60 backdrop-blur-sm text-white px-4 py-1 flex items-center justify-between opacity-0 group-hover:opacity-100 group-hover:py-2 transition-all duration-300 text-sm">
+        {/* Usuario */}
+        <div className="flex items-center space-x-2">
+          {post.post.user.profile_image?.path_small ? (
+            <Image
+              src={`${post.post.user.profile_image.path_small}?t=${new Date().getTime()}`}
+              alt={post.post.user.name}
+              className="w-9 h-9 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm">?</div>
+          )}
+          <Link
+            href={route('users.show', post.post.user.id)}
+            className="hover:underline text-base font-medium"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {post.post.user.name}
+          </Link>
+        </div>
+
+        {/* Likes y acciones */}
+        <div className="flex items-center space-x-3">
+          {/* Me gusta */}
+          <button
+            onClick={toggleLike}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            className="text-lg focus:outline-none"
+          >
+            <FontAwesomeIcon
+              icon={
+                isLiked
+                  ? hovered
+                    ? faHeartCrack
+                    : faHeartSolid
+                  : faHeartRegular
+              }
+              className={`w-6 h-6 transition duration-200 ${isLiked ? 'text-red-500' : 'text-white'}`}
+            />
+          </button>
+          <span className="text-sm">{totalLikes}</span>
+
+          {/* Compartir */}
+          <button
+            onClick={toggleShare}
+            className="text-lg focus:outline-none"
+          >
+            <FontAwesomeIcon
+              icon={faRetweet}
+              className={`w-6 h-6 transition duration-200 ${isShared ? 'text-[#E0B0FF]' : 'text-white'}`}
+            />
+          </button>
+          <span className="text-sm">{totalShares}</span>
+
+          {/* Editar */}
+          {canEdit && (
+            <>
+              <button
+                onClick={handleOpenEditModal}
+                onMouseEnter={() => setEditHovered(true)}
+                onMouseLeave={() => setEditHovered(false)}
+                className="text-white"
+              >
+                {editHovered ? (
+                  <PencilSolid className="w-5 h-5 text-white" />
+                ) : (
+                  <PencilOutline className="w-5 h-5 text-white" />
+                )}
+              </button>
+
+              {/* Eliminar */}
+              <button
+                onClick={handleDelete}
+                onMouseEnter={() => setDeleteHovered(true)}
+                onMouseLeave={() => setDeleteHovered(false)}
+                className="text-white"
+              >
+                {deleteHovered ? (
+                  <TrashSolid className="w-5 h-5 text-red-500" />
+                ) : (
+                  <TrashOutline className="w-5 h-5 text-white" />
+                )}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Modales */}
+      {showModalOpen && selectedPost && (
+        <Show
+          post={selectedPost}
+          onClose={handleCloseShowModal}
+          isLiked={isLiked}
+          setIsLiked={setIsLiked}
+          totalLikes={totalLikes}
+          setTotalLikes={setTotalLikes}
+        />
+      )}
       {editModalOpen && selectedPost && (
-        <Edit post={selectedPost} tags={tags} onClose={handleCloseEditModal} />
+        <Edit
+          post={selectedPost}
+          tags={tags}
+          onClose={handleCloseEditModal}
+          isOpen={editModalOpen}
+        />
       )}
     </div>
   );

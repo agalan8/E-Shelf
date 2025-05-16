@@ -42,7 +42,7 @@ const PostsSeguidos = ({ posts, tags }) => {
       {
         contenido,
         commentable_id: postId,
-        commentable_type: 'App\\Models\\Post',
+        commentable_type: 'App\\Models\\RegularPost',
       },
       {
         onSuccess: () =>
@@ -66,44 +66,20 @@ const PostsSeguidos = ({ posts, tags }) => {
 
   return (
     <AuthenticatedLayout
-      header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Seguidos</h2>}
+      header={<h2 className=" font-semibold leading-tight">Seguidos</h2>}
       subnav={<HomeSubnav />}
     >
       <Head title="Mis publicaciones" />
       <div className="container mx-auto p-4">
-        <h2 className="text-xl font-semibold mb-4">Seguidos</h2>
+        <h2 className="text-xl font-semibold mb-4 text-white">Seguidos</h2>
 
         {posts.length === 0 ? (
-          <p>No sigues a nadie aún.</p>
+          <p className="text-white">No sigues a nadie aún.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {posts.map((post) => (
-              <div key={post.id} className="space-y-2">
-                <Post post={post} tags={tags} />
-
-                {/* Botón de me gusta */}
-                <div className="px-4">
-                  <button
-                    onClick={() => toggleLike(post.id)}
-                    onMouseEnter={() => setHoveredLike((prev) => ({ ...prev, [post.id]: true }))}
-                    onMouseLeave={() => setHoveredLike((prev) => ({ ...prev, [post.id]: false }))}
-                    className="text-xl focus:outline-none"
-                  >
-                    <FontAwesomeIcon
-                      icon={
-                        likes[post.id]
-                          ? hoveredLike[post.id]
-                            ? faHeartCrack
-                            : faHeartSolid
-                          : faHeartRegular
-                      }
-                      className={`transition duration-200 ${
-                        likes[post.id] ? 'text-red-600' : 'text-gray-500'
-                      }`}
-                    />
-                  </button>
-                  <span className="ml-2 text-sm text-gray-700">{post.getTotalLikes}</span>
-                </div>
+              <div key={`${post.post_type}-${post.id}`} className="space-y-2">
+                <Post post={post} tags={tags} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} isSharedByUser={post.isSharedByUser} getTotalShares={post.getTotalShares} postType={post.post_type} />
 
                 {/* Campo para comentarios */}
                 <div className="px-4">

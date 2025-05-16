@@ -78,7 +78,7 @@ export default function SocialIndex() {
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Gestión de Redes Sociales</h2>}
+            header={<h2 className=" font-semibold leading-tight text-gray-800">Gestión de Redes Sociales</h2>}
         >
             <Head title="Gestión de Redes Sociales" />
 

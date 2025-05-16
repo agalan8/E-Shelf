@@ -10,7 +10,7 @@ export default function BusquedaResultados({ results, filter, auth }) {
   return (
     <Layout
       header={
-        <h2 className="text-xl font-semibold leading-tight text-gray-800">
+        <h2 className=" font-semibold leading-tight text-gray-800">
           Resultado de la búsqueda
         </h2>
       }

@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('likes', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('post_id')->constrained();
+        Schema::create('shared_posts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('regular_post_id')->constrained();
             $table->timestamps();
-
-            $table->primary(['user_id', 'post_id']);
+            $table->softDeletes();
         });
     }
 
@@ -25,6 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('likes');
-    }
+        Schema::table('shared_posts', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });    }
 };

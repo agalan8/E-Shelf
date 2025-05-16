@@ -1,6 +1,7 @@
 import { Link, Head, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Image from '@/Components/Image';
 
 export default function UserIndex() {
     const { users } = usePage().props;
@@ -11,14 +12,12 @@ export default function UserIndex() {
     const [sortField, setSortField] = useState('name');
     const [sortDirection, setSortDirection] = useState('asc');
 
-    // Función para eliminar usuario
     const deleteUser = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
             router.delete(route('users.destroy', id));
         }
     };
 
-    // Función para cambiar el orden al hacer clic en el título de la columna
     const handleSort = (field) => {
         if (sortField === field) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -28,7 +27,6 @@ export default function UserIndex() {
         }
     };
 
-    // Filtrar usuarios según la búsqueda
     const filteredUsers = users
         .filter((user) => {
             if (searchField === 'name') {
@@ -58,7 +56,7 @@ export default function UserIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className=" font-semibold leading-tight text-gray-800">
                     Gestión de Usuarios
                 </h2>
             }
@@ -76,7 +74,6 @@ export default function UserIndex() {
                     </button>
                 </div>
 
-                {/* Barra de búsqueda y selector */}
                 <div className="mb-4 flex justify-between items-center">
                     <div className="flex space-x-4">
                         <input
@@ -97,28 +94,18 @@ export default function UserIndex() {
                     </div>
                 </div>
 
-                {/* Tabla de usuarios */}
                 <table className="w-full border-collapse border border-gray-300">
                     <thead>
                         <tr className="bg-gray-100">
                             <th className="border p-2">Imagen</th>
-                            <th
-                                className="border p-2 cursor-pointer"
-                                onClick={() => handleSort('name')}
-                            >
+                            <th className="border p-2 cursor-pointer" onClick={() => handleSort('name')}>
                                 Nombre {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
                             </th>
-                            <th
-                                className="border p-2 cursor-pointer"
-                                onClick={() => handleSort('email')}
-                            >
+                            <th className="border p-2 cursor-pointer" onClick={() => handleSort('email')}>
                                 Email {sortField === 'email' && (sortDirection === 'asc' ? '↑' : '↓')}
                             </th>
                             <th className="border p-2">Rol</th>
-                            <th
-                                className="border p-2 cursor-pointer"
-                                onClick={() => handleSort('created_at')}
-                            >
+                            <th className="border p-2 cursor-pointer" onClick={() => handleSort('created_at')}>
                                 Fecha creación {sortField === 'created_at' && (sortDirection === 'asc' ? '↑' : '↓')}
                             </th>
                             <th className="border p-2">Acciones</th>
@@ -128,11 +115,17 @@ export default function UserIndex() {
                         {filteredUsers.map(user => (
                             <tr key={user.id} className="text-center">
                                 <td className="border p-2">
-                                    <img
-                                        src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
-                                        alt="Perfil"
-                                        className="w-10 h-10 rounded-full mx-auto"
-                                    />
+                                    {user.profile_image?.path_small ? (
+                                        <Image
+                                            src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
+                                            alt="Perfil"
+                                            className="w-10 h-10 rounded-full mx-auto"
+                                        />
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white mx-auto">
+                                            ?
+                                        </div>
+                                    )}
                                 </td>
                                 <td className="border p-2">
                                     <Link href={route('users.show', user.id)} className="text-blue-600 hover:underline">
@@ -165,7 +158,6 @@ export default function UserIndex() {
                                             >
                                                 {user.is_admin ? 'Quitar Admin' : 'Hacer Admin'}
                                             </Link>
-
                                             <Link
                                                 href={route('users.destroy', user.id)}
                                                 method="delete"
@@ -187,7 +179,6 @@ export default function UserIndex() {
                 </table>
             </div>
 
-            {/* Modal de creación de usuario */}
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded shadow-lg w-96">
@@ -216,7 +207,7 @@ export default function UserIndex() {
                             <div className="mb-2">
                                 <label className="block text-sm font-medium">Admin</label>
                                 <select name="is_admin" id="is_admin">
-                                    <option value="false" selected disabled>Sleccione una opción...</option>
+                                    <option value="" disabled selected>Seleccione una opción...</option>
                                     <option value="true">Sí</option>
                                     <option value="false">No</option>
                                 </select>
