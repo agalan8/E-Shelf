@@ -70,6 +70,7 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->hasMany(Post::class)->where('posteable_type', RegularPost::class);
+
     }
 
     public function albums()

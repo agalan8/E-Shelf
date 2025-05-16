@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+use function Pest\Laravel\post;
+
 class RegularPost extends Model
 {
     /** @use HasFactory<\Database\Factories\RegularPostFactory> */
@@ -21,6 +23,11 @@ class RegularPost extends Model
 
     public function post(){
         return $this->morphOne(Post::class, 'posteable');
+    }
+
+    public function sharedPosts()
+    {
+        return $this->hasMany(SharedPost::class);
     }
 
     public function image()
@@ -53,15 +60,41 @@ class RegularPost extends Model
         return $this->likedBy()->where('user_id', $user->id)->exists();
     }
 
+
     public function getTotalLikes(){
         return $this->likedBy()->count();
     }
 
-    protected static function booted()
+public function isSharedByUser()
+{
+    $user = Auth::user();
+
+    if (!$user) {
+        return false;
+    }
+
+    return $this->sharedPosts()
+        ->whereHas('post', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->exists();
+}
+
+
+public function getTotalShares()
+{
+    return $this->sharedPosts()->count();
+}
+
+
+protected static function booted()
 {
     static::deleting(function ($RegularPost) {
         if (! $RegularPost->isForceDeleting()) {
-            // Verifica si el RegularPost tiene una imagen asociada antes de intentar eliminarla
+            // 🔁 Eliminar todos los SharedPosts relacionados
+            $RegularPost->sharedPosts()->delete();
+
+            // Eliminar imagen asociada si existe
             if ($RegularPost->image) {
                 $image = $RegularPost->image;
 
@@ -77,14 +110,16 @@ class RegularPost extends Model
                 $image->delete();
             }
 
+            // Eliminar la relación con el modelo Post
             $RegularPost->post()->delete();
 
-            // Desvincula los tags y álbumes del RegularPost
+            // Desvincular tags y álbumes
             $RegularPost->tags()->detach();
             $RegularPost->albums()->detach();
         }
     });
 }
+
 
 
 

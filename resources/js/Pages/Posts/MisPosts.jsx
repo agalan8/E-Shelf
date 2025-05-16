@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
 
 const MisPosts = ({ posts, tags }) => {
+
   return (
     <AuthenticatedLayout
       header={<h2 className=" font-semibold leading-tight text-gray-800">Mis Publicaciones</h2>}
@@ -11,6 +12,7 @@ const MisPosts = ({ posts, tags }) => {
     >
       <Head title="Mis publicaciones" />
       <div className="container">
+
 
         {posts.length === 0 ? (
           <p>No tienes publicaciones aún.</p>
@@ -21,7 +23,7 @@ const MisPosts = ({ posts, tags }) => {
                     {posts
                         .filter((_, index) => index % 3 === colIndex)
                         .map((post) => (
-                        <Post key={post.id} post={post} tags={tags} />
+                        <Post key={post.id} post={post} tags={tags}  postType={post.post_type}/>
                         ))}
                     </div>
                 ))}

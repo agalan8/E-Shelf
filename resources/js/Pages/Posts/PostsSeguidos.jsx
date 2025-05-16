@@ -78,8 +78,8 @@ const PostsSeguidos = ({ posts, tags }) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {posts.map((post) => (
-              <div key={post.id} className="space-y-2">
-                <Post post={post} tags={tags} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} />
+              <div key={`${post.post_type}-${post.id}`} className="space-y-2">
+                <Post post={post} tags={tags} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} isSharedByUser={post.isSharedByUser} getTotalShares={post.getTotalShares} postType={post.post_type} />
 
                 {/* Campo para comentarios */}
                 <div className="px-4">

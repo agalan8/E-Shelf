@@ -77,6 +77,8 @@ class UserController extends Controller
             ->get()->map(function ($post) {
             $post->getTotalLikes = $post->posteable->getTotalLikes();
             $post->isLikedByUser = $post->posteable->isLikedByUser();
+            $post->getTotalShares = $post->posteable->getTotalShares();
+            $post->isSharedByUser = $post->posteable->isSharedByUser();
             return $post;
         }),
         'tags' => Tag::all(),

@@ -125,7 +125,7 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
                 {posts
                   .filter((_, index) => index % 3 === colIndex)
                   .map((post) => (
-                    <Post key={post.posteable.id} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} post={post.posteable} tags={tags} />
+                    <Post key={post.posteable.id} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} isSharedByUser={post.isSharedByUser} getTotalShares={post.getTotalShares} post={post.posteable} tags={tags} />
                   ))}
               </div>
             ))}

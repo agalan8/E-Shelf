@@ -7,6 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegularPostController;
+use App\Http\Controllers\SharedPostController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
@@ -14,6 +15,7 @@ use App\Models\Album;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\RegularPost;
+use App\Models\SharedPost;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Application;
@@ -70,8 +72,29 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::delete('/shared-posts/by-regular', function (Request $request) {
+    $request->validate([
+        'regular_post_id' => 'required|exists:regular_posts,id',
+    ]);
+
+    $sharedPost = SharedPost::where('regular_post_id', $request->input('regular_post_id'))
+        ->whereHas('post', function ($query) {
+            $query->where('user_id', Auth::id());
+        })
+        ->first();
+
+    if (!$sharedPost) {
+        return response()->json(['message' => 'No shared post found.'], 404);
+    }
+
+    $sharedPost->post()->delete();
+    $sharedPost->delete();
+
+})->middleware('auth')->name('shared-posts.destroyByPostId');
+
 // Route::resource('posts', PostController::class)->middleware('auth');
 Route::resource('regular-posts', RegularPostController::class)->middleware('auth');
+Route::resource('shared-posts', SharedPostController::class)->middleware('auth');
 Route::resource('albums', AlbumController::class)->middleware('auth');
 Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])
     ->name('albums.eliminar-portada');
@@ -108,11 +131,15 @@ Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies
 // })->middleware('auth')->name('mis-posts');
 
 Route::get('/posts-seguidos', function () {
-    $userId = Auth::id();
-    $followingIds = User::findOrFail($userId)->following()->pluck('followed_user_id');
 
-    $posts = RegularPost::whereHas('post', function ($query) use ($followingIds) {
-            $query->whereIn('user_id', $followingIds);
+    $user = User::findOrFail(Auth::id());
+
+    // IDs de usuarios seguidos + el propio
+    $userIds = $user->following()->pluck('followed_user_id')->push($user->id);
+
+    // RegularPosts de usuarios seguidos o propios
+    $regularPosts = RegularPost::whereHas('post', function ($query) use ($userIds) {
+            $query->whereIn('user_id', $userIds);
         })
         ->with([
             'image',
@@ -123,21 +150,64 @@ Route::get('/posts-seguidos', function () {
             'comments.user.backgroundImage',
             'comments.replies.user.profileImage',
             'comments.replies.user.backgroundImage',
-            'likedBy' // Para evitar N+1 en likes
+            'likedBy'
         ])
-        ->orderBy('created_at', 'desc')
-        ->get()
-        ->map(function ($post) {
-            $post->getTotalLikes = $post->getTotalLikes();
-            $post->isLikedByUser = $post->isLikedByUser();
-            return $post;
-        });
+        ->get();
+
+    // SharedPosts de usuarios seguidos o propios
+    $sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
+            $query->whereIn('user_id', $userIds);
+        })
+        ->with([
+            'regularPost.image',
+            'regularPost.post.user.profileImage',
+            'regularPost.post.user.backgroundImage',
+            'regularPost.tags',
+            'regularPost.comments.user.profileImage',
+            'regularPost.comments.user.backgroundImage',
+            'regularPost.comments.replies.user.profileImage',
+            'regularPost.comments.replies.user.backgroundImage',
+            'regularPost.likedBy',
+            'post.user.profileImage', // quien hizo el share
+        ])
+        ->get();
+
+    // Mapear ambos tipos al mismo formato base
+    $allPosts = collect();
+
+    foreach ($regularPosts as $post) {
+        $post->getTotalLikes = $post->getTotalLikes();
+        $post->isLikedByUser = $post->isLikedByUser();
+        $post->isSharedByUser = $post->isSharedByUser();
+        $post->getTotalShares = $post->getTotalShares();
+        $post->post_type = 'regular';
+        $post->shared_by = null; // No aplica
+        $allPosts->push($post);
+    }
+
+    foreach ($sharedPosts as $sharedPost) {
+        $original = $sharedPost->regularPost;
+        $original->getTotalLikes = $original->getTotalLikes();
+        $original->isLikedByUser = $original->isLikedByUser();
+        $original->isSharedByUser = $original->isSharedByUser();
+        $original->getTotalShares = $original->getTotalShares();
+        $original->post_type = 'shared';
+        $original->shared_by = $sharedPost->post->user; // quien lo compartió
+        $original->shared_at = $sharedPost->post->created_at;
+        $allPosts->push($original);
+    }
+
+    // Ordenar todos los posts por fecha de creación (propia o compartida)
+    $sortedPosts = $allPosts->sortByDesc(function ($post) {
+        return $post->shared_at ?? $post->post->created_at;
+    })->values();
 
     return Inertia::render('Posts/PostsSeguidos', [
-        'posts' => $posts,
+        'posts' => $sortedPosts,
         'tags' => Tag::all(),
     ]);
 })->middleware('auth')->name('posts-seguidos');
+
 
 
 Route::get('/mis-albums', function () {
@@ -338,6 +408,8 @@ Route::post('/like', function (Request $request) {
 
     return back();
 })->name('like')->middleware('auth');
+
+
 
 
 Route::get('/buscar', function (Request $request) {
