@@ -437,7 +437,7 @@ Route::get('/buscar', function (Request $request) {
             ->get();
     } elseif ($filter === 'Publicaciones') {
         $posts = RegularPost::where('titulo', 'ilike', "%{$query}%")
-            ->with(['post.user.profileImage', 'tags', 'image', 'communities'])
+            ->with(['post.user.profileImage', 'tags', 'image', 'communities', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user'])
             ->get();
 
         // Añadir propiedades calculadas a cada post
