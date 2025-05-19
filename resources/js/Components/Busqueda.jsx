@@ -11,6 +11,7 @@ export default function Busqueda() {
   const closeModal = () => setIsOpen(false);
   const selectFilter = (type) => setFilter(type);
   const clearFilter = () => setFilter(null);
+
   const handleSearch = () => {
     router.get("/buscar", { q: searchText, filter });
     setIsOpen(false);
@@ -30,6 +31,7 @@ export default function Busqueda() {
         <button
           onClick={handleSearch}
           className="absolute inset-y-0 right-2 flex items-center text-blue-500"
+          aria-label="Buscar"
         >
           <MagnifyingGlassIcon className="h-4 w-4" />
         </button>
@@ -40,7 +42,13 @@ export default function Busqueda() {
           {filter ? (
             <div className="flex items-center bg-gray-200 px-2 py-1 rounded-full mb-2">
               <span className="text-sm font-medium">{filter}</span>
-              <button className="ml-2 text-red-500" onClick={clearFilter}>×</button>
+              <button
+                className="ml-2 text-red-500"
+                onClick={clearFilter}
+                aria-label="Quitar filtro"
+              >
+                ×
+              </button>
             </div>
           ) : (
             <>
@@ -50,6 +58,12 @@ export default function Busqueda() {
                 onClick={() => selectFilter("Usuarios")}
               >
                 Usuarios
+              </button>
+              <button
+                className="w-full text-left p-2 hover:bg-gray-200 rounded-lg"
+                onClick={() => selectFilter("Publicaciones")}
+              >
+                Publicaciones
               </button>
             </>
           )}
