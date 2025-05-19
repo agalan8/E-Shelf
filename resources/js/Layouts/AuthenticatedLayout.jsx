@@ -17,6 +17,10 @@ import {
     ArrowLeftStartOnRectangleIcon,
     HomeIcon
 } from '@heroicons/react/24/solid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsersGear, faUsers } from '@fortawesome/free-solid-svg-icons';
+
+
 
 export default function AuthenticatedLayout({ header, children, subnav }) {
     const { auth: { user }, mustVerifyEmail, status, socials } = usePage().props;
@@ -50,12 +54,15 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         <NavLink href={route('regular-posts.create')} active={route().current('regular-posts.create')} className="flex justify-center">
                             <ArrowUpTrayIcon className="h-9 w-9" />
                         </NavLink>
+                        <NavLink href={route('communities.index')} active={route().current('communities.index')} className="flex justify-center">
+                            <FontAwesomeIcon icon={faUsers} className="h-9 w-9" />
+                        </NavLink>
                     </div>
 
                     {user.is_admin && (
                         <div className="flex flex-col space-y-3 border-t border-gray-700 pt-3">
                             <NavLink href={route('users.index')} active={route().current('users.index')} className="flex justify-center">
-                                <UserGroupIcon className="h-9 w-9" />
+                                <FontAwesomeIcon icon={faUsersGear} className="h-9 w-9" />
                             </NavLink>
                             <NavLink href={route('regular-posts.index')} active={route().current('regular-posts.index')} className="flex justify-center">
                                 <RectangleStackIcon className="h-9 w-9" />

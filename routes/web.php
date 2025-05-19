@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
@@ -38,7 +39,7 @@ Route::get('/', function () {
 
     if(Auth::check()){
         return Inertia::render('Explorar', [
-            'posts' => RegularPost::with('image', 'post', 'post.user', 'tags', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get(),
+            'posts' => RegularPost::with('image', 'post', 'post.user', 'tags', 'communities', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get(),
         ]);
     }
 
@@ -57,7 +58,7 @@ Route::get('/explorar', function () {
 
 
     return Inertia::render('Explorar', [
-        'posts' => RegularPost::with('image', 'tags','post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get()->map(function ($post) {
+        'posts' => RegularPost::with('image', 'tags', 'communities','post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
@@ -94,6 +95,8 @@ Route::delete('/shared-posts/by-regular', function (Request $request) {
 
 })->middleware('auth')->name('shared-posts.destroyByPostId');
 
+
+
 // Route::resource('posts', PostController::class)->middleware('auth');
 Route::resource('regular-posts', RegularPostController::class)->middleware('auth');
 Route::resource('shared-posts', SharedPostController::class)->middleware('auth');
@@ -111,6 +114,12 @@ Route::middleware(['auth'])->group(function () {
 Route::resource('comments', CommentController::class)->middleware('auth');
 // Ruta para obtener las respuestas de un comentario
 Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies'])->middleware('auth');
+Route::resource('communities', CommunityController::class)->middleware('auth');
+Route::delete('/communities/{community}/images/{imageType}', [CommunityController::class, 'destroyImage'])
+    ->name('communities.images.destroy');
+Route::post('/communities/{community}/join', [CommunityController::class, 'join'])->name('communities.join');
+Route::post('/communities/{community}/leave', [CommunityController::class, 'leave'])->name('communities.leave');
+
 
 
 
@@ -148,6 +157,7 @@ Route::get('/posts-seguidos', function () {
             'post.user.profileImage',
             'post.user.backgroundImage',
             'tags',
+            'communities',
             'comments.user.profileImage',
             'comments.user.backgroundImage',
             'comments.replies.user.profileImage',
@@ -165,6 +175,7 @@ Route::get('/posts-seguidos', function () {
             'regularPost.post.user.profileImage',
             'regularPost.post.user.backgroundImage',
             'regularPost.tags',
+            'regulasrPost.communities',
             'regularPost.comments.user.profileImage',
             'regularPost.comments.user.backgroundImage',
             'regularPost.comments.replies.user.profileImage',
@@ -220,9 +231,13 @@ Route::get('/mis-albums', function () {
     return Inertia::render('Albums/MisAlbums', [
         'user' => $user,
         'albums' => $user->albums()->with('posts', 'user', 'user.profileImage', 'user.backgroundImage', 'coverImage', 'posts.image')->orderBy('created_at', 'desc')->get(),
-        'posts' => $user->posts()->with('posteable','posteable.image', 'posteable.tags', 'user')->get(),
+        'posts' => $user->posts()->with('posteable','posteable.image', 'posteable.tags', 'posteable.communities', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
+
+Route::get('mis-comunidades', function(){
+
+})->middleware('auth')->name('mis-comunidades');
 
 Route::post('albums/{album}/posts', function (Request $request, Album $album) {
 

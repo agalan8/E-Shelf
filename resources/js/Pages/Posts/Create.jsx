@@ -4,22 +4,33 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { ArrowUpTrayIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const PostCreate = () => {
-    const { tags } = usePage().props;
+    const { tags, communities } = usePage().props; // comunidades recibidas desde props
+
     const [imageFile, setImageFile] = useState(null);
     const [titulo, setTitulo] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [localizacion, setLocalizacion] = useState('');
     const [imageUploaded, setImageUploaded] = useState(false);
+
+    // Tags
     const [selectedTags, setSelectedTags] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
     const dropdownRef = useRef();
+
+    // Comunidades
+    const [selectedCommunities, setSelectedCommunities] = useState([]);
+    const [communitySearchTerm, setCommunitySearchTerm] = useState('');
+    const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] = useState(false);
+    const communityDropdownRef = useRef();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsDropdownOpen(false);
+            }
+            if (communityDropdownRef.current && !communityDropdownRef.current.contains(event.target)) {
+                setIsCommunityDropdownOpen(false);
             }
         };
 
@@ -40,6 +51,7 @@ const PostCreate = () => {
         setImageUploaded(false);
     };
 
+    // Manejo etiquetas
     const handleTagSelect = (tag) => {
         if (!selectedTags.some(t => t.id === tag.id)) {
             setSelectedTags([...selectedTags, tag]);
@@ -48,6 +60,17 @@ const PostCreate = () => {
 
     const handleTagRemove = (tagId) => {
         setSelectedTags(selectedTags.filter(tag => tag.id !== tagId));
+    };
+
+    // Manejo comunidades
+    const handleCommunitySelect = (community) => {
+        if (!selectedCommunities.some(c => c.id === community.id)) {
+            setSelectedCommunities([...selectedCommunities, community]);
+        }
+    };
+
+    const handleCommunityRemove = (communityId) => {
+        setSelectedCommunities(selectedCommunities.filter(c => c.id !== communityId));
     };
 
     const handleSubmit = (e) => {
@@ -59,9 +82,15 @@ const PostCreate = () => {
         formData.append('titulo', titulo);
         formData.append('descripcion', descripcion);
         formData.append('localizacion', localizacion);
+
         selectedTags.forEach(tag => {
             formData.append('tags[]', tag.id);
         });
+
+        selectedCommunities.forEach(community => {
+            formData.append('communities[]', community.id);
+        });
+
         router.post(route('regular-posts.store'), formData);
     };
 
@@ -102,8 +131,10 @@ const PostCreate = () => {
                         </div>
 
                         {/* Contenedor del formulario */}
-                        <div className="w-[35%] bg-[#303136] p-6 shadow h-[80vh]">
+                        <div className="w-[35%] bg-[#303136] p-6 shadow h-[80vh] overflow-y-auto">
                             <form onSubmit={handleSubmit} className="space-y-4">
+
+                                {/* Título */}
                                 <div>
                                     <label htmlFor="titulo" className="block text-lg font-semibold text-white">Título</label>
                                     <input
@@ -115,6 +146,8 @@ const PostCreate = () => {
                                         required
                                     />
                                 </div>
+
+                                {/* Descripción */}
                                 <div>
                                     <label htmlFor="descripcion" className="block text-lg font-semibold text-white">Descripción</label>
                                     <textarea
@@ -125,6 +158,8 @@ const PostCreate = () => {
                                         required
                                     />
                                 </div>
+
+                                {/* Localización */}
                                 <div>
                                     <label htmlFor="localizacion" className="block text-lg font-semibold text-white">Localización</label>
                                     <input
@@ -137,6 +172,7 @@ const PostCreate = () => {
                                     />
                                 </div>
 
+                                {/* Etiquetas */}
                                 <div>
                                     <label className="block text-lg font-semibold text-white">Etiquetas</label>
                                     <div className="flex flex-wrap gap-2 mb-2">
@@ -180,11 +216,57 @@ const PostCreate = () => {
                                     </div>
                                 </div>
 
+                                {/* Comunidades */}
+                                <div>
+                                    <label className="block text-lg font-semibold text-white">Comunidades</label>
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        {selectedCommunities.map(com => (
+                                            <div key={com.id} className="bg-gray-200 px-2 py-1 rounded flex items-center space-x-2">
+                                                <span>{com.nombre}</span>
+                                                <button type="button" onClick={() => handleCommunityRemove(com.id)} className="text-red-500">✕</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="relative" ref={communityDropdownRef}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsCommunityDropdownOpen(!isCommunityDropdownOpen)}
+                                            className="w-full mt-2 p-2 border text-left rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                                        >
+                                            Seleccionar comunidad...
+                                        </button>
+                                        {isCommunityDropdownOpen && (
+                                            <div className="absolute w-full mt-1 border rounded bg-white shadow-md z-10 max-h-40 overflow-y-auto">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Buscar comunidades..."
+                                                    value={communitySearchTerm}
+                                                    onChange={(e) => setCommunitySearchTerm(e.target.value)}
+                                                    className="w-full p-2 border-b rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                                                />
+                                                {communities
+                                                    .filter(com => com.nombre.toLowerCase().includes(communitySearchTerm.toLowerCase()))
+                                                    .map(com => (
+                                                        <div
+                                                            key={com.id}
+                                                            className="cursor-pointer p-2 hover:bg-opacity-80 bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                                                            onClick={() => handleCommunitySelect(com)}
+                                                        >
+                                                            {com.nombre}
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Botón enviar */}
                                 <div className="flex justify-end">
                                     <button type="submit" className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
                                         Crear Publicación
                                     </button>
                                 </div>
+
                             </form>
                         </div>
                     </div>

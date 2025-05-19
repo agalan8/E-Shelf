@@ -108,6 +108,15 @@ class User extends Authenticatable
         return $this->belongsToMany(RegularPost::class, 'likes');
     }
 
+    public function ownedCommunnities()
+    {
+        return $this->hasMany(Community::class);
+    }
+
+    public function communities()
+    {
+        return $this->belongsToMany(Community::class);
+    }
 
     protected static function booted()
     {
