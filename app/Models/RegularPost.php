@@ -65,60 +65,66 @@ class RegularPost extends Model
         return $this->likedBy()->count();
     }
 
-public function isSharedByUser()
-{
-    $user = Auth::user();
+    public function isSharedByUser()
+    {
+        $user = Auth::user();
 
-    if (!$user) {
-        return false;
+        if (!$user) {
+            return false;
+        }
+
+        return $this->sharedPosts()
+            ->whereHas('post', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->exists();
     }
 
-    return $this->sharedPosts()
-        ->whereHas('post', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->exists();
-}
+
+    public function getTotalShares()
+    {
+        return $this->sharedPosts()->count();
+    }
+
+    public function communities()
+    {
+        return $this->belongsToMany(Community::class);
+    }
 
 
-public function getTotalShares()
-{
-    return $this->sharedPosts()->count();
-}
+    protected static function booted()
+    {
+        static::deleting(function ($RegularPost) {
+            if (! $RegularPost->isForceDeleting()) {
+                // 🔁 Eliminar todos los SharedPosts relacionados
+                $RegularPost->sharedPosts()->delete();
 
+                // Eliminar imagen asociada si existe
+                if ($RegularPost->image) {
+                    $image = $RegularPost->image;
 
-protected static function booted()
-{
-    static::deleting(function ($RegularPost) {
-        if (! $RegularPost->isForceDeleting()) {
-            // 🔁 Eliminar todos los SharedPosts relacionados
-            $RegularPost->sharedPosts()->delete();
+                    $paths = [
+                        ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                        ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                    ];
 
-            // Eliminar imagen asociada si existe
-            if ($RegularPost->image) {
-                $image = $RegularPost->image;
+                    // Elimina las imágenes asociadas al RegularPost desde S3
+                    Storage::disk('s3')->delete($paths);
 
-                $paths = [
-                    ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                    ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-                ];
+                    // Eliminar la imagen de la base de datos
+                    $image->delete();
+                }
 
-                // Elimina las imágenes asociadas al RegularPost desde S3
-                Storage::disk('s3')->delete($paths);
+                // Eliminar la relación con el modelo Post
+                $RegularPost->post()->delete();
 
-                // Eliminar la imagen de la base de datos
-                $image->delete();
+                // Desvincular tags y álbumes
+                $RegularPost->tags()->detach();
+                $RegularPost->communities()->detach();
+                $RegularPost->albums()->detach();
             }
-
-            // Eliminar la relación con el modelo Post
-            $RegularPost->post()->delete();
-
-            // Desvincular tags y álbumes
-            $RegularPost->tags()->detach();
-            $RegularPost->albums()->detach();
-        }
-    });
-}
+        });
+    }
 
 
 

@@ -196,7 +196,7 @@ export default function PostIndex() {
                     <tbody>
                         {filteredPosts.map((post) => (
                             <tr key={post.id} className="text-center h-10">
-                                <td className="border px-2 py-2">{post.user.name}</td>
+                                <td className="border px-2 py-2">{post.post.user.name}</td>
                                 <td className="border px-2 py-2">{post.titulo}</td>
                                 <td className="border px-2 py-2">{post.descripcion}</td>
                                 <td className="border px-2 py-2">

@@ -117,6 +117,7 @@ class AlbumController extends Controller
             'posts.image',
             'posts.post.user',
             'posts.tags',
+            'posts.communities',
             'posts.likedBy'
         ])->findOrFail($album->id), function ($album) {
             $album->posts->each(function ($post) {

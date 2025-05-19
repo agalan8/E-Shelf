@@ -22,6 +22,9 @@ const Create = ({ onClose, posts }) => {
         }
     };
 
+    console.log("Selected Posts:", selectedPosts);
+    console.log("posts:", posts);
+
     const handleTogglePost = (postId) => {
         setSelectedPosts((prev) =>
             prev.includes(postId)
@@ -165,12 +168,12 @@ const Create = ({ onClose, posts }) => {
                                 ) : (
                                     posts.map((post) => (
                                         <div
-                                            key={post.id}
+                                            key={post.posteable.id}
                                             onClick={() =>
-                                                handleTogglePost(post.id)
+                                                handleTogglePost(post.posteable.id)
                                             }
                                             className={`relative rounded cursor-pointer transition-all ${
-                                                selectedPosts.includes(post.id)
+                                                selectedPosts.includes(post.posteable.id)
                                                     ? "border-4 border-blue-500 bg-blue-100 bg-opacity-10"
                                                     : "border border-gray-600"
                                             }`}

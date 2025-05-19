@@ -73,7 +73,7 @@ class UserController extends Controller
             'user' => $user->load('profileImage', 'backgroundImage'),
             'followers' => $user->getTotalFollowers(),
             'following' => $user->getTotalFollowing(),
-            'posts' => $user->posts()->with('posteable.image','posteable.tags', 'posteable', 'user', 'user.profileImage', 'user.backgroundImage', 'posteable.post', 'posteable.post.user', 'posteable.post.user.profileImage', 'posteable.post.user.backgroundImage', 'posteable.comments', 'posteable.comments.user', 'posteable.comments.user.profileImage', 'posteable.comments.user.backgroundImage', 'posteable.comments.replies', 'posteable.comments.replies.user', 'posteable.comments.replies.user.profileImage', 'posteable.comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')
+            'posts' => $user->posts()->with('posteable.image','posteable.tags','posteable.communities', 'posteable', 'user', 'user.profileImage', 'user.backgroundImage', 'posteable.post', 'posteable.post.user', 'posteable.post.user.profileImage', 'posteable.post.user.backgroundImage', 'posteable.comments', 'posteable.comments.user', 'posteable.comments.user.profileImage', 'posteable.comments.user.backgroundImage', 'posteable.comments.replies', 'posteable.comments.replies.user', 'posteable.comments.replies.user.profileImage', 'posteable.comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')
             ->get()->map(function ($post) {
             $post->getTotalLikes = $post->posteable->getTotalLikes();
             $post->isLikedByUser = $post->posteable->isLikedByUser();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRegularPostRequest;
 use App\Http\Requests\UpdateRegularPostRequest;
+use App\Models\Community;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\RegularPost;
@@ -25,7 +26,7 @@ class RegularPostController extends Controller
     use AuthorizesRequests;
     public function index()
     {
-        $posts = RegularPost::orderBy('created_at')->with('user', 'image', 'tags')->get();
+        $posts = RegularPost::orderBy('created_at')->with('post.user', 'image', 'tags', 'communities')->get();
 
         return Inertia::render('Posts/Index', [
             'posts' => $posts,
@@ -40,6 +41,7 @@ class RegularPostController extends Controller
     {
         return Inertia::render('Posts/Create', [
             'tags' => Tag::all(),
+            'communities' => Auth::user()->communities,
         ]);
     }
 
@@ -103,6 +105,14 @@ class RegularPostController extends Controller
         if($tags != null) {
             foreach ($tags as $tag) {
                 $RegularPost->tags()->attach(Tag::findOrFail($tag));
+            }
+        }
+
+        $communities = $request->input('communities');
+
+        if($communities != null) {
+            foreach ($communities as $community) {
+                $RegularPost->communities()->attach(Community::findOrFail($community));
             }
         }
 
@@ -188,6 +198,16 @@ class RegularPostController extends Controller
         if($tags != null) {
             foreach ($tags as $tag) {
                 $RegularPost->tags()->attach(Tag::findOrFail($tag));
+            }
+        }
+
+        $RegularPost->communities()->detach();
+
+        $communities = $request->input('communities');
+
+        if($communities != null) {
+            foreach ($communities as $community) {
+                $RegularPost->communities()->attach(Community::findOrFail($community));
             }
         }
 
