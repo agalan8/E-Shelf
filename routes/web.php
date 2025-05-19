@@ -426,18 +426,31 @@ Route::post('/like', function (Request $request) {
     return back();
 })->name('like')->middleware('auth');
 
-
-
-
 Route::get('/buscar', function (Request $request) {
     $query = $request->query('q');
     $filter = $request->query('filter');
 
 
     if ($filter === 'Usuarios') {
-        $results = User::where('name', 'like', "%{$query}%")->with('profileImage', 'backgroundImage')->get();
+        $results = User::where('name', 'ilike', "%{$query}%")
+            ->with('profileImage', 'backgroundImage')
+            ->get();
+    } elseif ($filter === 'Publicaciones') {
+        $posts = RegularPost::where('titulo', 'ilike', "%{$query}%")
+            ->with(['post.user.profileImage', 'tags', 'image', 'communities'])
+            ->get();
+
+        // Añadir propiedades calculadas a cada post
+        $results = $posts->map(function ($post) {
+            $post->getTotalLikes = $post->getTotalLikes();
+            $post->isLikedByUser = $post->isLikedByUser();
+            $post->isSharedByUser = $post->isSharedByUser();
+            $post->getTotalShares = $post->getTotalShares();
+            $post->post_type = 'regular';
+            return $post;
+        });
     } else {
-        $results = [];
+        $results = collect();
     }
 
     return inertia('BusquedaResultados', [
