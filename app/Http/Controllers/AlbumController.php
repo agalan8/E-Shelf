@@ -113,6 +113,7 @@ class AlbumController extends Controller
 
         $album = tap(Album::with([
             'user',
+            'coverImage',
             'posts.comments.user',
             'posts.image',
             'posts.post.user',

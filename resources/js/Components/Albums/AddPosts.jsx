@@ -1,93 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
-import Image from '../Image';
+import React, { useState, useEffect } from "react";
+import { router } from "@inertiajs/react";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+import Image from "../Image";
 
 const AddPosts = ({ album, userPosts, onClose }) => {
-  const [selectedPosts, setSelectedPosts] = useState([]);
+    const [selectedPosts, setSelectedPosts] = useState([]);
+    const [isVisible, setIsVisible] = useState(false);
 
-  const togglePostSelection = (postId) => {
-    setSelectedPosts((prevSelected) =>
-      prevSelected.includes(postId)
-        ? prevSelected.filter((id) => id !== postId)
-        : [...prevSelected, postId]
-    );
-  };
+    useEffect(() => {
+        setTimeout(() => setIsVisible(true), 10);
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (selectedPosts.length === 0) {
-      alert('Selecciona al menos un post para agregar.');
-      return;
-    }
-
-    router.post(route('albums.posts.store', album.id), { posts: selectedPosts }, {
-      onSuccess: () => onClose(),
-      preserveScroll: true,
-    });
-  };
-
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
+    const togglePostSelection = (postId) => {
+        setSelectedPosts((prevSelected) =>
+            prevSelected.includes(postId)
+                ? prevSelected.filter((id) => id !== postId)
+                : [...prevSelected, postId]
+        );
     };
-  }, []);
 
-  return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl h-[90%] overflow-hidden flex flex-col">
-        <h3 className="text-xl font-semibold mb-4">Seleccionar Posts</h3>
+    const handleSubmit = (e) => {
+        e.preventDefault();
 
-        <form onSubmit={handleSubmit} className="flex flex-col flex-grow">
-          {/* Contenedor de posts con scroll */}
-          <div className="flex-grow overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[70vh]">
-            {userPosts.length === 0 ? (
-              <p className="text-gray-500">No tienes posts disponibles.</p>
-            ) : (
-              userPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className={`relative cursor-pointer rounded-md transition-all transform ${
-                    selectedPosts.includes(post.id)
-                      ? 'border-4 border-blue-500 shadow-lg bg-blue-100'
-                      : 'bg-white'
-                  }`}
-                  onClick={() => togglePostSelection(post.id)}
+        if (selectedPosts.length === 0) {
+            alert("Selecciona al menos un post para agregar.");
+            return;
+        }
+
+        router.post(
+            route("albums.posts.store", album.id),
+            { posts: selectedPosts },
+            {
+                onSuccess: () => handleClose(),
+                preserveScroll: true,
+            }
+        );
+    };
+
+    const handleClose = () => {
+        setIsVisible(false);
+        setTimeout(() => onClose(), 300);
+    };
+
+    return (
+        <div
+            className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ${
+                isVisible ? "opacity-100" : "opacity-0"
+            }`}
+        >
+            <div
+                className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-5xl h-[80vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
+                    isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
+                }`}
+            >
+                <button
+                    onClick={handleClose}
+                    className="absolute top-4 right-4 text-white hover:text-red-400 z-10"
                 >
-                  <Image
-                    src={`${post.image.path_medium}`}
-                    alt={post.titulo}
-                    className="object-cover w-full h-64 rounded-md"
-                  />
-                  <div className="absolute bottom-0 left-0 p-2 bg-black bg-opacity-50 text-white w-full text-center">
-                    {post.titulo}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+                    <XMarkIcon className="w-6 h-6" />
+                </button>
 
-          {/* Botones de acción fijos debajo del listado de posts */}
-          <div className="bg-white py-4 flex justify-between border-t border-gray-300 sticky bottom-0 left-0 right-0 z-10">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-400 text-white rounded-md"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md"
-            >
-              Agregar Posts
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+                <form onSubmit={handleSubmit} className="flex flex-col flex-grow">
+                    <div className="p-6 text-white overflow-y-auto">
+                        <h2 className="text-2xl font-bold mb-6">
+                            Agregar Publicaciones al Álbum
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto p-4">
+                            {userPosts.length === 0 ? (
+                                <p>No tienes posts disponibles.</p>
+                            ) : (
+                                userPosts.map((post) => (
+                                    <div
+                                        key={post.id}
+                                        onClick={() => togglePostSelection(post.id)}
+                                        className={`relative rounded cursor-pointer transition-all ${
+                                            selectedPosts.includes(post.id)
+                                                ? "border-4 border-blue-500 bg-blue-100 bg-opacity-10"
+                                                : "border border-gray-600"
+                                        }`}
+                                    >
+                                        <Image
+                                            src={post.image.path_medium}
+                                            alt={post.titulo}
+                                            className="object-cover w-full h-48 rounded"
+                                        />
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-center text-sm p-1">
+                                            {post.titulo}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Botón fijo abajo a la derecha */}
+                    <div className="absolute bottom-6 right-6">
+                        <button
+                            type="submit"
+                            className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-500"
+                        >
+                            Agregar Posts
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
 };
 
 export default AddPosts;
