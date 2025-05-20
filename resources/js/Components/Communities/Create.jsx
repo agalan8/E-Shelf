@@ -43,7 +43,7 @@ export default function Create({ onClose }) {
       }`}
     >
       <div
-        className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-3xl h-auto flex flex-col overflow-hidden relative transform transition-all duration-300 ${
+        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl h-auto flex flex-col overflow-hidden relative transform transition-all duration-300 ${
           isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
         }`}
       >

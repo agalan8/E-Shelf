@@ -175,7 +175,7 @@ Route::get('/posts-seguidos', function () {
             'regularPost.post.user.profileImage',
             'regularPost.post.user.backgroundImage',
             'regularPost.tags',
-            'regulasrPost.communities',
+            'regularPost.communities',
             'regularPost.comments.user.profileImage',
             'regularPost.comments.user.backgroundImage',
             'regularPost.comments.replies.user.profileImage',
@@ -236,6 +236,24 @@ Route::get('/mis-albums', function () {
 })->middleware('auth')->name('mis-albums');
 
 Route::get('mis-comunidades', function(){
+
+    $userId = Auth::user()->id;
+    $user = User::findOrFail($userId);
+
+    return Inertia::render('Communities/MisComunidades', [
+        'user' => $user,
+        'communities' => $user->communities()
+            ->with('user', 'profileImage', 'backgroundImage', 'members')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($community) {
+                $community->getTotalMembers = $community->getTotalMembers(); // Asumiendo que estos son métodos personalizados
+                $community->getTotalPosts = $community->getTotalPosts();
+                return $community;
+    }),
+
+    ]);
+
 
 })->middleware('auth')->name('mis-comunidades');
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import ImageInput from '@/Components/ImageInput';
@@ -7,12 +7,19 @@ export default function EditCommunity({ community, onClose }) {
   const { data, setData, post, processing, errors } = useForm({
     nombre: community.nombre || '',
     descripcion: community.descripcion || '',
-    visibilidad: community.visibilidad || 'publico', // <--- agregado
+    visibilidad: community.visibilidad || 'publico',
     profile_image: null,
     background_image: null,
   });
 
-  // Función para eliminar imagen de perfil
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Pequeña demora para activar la animación de entrada
+    const timer = setTimeout(() => setIsVisible(true), 10);
+    return () => clearTimeout(timer);
+  }, []);
+
   const eliminarImagenPerfil = () => {
     if (window.confirm('¿Estás seguro que quieres eliminar la imagen de perfil?')) {
       router.delete(route('communities.images.destroy', { community: community.id, imageType: 'profile_image' }), {
@@ -24,7 +31,6 @@ export default function EditCommunity({ community, onClose }) {
     }
   };
 
-  // Función para eliminar imagen de fondo
   const eliminarImagenFondo = () => {
     if (window.confirm('¿Estás seguro que quieres eliminar la imagen de fondo?')) {
       router.delete(route('communities.images.destroy', { community: community.id, imageType: 'background_image' }), {
@@ -42,7 +48,7 @@ export default function EditCommunity({ community, onClose }) {
 
     formData.append('nombre', data.nombre);
     formData.append('descripcion', data.descripcion);
-    formData.append('visibilidad', data.visibilidad); // <--- agregado
+    formData.append('visibilidad', data.visibilidad);
 
     if (data.profile_image) formData.append('profile_image', data.profile_image);
     if (data.background_image) formData.append('background_image', data.background_image);
@@ -51,23 +57,36 @@ export default function EditCommunity({ community, onClose }) {
 
     router.post(route('communities.update', community.id), formData, {
       preserveScroll: true,
-      onSuccess: () => onClose(),
+      onSuccess: () => handleClose(),
     });
   };
 
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => onClose(), 300);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-3xl p-6 relative">
+    <div
+      className={`fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 transition-opacity duration-300 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
+      <div
+        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl p-6 relative transform transition-all duration-300 ${
+          isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
+        }`}
+      >
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-red-500"
+          onClick={handleClose}
+          className="absolute top-4 right-4 text-white hover:text-red-500"
           aria-label="Cerrar"
           type="button"
         >
           <XMarkIcon className="w-6 h-6" />
         </button>
 
-        <h2 className="text-xl font-bold mb-4">Editar Comunidad</h2>
+        <h2 className="text-white text-xl font-bold mb-4">Editar Comunidad</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6 bg-[#36393F] p-4 rounded">
           <div>
@@ -79,7 +98,7 @@ export default function EditCommunity({ community, onClose }) {
               type="text"
               value={data.nombre}
               onChange={e => setData('nombre', e.target.value)}
-              className="w-full rounded px-3 py-2 border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
+              className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
             {errors.nombre && <p className="text-red-500 mt-1">{errors.nombre}</p>}
@@ -94,13 +113,12 @@ export default function EditCommunity({ community, onClose }) {
               value={data.descripcion}
               onChange={e => setData('descripcion', e.target.value)}
               rows={4}
-              className="w-full rounded px-3 py-2 border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
+              className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
             {errors.descripcion && <p className="text-red-500 mt-1">{errors.descripcion}</p>}
           </div>
 
-          {/* NUEVO - Input Radio para visibilidad */}
           <div>
             <label className="block text-white font-semibold mb-1">Visibilidad</label>
             <div className="flex space-x-6">
@@ -111,7 +129,7 @@ export default function EditCommunity({ community, onClose }) {
                   value="publico"
                   checked={data.visibilidad === 'publico'}
                   onChange={e => setData('visibilidad', e.target.value)}
-                  className="accent-[#a32bff]"
+                  className="text-purple-600 focus:ring-purple-500"
                 />
                 <span className="text-white">Público</span>
               </label>
@@ -123,7 +141,7 @@ export default function EditCommunity({ community, onClose }) {
                   value="privado"
                   checked={data.visibilidad === 'privado'}
                   onChange={e => setData('visibilidad', e.target.value)}
-                  className="accent-[#a32bff]"
+                  className="text-purple-600 focus:ring-purple-500"
                 />
                 <span className="text-white">Privado</span>
               </label>
@@ -132,7 +150,6 @@ export default function EditCommunity({ community, onClose }) {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            {/* Imagen de perfil */}
             <div className="flex-1 min-w-[200px]">
               <ImageInput
                 name="profile_image"
@@ -145,7 +162,6 @@ export default function EditCommunity({ community, onClose }) {
               {errors.profile_image && <p className="text-red-500">{errors.profile_image}</p>}
             </div>
 
-            {/* Imagen de fondo */}
             <div className="flex-1 min-w-[200px]">
               <ImageInput
                 name="background_image"
