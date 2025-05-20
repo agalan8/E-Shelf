@@ -1,27 +1,35 @@
 import React, { useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
-import { PencilIcon as PencilOutline } from '@heroicons/react/24/outline';
 import { PencilIcon as PencilSolid } from '@heroicons/react/24/solid';
-import { TrashIcon as TrashOutline } from '@heroicons/react/24/outline';
-import { TrashIcon as TrashSolid } from '@heroicons/react/24/solid';
-import Edit from './Edit'; // modal para editar comunidad
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faUserGroup,
+  faImage,
+  faPlus,
+  faCheck,
+  faXmark,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
+import Edit from './Edit';
 
 export default function Community({ community }) {
   const { auth } = usePage().props;
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const [deleteHovered, setDeleteHovered] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const handleOpenEditModal = () => setEditModalOpen(true);
-  const handleCloseEditModal = () => setEditModalOpen(false);
+  const [buttonHovered, setButtonHovered] = useState(false);
 
   const canEdit = auth.user && (auth.user.is_admin || auth.user.id === community.user_id);
-
-  // Verifica si el usuario está en miembros
   const isMember = community.members.some(member => member.id === auth.user.id);
 
-  const handleJoin = () => {
+  const handleOpenEditModal = (e) => {
+    e.stopPropagation();
+    setEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => setEditModalOpen(false);
+
+  const handleJoin = (e) => {
+    e.stopPropagation();
     setLoading(true);
     router.post(route('communities.join', community.id), {}, {
       onFinish: () => setLoading(false),
@@ -29,7 +37,8 @@ export default function Community({ community }) {
     });
   };
 
-  const handleLeave = () => {
+  const handleLeave = (e) => {
+    e.stopPropagation();
     setLoading(true);
     router.post(route('communities.leave', community.id), {}, {
       onFinish: () => setLoading(false),
@@ -37,7 +46,8 @@ export default function Community({ community }) {
     });
   };
 
-  const handleDelete = () => {
+  const handleDelete = (e) => {
+    e.stopPropagation();
     if (confirm('¿Estás seguro de que quieres eliminar esta comunidad?')) {
       router.delete(route('communities.destroy', community.id), {
         preserveScroll: true,
@@ -45,75 +55,124 @@ export default function Community({ community }) {
     }
   };
 
+  const handleCardClick = () => {
+    router.visit(route('communities.show', community.id));
+  };
+
   return (
     <>
-      <div className="bg-white rounded-2xl shadow p-4 border border-gray-100 hover:shadow-md transition overflow-hidden relative">
-        {community.background_image && (
+      <div
+        className="relative w-[500px] h-60 rounded-2xl overflow-hidden shadow-lg group transition cursor-pointer"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={handleCardClick}
+      >
+        {/* Fondo */}
+        <div
+          className={`w-full h-full bg-cover bg-center ${
+            !community.background_image && 'bg-[#7A27BC]'
+          }`}
+          style={{
+            backgroundImage: community.background_image
+              ? `url(${community.background_image.path_medium})`
+              : 'none',
+          }}
+        />
+
+        {/* Botones de editar/eliminar */}
+        {canEdit && (
           <div
-            className="h-32 rounded-t-2xl bg-cover bg-center mb-4"
-            style={{ backgroundImage: `url(${community.background_image.path_medium})` }}
-          />
+            className={`absolute top-3 right-3 flex space-x-2 z-10 transition-all duration-300
+              ${hovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}
+            `}
+          >
+            <button
+              onClick={handleOpenEditModal}
+              className="w-9 h-9 flex items-center justify-center rounded-md bg-[#7A27BC] hover:bg-opacity-100 transition-all duration-200 backdrop-blur-md transform hover:scale-110"
+              aria-label="Editar comunidad"
+            >
+              <PencilSolid className="w-5 h-5 text-white" />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="w-9 h-9 flex items-center justify-center rounded-md bg-[#7A27BC] hover:bg-opacity-100 transition-all duration-200 backdrop-blur-md transform hover:scale-110"
+              aria-label="Eliminar comunidad"
+            >
+              <FontAwesomeIcon icon={faTrash} className="text-red-400 w-5 h-5" />
+            </button>
+          </div>
         )}
 
-        <div className="flex items-center space-x-4">
-          {community.profile_image && (
-            <img
-              src={community.profile_image.path_small}
-              alt={`${community.nombre} perfil`}
-              className="w-16 h-16 rounded-full object-cover border-2 border-white -mt-12 shadow-md"
-            />
-          )}
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800">{community.nombre}</h3>
-            <p className="text-sm text-gray-600 mt-1">{community.descripcion}</p>
+        {/* Franja inferior */}
+        <div
+          className={`absolute bottom-0 w-full px-4 py-2 flex items-center justify-between ${
+            community.background_image
+              ? 'bg-black/30 backdrop-blur-md'
+              : 'bg-[#2d2e38]'
+          }`}
+        >
+          {/* Perfil + nombre */}
+          <div className="flex items-center space-x-3">
+            {community.profile_image ? (
+              <img
+                src={community.profile_image.path_small}
+                alt={`${community.nombre} perfil`}
+                className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm"
+              />
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-gray-500 text-white text-xl font-bold flex items-center justify-center border-2 border-white shadow-sm">
+                ?
+              </div>
+            )}
+            <h3 className="text-base font-semibold text-white truncate max-w-[120px]">
+              {community.nombre}
+            </h3>
           </div>
 
-          {canEdit && (
-            <>
+          {/* Contadores + botón */}
+          <div className="flex items-center justify-end space-x-4 min-w-0">
+            <div className="flex items-center space-x-4 min-w-max">
+              <div className="flex items-center text-white space-x-1">
+                <FontAwesomeIcon icon={faUserGroup} className="w-4 h-4" />
+                <span className="text-sm">{community.getTotalMembers}</span>
+              </div>
+              <div className="flex items-center text-white space-x-1">
+                <FontAwesomeIcon icon={faImage} className="w-4 h-4" />
+                <span className="text-sm">{community.getTotalPosts}</span>
+              </div>
+            </div>
+
+            {auth.user && !canEdit && (
               <button
-                onClick={handleOpenEditModal}
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-                className="ml-auto p-1 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                aria-label="Editar comunidad"
+                onClick={isMember ? handleLeave : handleJoin}
+                disabled={loading}
+                onMouseEnter={() => setButtonHovered(true)}
+                onMouseLeave={() => setButtonHovered(false)}
+                className={`w-24 flex items-center justify-center space-x-1 px-1 py-1.5 rounded border-2 text-base whitespace-nowrap transition-all duration-200
+                  ${isMember
+                    ? 'bg-white text-[#9C7FB3] font-extrabold border-[#876aa0] hover:bg-[#FDECEA] hover:text-red-600 hover:border-red-500'
+                    : 'bg-[#9C7FB3] text-white font-extrabold hover:bg-[#876aa0] border-transparent'}
+                  `}
               >
-                {hovered ? (
-                  <PencilSolid className="w-6 h-6 text-gray-700" />
+                {loading ? (
+                  '...'
+                ) : isMember ? (
+                  <>
+                    <FontAwesomeIcon
+                      icon={buttonHovered ? faXmark : faCheck}
+                      className="w-4 h-4 transition-all duration-200"
+                    />
+                    <span>{buttonHovered ? 'Salir' : 'Unido'}</span>
+                  </>
                 ) : (
-                  <PencilOutline className="w-6 h-6 text-gray-600" />
+                  <>
+                    <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+                    <span>Unirse</span>
+                  </>
                 )}
               </button>
-
-              <button
-                onClick={handleDelete}
-                onMouseEnter={() => setDeleteHovered(true)}
-                onMouseLeave={() => setDeleteHovered(false)}
-                className="p-1 ml-2 rounded hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400"
-                aria-label="Eliminar comunidad"
-              >
-                {deleteHovered ? (
-                  <TrashSolid className="w-6 h-6 text-red-600" />
-                ) : (
-                  <TrashOutline className="w-6 h-6 text-gray-600" />
-                )}
-              </button>
-            </>
-          )}
-
-          {auth.user && !canEdit && (
-            <button
-              onClick={isMember ? handleLeave : handleJoin}
-              disabled={loading}
-              className={`ml-auto px-4 py-2 rounded text-white ${
-                isMember ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                isMember ? 'focus:ring-red-400' : 'focus:ring-green-400'
-              }`}
-            >
-              {loading ? 'Procesando...' : isMember ? 'Salir' : 'Unirse'}
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

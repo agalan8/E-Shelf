@@ -6,9 +6,11 @@ use App\Http\Requests\StoreCommunityRequest;
 use App\Http\Requests\UpdateCommunityRequest;
 use App\Models\Community;
 use App\Models\Image;
+use FFI\CData;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
 
 
@@ -21,7 +23,14 @@ class CommunityController extends Controller
 
     public function index()
     {
-        $communities = Community::select('id', 'nombre', 'descripcion', 'visibilidad')->with('user', 'profileImage', 'backgroundImage', 'members')->get();
+        $communities = Community::select('id', 'nombre', 'descripcion', 'visibilidad')
+            ->with('user', 'profileImage', 'backgroundImage', 'members')
+            ->get()
+            ->map(function ($community) {
+                $community->getTotalMembers = $community->getTotalMembers(); // Asumiendo que es un método
+                $community->getTotalPosts = $community->getTotalPosts(); // Asumiendo que es un método
+                return $community;
+            });
 
         return inertia('Communities/Index', [
             'communities' => $communities,
@@ -31,10 +40,7 @@ class CommunityController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -68,7 +74,7 @@ class CommunityController extends Controller
             $path_medium = "public/communities/{$community->id}/profile_image/medium/{$community->id}.{$extension}";
             $path_small = "public/communities/{$community->id}/profile_image/small/{$community->id}.{$extension}";
 
-            $smallImage = ImageIntervention::read($imagen)->scale( height: 350)->encode();
+            $smallImage = ImageIntervention::read($imagen)->scale(height: 350)->encode();
 
             Storage::disk('s3')->put($path_small, $smallImage, 'public');
 
@@ -91,7 +97,7 @@ class CommunityController extends Controller
             $path_small = "public/communities/{$community->id}/background_image/small/{$community->id}.{$extension}";
 
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
-            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+            $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
 
             Storage::disk('s3')->put($path_original, $imagen, 'public');
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
@@ -109,7 +115,6 @@ class CommunityController extends Controller
         $community->save();
 
         return redirect()->route('mis-comunidades');
-
     }
 
     /**
@@ -117,7 +122,39 @@ class CommunityController extends Controller
      */
     public function show(Community $community)
     {
-        //
+        // Cargar comunidad con relaciones
+        $community->load([
+            'user',
+            'profileImage',
+            'backgroundImage',
+            'members',
+        ]);
+
+        $community->getTotalMembers = $community->getTotalMembers();
+        $community->getTotalPosts = $community->getTotalPosts();
+
+        // Obtener posts de la comunidad con todas sus relaciones
+        $posts = $community->posts()
+            ->with([
+                'comments.user',
+                'image',
+                'post.user', // si es re-post
+                'tags',
+                'communities',
+                'likedBy',
+            ])
+            ->latest()
+            ->get()
+            ->map(function ($post) {
+                $post->getTotalLikes = $post->getTotalLikes();
+                $post->isLikedByUser = $post->isLikedByUser();
+                return $post;
+            });
+
+        return Inertia::render('Communities/Show', [
+            'community' => $community,
+            'posts' => $posts,
+        ]);
     }
 
     /**
@@ -157,7 +194,7 @@ class CommunityController extends Controller
             $path_medium = "public/communities/{$community->id}/profile_image/medium/{$community->id}.{$extension}";
             $path_small = "public/communities/{$community->id}/profile_image/small/{$community->id}.{$extension}";
 
-            if($community->profileImage){
+            if ($community->profileImage) {
                 $paths = [
                     ltrim(parse_url($community->profileImage->path_small, PHP_URL_PATH), '/'),
                 ];
@@ -168,11 +205,11 @@ class CommunityController extends Controller
             }
 
 
-            $smallImage = ImageIntervention::read($imagen)->scale( height: 350)->encode();
+            $smallImage = ImageIntervention::read($imagen)->scale(height: 350)->encode();
 
             Storage::disk('s3')->put($path_small, $smallImage, 'public');
 
-            if($community->profileImage){
+            if ($community->profileImage) {
                 // Actualizamos la foto asociada al post
                 $community->profileImage()->update([
                     'path_small' => $path_aws . $path_small,
@@ -186,9 +223,7 @@ class CommunityController extends Controller
                 ]);
 
                 $image->imageable()->associate($community)->save();
-
             }
-
         }
 
         if ($request->hasFile('background_image')) {
@@ -200,7 +235,7 @@ class CommunityController extends Controller
             $path_medium = "public/communities/{$community->id}/background_image/medium/{$community->id}.{$extension}";
             $path_small = "public/communities/{$community->id}/background_image/small/{$community->id}.{$extension}";
 
-            if($community->backgroundImage){
+            if ($community->backgroundImage) {
                 $paths = [
                     ltrim(parse_url($community->backgroundImage->path_original, PHP_URL_PATH), '/'),
                     ltrim(parse_url($community->backgroundImage->path_medium, PHP_URL_PATH), '/'),
@@ -213,12 +248,12 @@ class CommunityController extends Controller
 
 
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
-            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+            $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
 
             Storage::disk('s3')->put($path_original, $imagen, 'public');
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
-            if($community->backgrounImage){
+            if ($community->backgrounImage) {
                 // Actualizamos la foto asociada al post
                 $community->backgroundImage()->update([
                     'path_original' => $path_aws . $path_original,
@@ -235,15 +270,12 @@ class CommunityController extends Controller
                 ]);
 
                 $image->imageable()->associate($community)->save();
-
             }
-
         }
 
         $community->save();
 
         return redirect()->back();
-
     }
 
     /**
@@ -256,40 +288,39 @@ class CommunityController extends Controller
     }
 
     public function destroyImage(Community $community, $imageType)
-{
+    {
 
-    if($imageType == 'profile_image'){
+        if ($imageType == 'profile_image') {
 
-        if($community->profileImage){
+            if ($community->profileImage) {
 
-            $paths = [
-            ltrim(parse_url($community->profileImage->path_small, PHP_URL_PATH), '/'),
-            ];
-            // Eliminar archivos de AWS S3
-            Storage::disk('s3')->delete($paths);
+                $paths = [
+                    ltrim(parse_url($community->profileImage->path_small, PHP_URL_PATH), '/'),
+                ];
+                // Eliminar archivos de AWS S3
+                Storage::disk('s3')->delete($paths);
 
-            // Eliminar el registro de la base de datos
-            $community->profileImage->delete();
+                // Eliminar el registro de la base de datos
+                $community->profileImage->delete();
+            }
+        }
+
+        if ($imageType == 'background_image') {
+
+            if ($community->backgroundImage) {
+
+                $paths = [
+                    ltrim(parse_url($community->backgroundImage->path_original, PHP_URL_PATH), '/'),
+                    ltrim(parse_url($community->backgroundImage->path_medium, PHP_URL_PATH), '/'),
+                ];
+                // Eliminar archivos de AWS S3
+                Storage::disk('s3')->delete($paths);
+
+                // Eliminar el registro de la base de datos
+                $community->backgroundImage->delete();
+            }
         }
     }
-
-    if($imageType == 'background_image'){
-
-        if($community->backgroundImage){
-
-            $paths = [
-            ltrim(parse_url($community->backgroundImage->path_original, PHP_URL_PATH), '/'),
-            ltrim(parse_url($community->backgroundImage->path_medium, PHP_URL_PATH), '/'),
-            ];
-            // Eliminar archivos de AWS S3
-            Storage::disk('s3')->delete($paths);
-
-            // Eliminar el registro de la base de datos
-            $community->backgroundImage->delete();
-        }
-    }
-
-}
 
     public function join(Community $community)
     {
@@ -318,5 +349,4 @@ class CommunityController extends Controller
 
         return back();
     }
-
 }

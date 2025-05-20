@@ -28,9 +28,19 @@ class Community extends Model
         return $this->belongsToMany(User::class);
     }
 
+    public function getTotalMembers()
+    {
+        return $this->members()->count();
+    }
+
     public function posts()
     {
         return $this->belongsToMany(RegularPost::class);
+    }
+
+    public function getTotalPosts()
+    {
+        return $this->posts()->count();
     }
 
     public function profileImage()
