@@ -73,6 +73,25 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::delete('albums/posts', function (Request $request) {
+
+    $request->validate([
+        'album_id' => 'required|exists:albums,id',
+        'regular_post_id' => 'required|exists:regular_posts,id',
+    ]);
+
+    $album = Album::findOrFail($request->album_id);
+    $regularPost = RegularPost::findOrFail($request->regular_post_id);
+
+
+    // Eliminar el post (esto ejecuta el "booted" y elimina lo relacionado)
+
+    // Eliminar la relación entre album y post (por si queda)
+    $album->posts()->detach($regularPost->id);
+
+    return back();
+})->middleware('auth')->name('albums.posts.destroy');
+
 Route::delete('/shared-posts/by-regular', function (Request $request) {
     $request->validate([
         'regular_post_id' => 'required|exists:regular_posts,id',
@@ -275,16 +294,8 @@ Route::post('albums/{album}/posts', function (Request $request, Album $album) {
     return redirect()->route('albums.show', $album->id);
 })->name('albums.posts.store')->middleware('auth');
 
-Route::delete('albums/{album}/posts/{post}', function (Album $album, Post $post) {
-    // Verificar que el álbum existe
-    $album = Album::findOrFail($album->id);
 
-    // Eliminar la relación entre el álbum y el post
-    $album->posts()->detach($post->id);
 
-    // Devolver una respuesta con un mensaje de éxito
-    return redirect()->route('albums.show', $album->id);
-})->name('albums.posts.destroy')->middleware('auth');
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([

@@ -49,7 +49,7 @@ const MisAlbums = ({ albums, posts, user }) => {
             <p className="mt-4 text-lg">No tienes álbumes aún. ¡Haz clic en el icono para crear uno!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 gap-y-20 max-w-[1400px] mx-auto justify-items-center">
             {albums.map((album) => (
               <Album key={album.id} album={album} />
             ))}
