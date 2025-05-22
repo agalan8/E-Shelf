@@ -65,6 +65,12 @@ export default function Busqueda() {
               >
                 Publicaciones
               </button>
+              <button
+                className="w-full text-left p-2 hover:bg-gray-200 rounded-lg"
+                onClick={() => selectFilter("Comunidades")}
+              >
+                Comunidades
+              </button>
             </>
           )}
           <button
