@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegularPostController;
 use App\Http\Controllers\SharedPostController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\ShopPostController;
 use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
@@ -161,6 +162,7 @@ Route::delete('/communities/{community}/images/{imageType}', [CommunityControlle
 Route::post('/communities/{community}/join', [CommunityController::class, 'join'])->name('communities.join');
 Route::post('/communities/{community}/leave', [CommunityController::class, 'leave'])->name('communities.leave');
 Route::resource('shops', ShopController::class)->middleware('auth');
+Route::resource('shop-posts', ShopPostController::class)->middleware('auth');
 
 
 

@@ -45,7 +45,7 @@ class ShopPostPolicy
      */
     public function delete(User $user, ShopPost $shopPost): bool
     {
-        return false;
+        return $user->id === $shopPost->post->user->id || $user->is_admin;
     }
 
     /**

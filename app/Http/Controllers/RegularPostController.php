@@ -83,9 +83,9 @@ class RegularPostController extends Controller
             $path_medium = "public/posts/{$RegularPost->id}/medium/{$RegularPost->id}.{$extension}";
             $path_small = "public/posts/{$RegularPost->id}/small/{$RegularPost->id}.{$extension}";
 
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
             $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
 
 
             Storage::disk('s3')->put($path_original, $imagen, 'public');
@@ -133,11 +133,18 @@ class RegularPostController extends Controller
             ]);
 
 
-            ShopPost::create([
+            $ShopPost = ShopPost::create([
                 'shop_id' => $user->shop->id,
                 'regular_post_id' => $RegularPost->id,
                 'precio' => $request->precio,
             ]);
+
+            $post = new Post([
+                'user_id' => Auth::user()->id,
+            ]);
+
+            $post->posteable()->associate($ShopPost);
+            $post->save();
 
         }
 
@@ -203,9 +210,9 @@ class RegularPostController extends Controller
             // Eliminar del bucket S3
             Storage::disk('s3')->delete($paths);
 
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
             $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
 
 
 

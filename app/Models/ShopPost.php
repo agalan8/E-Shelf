@@ -23,8 +23,24 @@ class ShopPost extends Model
         return $this->belongsTo(Shop::class);
     }
 
+    public function post(){
+        return $this->morphOne(Post::class, 'posteable');
+    }
+
     public function regularPost()
     {
         return $this->belongsTo(RegularPost::class);
     }
+
+    protected static function booted()
+{
+    static::deleting(function ($shopPost) {
+        if (! $shopPost->isForceDeleting()) {
+            // Eliminar la relación con el modelo Post
+            $shopPost->post()?->delete();
+        }
+    });
+}
+
+
 }

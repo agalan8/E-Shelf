@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreShopRequest;
 use App\Http\Requests\UpdateShopRequest;
 use App\Models\Shop;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ShopController extends Controller
@@ -38,8 +40,12 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
+        $user = User::find(Auth::user()->id);
         return Inertia::render('Shops/Show', [
-            'shop' => $shop
+            'shop' => $shop->load('user', 'user.shop'),
+            'posts' => $shop->shopPosts()->with('regularPost.image', 'post.user')->get(),
+            'user' => Auth::user(),
+            'userPosts' => $user->posts()->with('posteable.image')->get(),
         ]);
     }
 
@@ -64,6 +70,6 @@ class ShopController extends Controller
      */
     public function destroy(Shop $shop)
     {
-        //
+
     }
 }
