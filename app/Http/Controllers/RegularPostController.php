@@ -8,8 +8,10 @@ use App\Models\Community;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\RegularPost;
+use App\Models\ShopPost;
 use App\Models\Tag;
 use App\Models\User;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -81,17 +83,20 @@ class RegularPostController extends Controller
             $path_medium = "public/posts/{$RegularPost->id}/medium/{$RegularPost->id}.{$extension}";
             $path_small = "public/posts/{$RegularPost->id}/small/{$RegularPost->id}.{$extension}";
 
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+            $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
 
 
             Storage::disk('s3')->put($path_original, $imagen, 'public');
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+            Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
 
             $image = new Image([
                 'path_original' => $path_aws . $path_original,
                 'path_medium' => $path_aws . $path_medium,
+                'path_small' => $path_aws . $path_small,
                 'type' => 'RegularPost',
                 'localizacion' => $request->localizacion,
 
@@ -114,6 +119,33 @@ class RegularPostController extends Controller
             foreach ($communities as $community) {
                 $RegularPost->communities()->attach(Community::findOrFail($community));
             }
+        }
+
+        if($request->has('add_to_store')){
+
+            $user = User::findOrFail(Auth::user()->id);
+
+            $request->validate([
+                'precio' => [
+                    'required',
+                    'regex:/^\d{1,10}(\.\d{2})?$/'
+                ],
+            ]);
+
+
+            $ShopPost = ShopPost::create([
+                'shop_id' => $user->shop->id,
+                'regular_post_id' => $RegularPost->id,
+                'precio' => $request->precio,
+            ]);
+
+            $post = new Post([
+                'user_id' => Auth::user()->id,
+            ]);
+
+            $post->posteable()->associate($ShopPost);
+            $post->save();
+
         }
 
         DB::commit();
@@ -172,21 +204,27 @@ class RegularPostController extends Controller
             $paths = [
                 ltrim(parse_url($RegularPost->image->path_original, PHP_URL_PATH), '/'),
                 ltrim(parse_url($RegularPost->image->path_medium, PHP_URL_PATH), '/'),
+                ltrim(parse_url($RegularPost->image->path_small, PHP_URL_PATH), '/'),
             ];
 
             // Eliminar del bucket S3
             Storage::disk('s3')->delete($paths);
 
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+            $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
+            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+
+
 
             Storage::disk('s3')->put($path_original, $imagen, 'public');
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+            Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
             // Actualizamos la foto asociada al post
             $RegularPost->image()->update([
                 'path_original' => $path_aws . $path_original,
                 'path_medium' =>$path_aws . $path_medium,
+                'path_small' => $path_aws . $path_small,
             ]);
         }
 
