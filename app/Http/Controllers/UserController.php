@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RegularPost;
+use App\Models\Shop;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -52,11 +53,15 @@ class UserController extends Controller
         //     $is_admin = false;
         // }
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'is_admin' => $request->is_admin,
             'password' => Hash::make($request->password),
+        ]);
+
+        Shop::create([
+            'user_id' => $user->id,
         ]);
 
         return Redirect::route('users.index');
@@ -70,7 +75,7 @@ class UserController extends Controller
     {
 
         return Inertia::render('Users/Show', [
-            'user' => $user->load('profileImage', 'backgroundImage'),
+            'user' => $user->load('profileImage', 'backgroundImage', 'shop'),
             'followers' => $user->getTotalFollowers(),
             'following' => $user->getTotalFollowing(),
             'posts' => $user->posts()->with('posteable.image','posteable.tags','posteable.communities', 'posteable', 'user', 'user.profileImage', 'user.backgroundImage', 'posteable.post', 'posteable.post.user', 'posteable.post.user.profileImage', 'posteable.post.user.backgroundImage', 'posteable.comments', 'posteable.comments.user', 'posteable.comments.user.profileImage', 'posteable.comments.user.backgroundImage', 'posteable.comments.replies', 'posteable.comments.replies.user', 'posteable.comments.replies.user.profileImage', 'posteable.comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')

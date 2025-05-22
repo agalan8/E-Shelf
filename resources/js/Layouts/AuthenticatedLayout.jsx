@@ -18,7 +18,7 @@ import {
     HomeIcon
 } from '@heroicons/react/24/solid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsersGear, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUsersGear, faUsers, faStore } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -53,6 +53,9 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         </NavLink>
                         <NavLink href={route('regular-posts.create')} active={route().current('regular-posts.create')} className="flex justify-center">
                             <ArrowUpTrayIcon className="h-9 w-9" />
+                        </NavLink>
+                        <NavLink href={route('shops.show', { shop: user.shop.id })} active={route().current('shops.show', { shop: user.shop.id })} className="flex justify-center">
+                            <FontAwesomeIcon icon={faStore} className="h-9 w-9" />
                         </NavLink>
                         <NavLink href={route('communities.index')} active={route().current('communities.index')} className="flex justify-center">
                             <FontAwesomeIcon icon={faUsers} className="h-9 w-9" />

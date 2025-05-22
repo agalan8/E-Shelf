@@ -10,6 +10,7 @@ use App\Models\Post;
 use App\Models\RegularPost;
 use App\Models\Tag;
 use App\Models\User;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,15 +84,18 @@ class RegularPostController extends Controller
 
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+            $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
 
 
             Storage::disk('s3')->put($path_original, $imagen, 'public');
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+            Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
 
             $image = new Image([
                 'path_original' => $path_aws . $path_original,
                 'path_medium' => $path_aws . $path_medium,
+                'path_small' => $path_aws . $path_small,
                 'type' => 'RegularPost',
                 'localizacion' => $request->localizacion,
 
@@ -172,6 +176,7 @@ class RegularPostController extends Controller
             $paths = [
                 ltrim(parse_url($RegularPost->image->path_original, PHP_URL_PATH), '/'),
                 ltrim(parse_url($RegularPost->image->path_medium, PHP_URL_PATH), '/'),
+                ltrim(parse_url($RegularPost->image->path_small, PHP_URL_PATH), '/'),
             ];
 
             // Eliminar del bucket S3
@@ -179,14 +184,19 @@ class RegularPostController extends Controller
 
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+            $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
+
+
 
             Storage::disk('s3')->put($path_original, $imagen, 'public');
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+            Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
             // Actualizamos la foto asociada al post
             $RegularPost->image()->update([
                 'path_original' => $path_aws . $path_original,
                 'path_medium' =>$path_aws . $path_medium,
+                'path_small' => $path_aws . $path_small,
             ]);
         }
 

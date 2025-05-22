@@ -2,7 +2,7 @@ import SubNavLink from "@/Components/SubNavLink";
 import { RectangleGroupIcon, BookOpenIcon } from "@heroicons/react/24/solid";
 import { usePage } from "@inertiajs/react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faStore } from '@fortawesome/free-solid-svg-icons';
 
 export default function UsersSubnav({ currentUser }) {
     const {
@@ -39,6 +39,19 @@ export default function UsersSubnav({ currentUser }) {
                     >
                         <FontAwesomeIcon icon={faUsers} className="h-6 w-6" />
                         <span>Mis Comunidades</span>
+                    </SubNavLink>
+                </>
+            )}
+
+            {currentUser.id !== user.id && (
+                <>
+                    <SubNavLink
+                        href={route("shops.show", { shop: currentUser.shop.id })}
+                        active={route().current("shops.show", { shop: currentUser.shop.id })}
+                        className="flex"
+                    >
+                        <FontAwesomeIcon icon={faStore} className="h-6 w-6" />
+                        <span>Tienda</span>
                     </SubNavLink>
                 </>
             )}

@@ -118,6 +118,10 @@ class User extends Authenticatable
         return $this->belongsToMany(Community::class);
     }
 
+    public function shop(){
+        return $this->hasOne(Shop::class);
+    }
+
     protected static function booted()
     {
         static::deleting(function ($user) {

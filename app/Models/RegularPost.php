@@ -30,6 +30,10 @@ class RegularPost extends Model
         return $this->hasMany(SharedPost::class);
     }
 
+    public function shopPost(){
+        return $this->hasOne(ShopPost::class);
+    }
+
     public function image()
     {
         return $this->morphOne(Image::class, 'imageable')->where('type', 'RegularPost');
@@ -106,6 +110,7 @@ class RegularPost extends Model
                     $paths = [
                         ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
                         ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                        ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
                     ];
 
                     // Elimina las imágenes asociadas al RegularPost desde S3
