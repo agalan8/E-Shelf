@@ -33,10 +33,12 @@ class Community extends Model
         return $this->members()->count();
     }
 
-    public function posts()
-    {
-        return $this->belongsToMany(RegularPost::class);
-    }
+ public function posts()
+{
+    return $this->belongsToMany(RegularPost::class)
+        ->whereDoesntHave('shopPost');
+}
+
 
     public function getTotalPosts()
     {

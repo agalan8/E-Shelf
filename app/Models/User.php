@@ -67,11 +67,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Social::class)->withPivot('perfil');
     }
 
+
     public function posts()
     {
-        return $this->hasMany(Post::class)->where('posteable_type', RegularPost::class);
-
+        return $this->hasMany(Post::class)
+            ->where('posteable_type', RegularPost::class)
+            ->whereHasMorph('posteable', [RegularPost::class], function ($query) {
+                $query->doesntHave('shopPost');
+            });
     }
+
 
     public function albums()
     {

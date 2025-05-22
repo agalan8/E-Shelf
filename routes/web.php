@@ -41,8 +41,28 @@ Route::get('/', function () {
 
     if(Auth::check()){
         return Inertia::render('Explorar', [
-            'posts' => RegularPost::with('image', 'post', 'post.user', 'tags', 'communities', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get(),
-        ]);
+    'posts' => RegularPost::with(
+        'image',
+        'post',
+        'post.user',
+        'tags',
+        'communities',
+        'post.user.profileImage',
+        'post.user.backgroundImage',
+        'comments',
+        'comments.user',
+        'comments.user.profileImage',
+        'comments.user.backgroundImage',
+        'comments.replies',
+        'comments.replies.user',
+        'comments.replies.user.profileImage',
+        'comments.replies.user.backgroundImage'
+    )
+    ->doesntHave('shopPost') // Aquí se filtran los que NO tienen shopPost relacionado
+    ->orderBy('created_at', 'desc')
+    ->get(),
+]);
+
     }
 
     return Inertia::render('Welcome', [
@@ -60,7 +80,7 @@ Route::get('/explorar', function () {
 
 
     return Inertia::render('Explorar', [
-        'posts' => RegularPost::with('image', 'tags', 'communities','post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')->get()->map(function ($post) {
+        'posts' => RegularPost::with('image', 'tags', 'communities','post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->doesntHave('shopPost')->orderBy('created_at', 'desc')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
@@ -171,22 +191,24 @@ Route::get('/posts-seguidos', function () {
     $userIds = $user->following()->pluck('followed_user_id')->push($user->id);
 
     // RegularPosts de usuarios seguidos o propios
-    $regularPosts = RegularPost::whereHas('post', function ($query) use ($userIds) {
-            $query->whereIn('user_id', $userIds);
-        })
-        ->with([
-            'image',
-            'post.user.profileImage',
-            'post.user.backgroundImage',
-            'tags',
-            'communities',
-            'comments.user.profileImage',
-            'comments.user.backgroundImage',
-            'comments.replies.user.profileImage',
-            'comments.replies.user.backgroundImage',
-            'likedBy'
-        ])
-        ->get();
+ $regularPosts = RegularPost::whereHas('post', function ($query) use ($userIds) {
+        $query->whereIn('user_id', $userIds);
+    })
+    ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
+    ->with([
+        'image',
+        'post.user.profileImage',
+        'post.user.backgroundImage',
+        'tags',
+        'communities',
+        'comments.user.profileImage',
+        'comments.user.backgroundImage',
+        'comments.replies.user.profileImage',
+        'comments.replies.user.backgroundImage',
+        'likedBy'
+    ])
+    ->get();
+
 
     // SharedPosts de usuarios seguidos o propios
     $sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
@@ -469,8 +491,19 @@ Route::get('/buscar', function (Request $request) {
             ->get();
     } elseif ($filter === 'Publicaciones') {
         $posts = RegularPost::where('titulo', 'ilike', "%{$query}%")
-            ->with(['post.user.profileImage', 'tags', 'image', 'communities', 'comments', 'comments.user', 'comments.replies', 'comments.replies.user'])
-            ->get();
+    ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
+    ->with([
+        'post.user.profileImage',
+        'tags',
+        'image',
+        'communities',
+        'comments',
+        'comments.user',
+        'comments.replies',
+        'comments.replies.user'
+    ])
+    ->get();
+
 
         // Añadir propiedades calculadas a cada post
         $results = $posts->map(function ($post) {

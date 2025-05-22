@@ -8,6 +8,7 @@ use App\Models\Community;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\RegularPost;
+use App\Models\ShopPost;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Contracts\Cache\Store;
@@ -118,6 +119,26 @@ class RegularPostController extends Controller
             foreach ($communities as $community) {
                 $RegularPost->communities()->attach(Community::findOrFail($community));
             }
+        }
+
+        if($request->has('add_to_store')){
+
+            $user = User::findOrFail(Auth::user()->id);
+
+            $request->validate([
+                'precio' => [
+                    'required',
+                    'regex:/^\d{1,10}(\.\d{2})?$/'
+                ],
+            ]);
+
+
+            ShopPost::create([
+                'shop_id' => $user->shop->id,
+                'regular_post_id' => $RegularPost->id,
+                'precio' => $request->precio,
+            ]);
+
         }
 
         DB::commit();
