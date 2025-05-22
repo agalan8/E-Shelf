@@ -13,6 +13,7 @@ use App\Http\Controllers\SocialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\Album;
+use App\Models\Community;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\RegularPost;
@@ -478,7 +479,19 @@ Route::get('/buscar', function (Request $request) {
             $post->post_type = 'regular';
             return $post;
         });
-    } else {
+    } elseif ($filter === 'Comunidades'){
+
+        $comunidades = Community::where('nombre', 'ilike', "%{$query}%")
+            ->with('profileImage', 'backgroundImage', 'members')
+            ->get();
+
+        $results = $comunidades->map(function ($community) {
+            $community->getTotalMembers = $community->getTotalMembers();
+            $community->getTotalPosts = $community->getTotalPosts();
+            return $community;
+        });
+    }
+    else {
         $results = collect();
     }
 

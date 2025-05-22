@@ -1,6 +1,7 @@
 import React from 'react';
 import User from '@/Components/Users/User';
 import Post from '@/Components/Posts/Post';
+import Community from '@/Components/Communities/Community'; // Asegúrate de que esta ruta sea correcta
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
@@ -47,6 +48,12 @@ export default function BusquedaResultados({ results, filter, auth, tags = [] })
                 ))}
               </div>
             </div>
+          </div>
+        ) : filter === "Comunidades" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+            {results.map((community) => (
+              <Community key={community.id} community={community} />
+            ))}
           </div>
         ) : (
           <div className="col-span-full text-center text-gray-600">
