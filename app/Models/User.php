@@ -113,7 +113,7 @@ class User extends Authenticatable
         return $this->belongsToMany(RegularPost::class, 'likes');
     }
 
-    public function ownedCommunnities()
+    public function ownedCommunities()
     {
         return $this->hasMany(Community::class);
     }
@@ -125,6 +125,11 @@ class User extends Authenticatable
 
     public function shop(){
         return $this->hasOne(Shop::class);
+    }
+
+    public function lineasCarrito()
+    {
+        return $this->hasMany(LineaCarrito::class);
     }
 
     protected static function booted()

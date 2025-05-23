@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-            'user' => $request->user() ? $request->user()->load('following', 'profileImage', 'backgroundImage', 'communities', 'shop') : null,  // Verificamos si hay un usuario autenticado
+            'user' => $request->user() ? $request->user()->load('following', 'profileImage', 'backgroundImage', 'communities', 'shop', 'lineasCarrito', 'lineasCarrito.shopPost', 'lineasCarrito.shopPost.regularPost', 'lineasCarrito.shopPost.regularPost.image', 'lineasCarrito.shopPost.post.user') : null,  // Verificamos si hay un usuario autenticado
             ],
             'userEdit' => $user ?? null,
             'socials' => Social::all(),

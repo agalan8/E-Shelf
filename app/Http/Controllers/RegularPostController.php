@@ -152,6 +152,10 @@ class RegularPostController extends Controller
 
         $user = User::findOrFail(Auth::id());
 
+        if($request->has('add_to_store')) {
+            return redirect()->route('shops.show', $user->shop->id);
+        }
+
         return redirect()->route('users.show', $user );
     }
 

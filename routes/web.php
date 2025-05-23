@@ -4,6 +4,7 @@ use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\LineaCarritoController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
@@ -539,5 +540,13 @@ Route::get('/buscar', function (Request $request) {
         'filter' => $filter,
     ]);
 })->name('buscar');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/carrito', [LineaCarritoController::class, 'index'])->name('linea-carrito.index');
+
+    Route::post('/carrito/add', [LineaCarritoController::class, 'add'])->name('linea-carrito.add');
+
+    Route::post('/carrito/remove', [LineaCarritoController::class, 'remove'])->name('linea-carrito.remove');
+});
 
 require __DIR__.'/auth.php';
