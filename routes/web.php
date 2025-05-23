@@ -212,24 +212,26 @@ Route::get('/posts-seguidos', function () {
     ->get();
 
 
-    // SharedPosts de usuarios seguidos o propios
-    $sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
-            $query->whereIn('user_id', $userIds);
-        })
-        ->with([
-            'regularPost.image',
-            'regularPost.post.user.profileImage',
-            'regularPost.post.user.backgroundImage',
-            'regularPost.tags',
-            'regularPost.communities',
-            'regularPost.comments.user.profileImage',
-            'regularPost.comments.user.backgroundImage',
-            'regularPost.comments.replies.user.profileImage',
-            'regularPost.comments.replies.user.backgroundImage',
-            'regularPost.likedBy',
-            'post.user.profileImage', // quien hizo el share
-        ])
-        ->get();
+$sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
+        $query->whereIn('user_id', $userIds);
+    })
+    ->whereHas('regularPost') // Asegurarse de que tiene un RegularPost
+    ->whereDoesntHave('regularPost.shopPost') // Excluir si su RegularPost tiene ShopPost
+    ->with([
+        'regularPost.image',
+        'regularPost.post.user.profileImage',
+        'regularPost.post.user.backgroundImage',
+        'regularPost.tags',
+        'regularPost.communities',
+        'regularPost.comments.user.profileImage',
+        'regularPost.comments.user.backgroundImage',
+        'regularPost.comments.replies.user.profileImage',
+        'regularPost.comments.replies.user.backgroundImage',
+        'regularPost.likedBy',
+        'post.user.profileImage', // quien hizo el share
+    ])
+    ->get();
+
 
     // Mapear ambos tipos al mismo formato base
     $allPosts = collect();
