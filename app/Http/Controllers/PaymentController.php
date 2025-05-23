@@ -50,7 +50,7 @@ class PaymentController extends Controller
                 'payment_method_types' => ['card'],
                 'line_items' => $line_items,
                 'mode' => 'payment',
-                'success_url' => url('/payment/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => route('payment.success'),
                 'cancel_url' => route('payment.cancel'),
             ]);
 
@@ -62,7 +62,7 @@ class PaymentController extends Controller
     }
 
     // Opcional: rutas para éxito y cancelación
-    public function success(Request $request)
+    public function success()
     {
 
 
