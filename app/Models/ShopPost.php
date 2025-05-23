@@ -32,15 +32,26 @@ class ShopPost extends Model
         return $this->belongsTo(RegularPost::class);
     }
 
-    protected static function booted()
+    public function lineasCarrito()
+{
+    return $this->hasMany(LineaCarrito::class);
+}
+
+
+protected static function booted()
 {
     static::deleting(function ($shopPost) {
+        $shopPost->lineasCarrito()->delete();
+
         if (! $shopPost->isForceDeleting()) {
             // Eliminar la relación con el modelo Post
             $shopPost->post()?->delete();
+
+            // Eliminar las líneas de carrito relacionadas
         }
     });
 }
+
 
 
 }

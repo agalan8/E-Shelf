@@ -102,6 +102,8 @@ protected static function booted()
         if (! $RegularPost->isForceDeleting()) {
             $RegularPost->sharedPosts()->delete();
 
+            $RegularPost->shopPost?->lineasCarrito()->delete();
+
             $RegularPost->shopPost()?->delete();
 
             if ($RegularPost->image) {

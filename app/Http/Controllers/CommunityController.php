@@ -23,7 +23,7 @@ class CommunityController extends Controller
 
     public function index()
     {
-        $communities = Community::select('id', 'nombre', 'descripcion', 'visibilidad')
+        $communities = Community::select('id', 'nombre', 'descripcion', 'visibilidad', 'user_id')
             ->with('user', 'profileImage', 'backgroundImage', 'members')
             ->get()
             ->map(function ($community) {

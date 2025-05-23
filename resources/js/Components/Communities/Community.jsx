@@ -21,6 +21,7 @@ export default function Community({ community }) {
 
   const canEdit = auth.user && (auth.user.is_admin || auth.user.id === community.user_id);
   const isMember = community.members.some(member => member.id === auth.user.id);
+  const isOwner = auth.user && auth.user.id === community.user_id;
 
   const handleOpenEditModal = (e) => {
     e.stopPropagation();
@@ -142,7 +143,7 @@ export default function Community({ community }) {
               </div>
             </div>
 
-            {auth.user && !canEdit && (
+            {auth.user && !isOwner && (
               <button
                 onClick={isMember ? handleLeave : handleJoin}
                 disabled={loading}

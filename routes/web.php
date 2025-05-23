@@ -4,6 +4,7 @@ use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\LineaCarritoController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
@@ -212,24 +213,26 @@ Route::get('/posts-seguidos', function () {
     ->get();
 
 
-    // SharedPosts de usuarios seguidos o propios
-    $sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
-            $query->whereIn('user_id', $userIds);
-        })
-        ->with([
-            'regularPost.image',
-            'regularPost.post.user.profileImage',
-            'regularPost.post.user.backgroundImage',
-            'regularPost.tags',
-            'regularPost.communities',
-            'regularPost.comments.user.profileImage',
-            'regularPost.comments.user.backgroundImage',
-            'regularPost.comments.replies.user.profileImage',
-            'regularPost.comments.replies.user.backgroundImage',
-            'regularPost.likedBy',
-            'post.user.profileImage', // quien hizo el share
-        ])
-        ->get();
+$sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
+        $query->whereIn('user_id', $userIds);
+    })
+    ->whereHas('regularPost') // Asegurarse de que tiene un RegularPost
+    ->whereDoesntHave('regularPost.shopPost') // Excluir si su RegularPost tiene ShopPost
+    ->with([
+        'regularPost.image',
+        'regularPost.post.user.profileImage',
+        'regularPost.post.user.backgroundImage',
+        'regularPost.tags',
+        'regularPost.communities',
+        'regularPost.comments.user.profileImage',
+        'regularPost.comments.user.backgroundImage',
+        'regularPost.comments.replies.user.profileImage',
+        'regularPost.comments.replies.user.backgroundImage',
+        'regularPost.likedBy',
+        'post.user.profileImage', // quien hizo el share
+    ])
+    ->get();
+
 
     // Mapear ambos tipos al mismo formato base
     $allPosts = collect();
@@ -405,7 +408,7 @@ Route::post('/images/update', function (Request $request) {
         Storage::disk('s3')->put($path_original, $imagen, 'public');
         Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
-        if($user->backgrounImage){
+        if($user->backgroundImage){
             // Actualizamos la foto asociada al post
             $user->backgroundImage()->update([
                 'path_original' => $path_aws . $path_original,
@@ -537,5 +540,13 @@ Route::get('/buscar', function (Request $request) {
         'filter' => $filter,
     ]);
 })->name('buscar');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/carrito', [LineaCarritoController::class, 'index'])->name('linea-carrito.index');
+
+    Route::post('/carrito/add', [LineaCarritoController::class, 'add'])->name('linea-carrito.add');
+
+    Route::post('/carrito/remove', [LineaCarritoController::class, 'remove'])->name('linea-carrito.remove');
+});
 
 require __DIR__.'/auth.php';
