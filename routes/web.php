@@ -408,7 +408,7 @@ Route::post('/images/update', function (Request $request) {
         Storage::disk('s3')->put($path_original, $imagen, 'public');
         Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
-        if($user->backgrounImage){
+        if($user->backgroundImage){
             // Actualizamos la foto asociada al post
             $user->backgroundImage()->update([
                 'path_original' => $path_aws . $path_original,
