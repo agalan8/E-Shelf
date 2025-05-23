@@ -20,6 +20,8 @@ class PaymentController extends Controller
 
         $lineasCarrito = $user->lineasCarrito()->with('shopPost')->get();
 
+        dump($lineasCarrito);
+
         if ($lineasCarrito->isEmpty()) {
             return back();
         }
@@ -50,7 +52,7 @@ class PaymentController extends Controller
                 'payment_method_types' => ['card'],
                 'line_items' => $line_items,
                 'mode' => 'payment',
-                'success_url' => route('payment.success'),
+                'success_url' => route('payment.success', ['lineasCarrito' => $lineasCarrito->pluck('id')->toArray()]),
                 'cancel_url' => route('payment.cancel'),
             ]);
 
@@ -62,7 +64,7 @@ class PaymentController extends Controller
     }
 
     // Opcional: rutas para éxito y cancelación
-    public function success()
+    public function success(Request $request)
     {
 
 
