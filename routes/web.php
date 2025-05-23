@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
+use App\Http\Controllers\PaymentController;
 
 
 Route::get('/', function () {
@@ -547,6 +548,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/carrito/add', [LineaCarritoController::class, 'add'])->name('linea-carrito.add');
 
     Route::post('/carrito/remove', [LineaCarritoController::class, 'remove'])->name('linea-carrito.remove');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::match(['get', 'post'], 'payment/create-checkout-session', [PaymentController::class, 'createCheckoutSession'])->name('payment.createCheckoutSession');
+    Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 });
 
 require __DIR__.'/auth.php';
