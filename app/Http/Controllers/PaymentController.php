@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderDigitalDownload;
 use App\Models\Order;
 use App\Models\OrderLine;
 use App\Models\User;
@@ -10,6 +11,7 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -30,8 +32,7 @@ class PaymentController extends Controller
 
         session(['lineas_carrito_pagadas' => $lineasCarrito->pluck('id')->toArray()]);
 
-
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe::setApiKey(config('services.stripe.secret'));
 
         $line_items = [];
 
@@ -107,6 +108,8 @@ class PaymentController extends Controller
 
         // Eliminar solo las líneas válidas que se pagaron
         $lineas->each->delete();
+
+        Mail::to($order->user->email)->queue(new OrderDigitalDownload($order));
 
         DB::commit();
 
