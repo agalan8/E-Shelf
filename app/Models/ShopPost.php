@@ -37,6 +37,11 @@ class ShopPost extends Model
     return $this->hasMany(LineaCarrito::class);
 }
 
+    public function orderLines()
+    {
+        return $this->hasMany(OrderLine::class);
+    }
+
 
 protected static function booted()
 {

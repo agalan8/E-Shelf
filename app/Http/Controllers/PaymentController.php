@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\OrderLine;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 class PaymentController extends Controller
 {
     public function createCheckoutSession(Request $request)
@@ -79,10 +83,32 @@ class PaymentController extends Controller
             abort(403, 'Validación de carrito fallida.');
         }
 
-        // 💥 Aquí podrías crear el pedido (Order) o similar antes de borrar
+        DB::beginTransaction();
+
+        $order = Order::create(
+            [
+                'user_id' => $user->id,
+                'total' => $lineas->sum(function ($linea) {
+                    return $linea->shopPost->precio;
+                }),
+            ]
+            );
+
+        foreach ($lineas as $linea) {
+
+            OrderLine::create([
+                'order_id' => $order->id,
+                'shop_post_id' => $linea->shopPost->id,
+                'titulo' => $linea->shopPost->regularPost->titulo ?? 'Producto',
+                'path_image' => $linea->shopPost->regularPost->image->path_original ?? '',
+                'precio' => $linea->shopPost->precio,
+            ]);
+        }
 
         // Eliminar solo las líneas válidas que se pagaron
         $lineas->each->delete();
+
+        DB::commit();
 
         session()->forget('lineas_carrito_pagadas');
 
