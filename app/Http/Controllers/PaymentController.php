@@ -20,11 +20,12 @@ class PaymentController extends Controller
 
         $lineasCarrito = $user->lineasCarrito()->with('shopPost')->get();
 
-        dump($lineasCarrito);
-
         if ($lineasCarrito->isEmpty()) {
             return back();
         }
+
+        session(['lineas_carrito_pagadas' => $lineasCarrito->pluck('id')->toArray()]);
+
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -52,7 +53,7 @@ class PaymentController extends Controller
                 'payment_method_types' => ['card'],
                 'line_items' => $line_items,
                 'mode' => 'payment',
-                'success_url' => route('payment.success', ['lineasCarrito' => $lineasCarrito->pluck('id')->toArray()]),
+                'success_url' => route('payment.success'),
                 'cancel_url' => route('payment.cancel'),
             ]);
 
@@ -67,15 +68,33 @@ class PaymentController extends Controller
     public function success(Request $request)
     {
 
-
         $user = User::findOrFail(Auth::user()->id);
-        $user->lineasCarrito()->delete(); // Eliminar el carrito después de la compra
+        // ✅ Recuperar las líneas desde la sesión del servidor
+        $ids = session('lineas_carrito_pagadas', []);
+
+        // Obtener solo las líneas que realmente están en el carrito y son del usuario
+        $lineas = $user->lineasCarrito()->whereIn('id', $ids)->get();
+
+        if (count($lineas) !== count($ids)) {
+            abort(403, 'Validación de carrito fallida.');
+        }
+
+        // 💥 Aquí podrías crear el pedido (Order) o similar antes de borrar
+
+        // Eliminar solo las líneas válidas que se pagaron
+        $lineas->each->delete();
+
+        session()->forget('lineas_carrito_pagadas');
+
+
         return redirect()->route('shops.show', $user->shop->id); // O vista simple con mensaje
     }
 
     public function cancel()
     {
         $user = User::findOrFail(Auth::user()->id);
+
+        session()->forget('lineas_carrito_pagadas');
         return redirect()->route('shops.show', $user->shop->id); // O vista simple con mensaje
     }
 }
