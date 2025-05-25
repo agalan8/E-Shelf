@@ -132,6 +132,11 @@ class User extends Authenticatable
         return $this->hasMany(LineaCarrito::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     protected static function booted()
     {
         static::deleting(function ($user) {

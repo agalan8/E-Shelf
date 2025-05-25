@@ -229,12 +229,12 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
                         <Busqueda search={handleSearch} />
                         <button
                             onClick={openCart}
-                            className="relative flex items-center justify-center text-white hover:text-gray-300 px-3 py-2 rounded bg-[#2A2D2F] hover:bg-[#1F2022]"
+                            className="relative flex items-center justify-center text-black hover:text-black px-3 py-2 rounded bg-[#2A2D2F] hover:bg-[#1F2022]"
                             title={`Carrito (${cantidadLineas} items)`}
                         >
                             <FontAwesomeIcon
                                 icon={faCartShopping}
-                                className="h-6 w-6"
+                                className="h-6 w-6 text-white"
                             />
                             {cantidadLineas > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-[#E0B0FE] text-b text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">

@@ -297,7 +297,7 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
           </button>
           <div className="w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
             <Image
-              src={`${post.post.image.path_original}?t=${new Date().getTime()}`}
+              src={`${post.image.path_original}?t=${new Date().getTime()}`}
               alt={post.titulo}
               className="max-w-full max-h-full object-contain cursor-pointer"
             />
