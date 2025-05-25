@@ -14,6 +14,7 @@ class OrderLine extends Model
         'order_id',
         'shop_post_id',
         'titulo',
+        'path_small',
         'path_image',
         'precio',
     ];

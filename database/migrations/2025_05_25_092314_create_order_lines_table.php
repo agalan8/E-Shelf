@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained();
             $table->foreignId('shop_post_id')->constrained();
             $table->string('titulo');
+            $table->string('path_small');
             $table->string('path_image');
             $table->decimal('precio', 10, 2);
             $table->timestamps();

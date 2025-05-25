@@ -5,6 +5,8 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LineaCarritoController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderLineController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProfileController;
@@ -140,7 +142,10 @@ Route::delete('/shared-posts/by-regular', function (Request $request) {
 })->middleware('auth')->name('shared-posts.destroyByPostId');
 
 
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/order-lines/{orderLineId}/download-image', [OrderLineController::class, 'downloadImage'])
+        ->name('order-lines.download-image');
+});
 // Route::resource('posts', PostController::class)->middleware('auth');
 Route::resource('regular-posts', RegularPostController::class)->middleware('auth');
 Route::resource('shared-posts', SharedPostController::class)->middleware('auth');
@@ -165,6 +170,9 @@ Route::post('/communities/{community}/join', [CommunityController::class, 'join'
 Route::post('/communities/{community}/leave', [CommunityController::class, 'leave'])->name('communities.leave');
 Route::resource('shops', ShopController::class)->middleware('auth');
 Route::resource('shop-posts', ShopPostController::class)->middleware('auth');
+Route::resource('orders', OrderController::class)->middleware('auth');
+
+
 
 
 

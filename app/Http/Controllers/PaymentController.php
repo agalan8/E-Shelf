@@ -101,6 +101,7 @@ class PaymentController extends Controller
                 'order_id' => $order->id,
                 'shop_post_id' => $linea->shopPost->id,
                 'titulo' => $linea->shopPost->regularPost->titulo ?? 'Producto',
+                'path_small' => $linea->shopPost->regularPost->image->path_small ?? '',
                 'path_image' => $linea->shopPost->regularPost->image->path_original ?? '',
                 'precio' => $linea->shopPost->precio,
             ]);
@@ -116,7 +117,7 @@ class PaymentController extends Controller
         session()->forget('lineas_carrito_pagadas');
 
 
-        return redirect()->route('shops.show', $user->shop->id); // O vista simple con mensaje
+        return redirect()->route('orders.index'); // O vista simple con mensaje
     }
 
     public function cancel()

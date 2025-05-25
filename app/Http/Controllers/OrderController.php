@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class OrderController extends Controller
 {
@@ -13,7 +16,12 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $user = User::findOrFail(Auth::user()->id);
+
+        return Inertia::render('Orders/Index', [
+            'orders' => $user->orders()->with(['lines'])->orderBy('created_at', 'desc')->get(),
+            'user' => $user,
+        ]);
     }
 
     /**
