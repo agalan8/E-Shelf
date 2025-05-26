@@ -47,7 +47,6 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
 
   const cartPanelRef = useRef(null);
   const notifPanelRef = useRef(null);
-  const hasMarkedAsRead = useRef(false); // Bandera para evitar llamadas múltiples
 
   const openCart = () => {
     setIsCartOpen(true);
@@ -62,17 +61,11 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
   const openNotif = () => {
     setIsNotifOpen(true);
     setTimeout(() => setIsNotifVisible(true), 10);
-    hasMarkedAsRead.current = false;
   };
 
   const closeNotif = () => {
     setIsNotifVisible(false);
     setTimeout(() => setIsNotifOpen(false), 300);
-
-    if (!hasMarkedAsRead.current) {
-      router.post("/notifications/read", {}, { preserveScroll: true });
-      hasMarkedAsRead.current = true;
-    }
   };
 
   const openPostModal = (post) => setModalPost(post);
@@ -94,21 +87,25 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
     };
   }, [isCartVisible]);
 
-  useEffect(() => {
-    function handleClickOutsideNotif(event) {
-      if (notifPanelRef.current && !notifPanelRef.current.contains(event.target)) {
-        closeNotif();
-      }
+useEffect(() => {
+  function handleClickOutsideNotif(event) {
+    // Si el modalPost está abierto, no cerramos el panel de notificaciones
+    if (modalPost) return;
+
+    if (notifPanelRef.current && !notifPanelRef.current.contains(event.target)) {
+      closeNotif();
     }
-    if (isNotifVisible) {
-      document.addEventListener("mousedown", handleClickOutsideNotif);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutsideNotif);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutsideNotif);
-    };
-  }, [isNotifVisible]);
+  }
+  if (isNotifVisible) {
+    document.addEventListener("mousedown", handleClickOutsideNotif);
+  } else {
+    document.removeEventListener("mousedown", handleClickOutsideNotif);
+  }
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutsideNotif);
+  };
+}, [isNotifVisible, modalPost]);
+
 
   const handleSearch = (query, filter) => {
     console.log("Buscando:", query, "Filtro:", filter);

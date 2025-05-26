@@ -174,7 +174,10 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/destroy', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead'])->name('notifications.read');
+    Route::get('/notifications/more', [NotificationController::class, 'loadMore'])->name('notifications.loadMore');
+
 });
 
 

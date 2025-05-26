@@ -53,6 +53,9 @@ class HandleInertiaRequests extends Middleware
                         'liker' => isset($notification->data['liker_id'])
                             ? User::with('profileImage')->find($notification->data['liker_id'])
                             : null,
+                        'mentioner' => isset($notification->data['mentioner_id'])
+                            ? User::with('profileImage')->find($notification->data['mentioner_id'])
+                            : null,
                         'post' => isset($notification->data['post_id'])
                             ? RegularPost::with('image', 'tags', 'communities', 'post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->find($notification->data['post_id'])
                             : null,

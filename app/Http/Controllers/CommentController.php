@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\RegularPost;
 use App\Models\User;
+use App\Notifications\MentionedInComment;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -91,6 +92,7 @@ class CommentController extends Controller
                 if ($user) {
                     // Guardar la mención en la tabla pivote
                     $comment->mentionedUsers()->attach($user->id);
+                    $user->notify(new MentionedInComment($post, $comment->user));
                 }
             }
         }

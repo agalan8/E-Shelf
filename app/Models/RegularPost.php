@@ -149,8 +149,9 @@ class RegularPost extends Model
 
                 DB::table('notifications')
                 ->whereIn('type', ['App\Notifications\PostLiked', 'App\Notifications\PostShared'])
-                ->whereRaw("(data::json->'post'->>'id')::int = ?", [$RegularPost->id])
+                ->whereRaw("(data::json->>'post_id')::int = ?", [$RegularPost->id])
                 ->delete();
+
 
 
             }

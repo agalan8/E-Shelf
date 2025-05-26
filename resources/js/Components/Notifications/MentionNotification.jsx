@@ -1,38 +1,38 @@
 import { Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faAt } from '@fortawesome/free-solid-svg-icons';
 
-export default function LikeNotification({ liker, post, openPostModal }) {
+export default function MentionNotification({ mentioner, post, openPostModal }) {
   return (
     <>
-      {/* Contenedor del usuario que dio like */}
+      {/* Contenedor del usuario que mencionó */}
       <Link
-        href={route('users.show', { user: liker.id })}
+        href={route('users.show', { user: mentioner.id })}
         className="flex items-start justify-between hover:bg-gray-700 p-2 rounded transition-colors"
-        title={`Perfil de ${liker.name}`}
+        title={`Perfil de ${mentioner.name}`}
       >
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0">
-            {liker.profile_image ? (
+            {mentioner.profile_image ? (
               <img
-                src={liker.profile_image.path_small}
-                alt={`${liker.name} avatar`}
+                src={mentioner.profile_image.path_small}
+                alt={`${mentioner.name} avatar`}
                 className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center text-white text-lg font-bold leading-none font-mono">
+              <div className="h-10 w-10 rounded-full bg-gray-600 flex items-center justify-center text-white text-base font-bold leading-none font-mono">
                 ?
               </div>
             )}
           </div>
           <div className="text-white text-sm leading-snug">
-            <strong>{liker.name}</strong> le gustó tu publicación.
+            <strong>{mentioner.name}</strong> te mencionó en una publicación.
           </div>
         </div>
-        <FontAwesomeIcon icon={faHeart} className="text-purple-300 w-7 h-7 flex-shrink-0 ml-2 mt-1" />
+        <FontAwesomeIcon icon={faAt} className="text-purple-300 w-7 h-7 flex-shrink-0 ml-2 mt-1" />
       </Link>
 
-      {/* Contenedor del post: abre modal al hacer clic */}
+      {/* Contenedor del post mencionado */}
       <div
         className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-700"
         onClick={() => openPostModal(post)}
