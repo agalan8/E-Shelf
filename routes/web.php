@@ -35,8 +35,7 @@ use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NotificationController;
-
-
+use App\Notifications\PostLiked;
 
 Route::get('/', function () {
 
@@ -490,12 +489,28 @@ Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $image
 Route::post('/like', function (Request $request) {
 
     $user = User::findOrFail(Auth::id());
-    $post = RegularPost::findOrFail($request->post_id);
+
+    $post = RegularPost::with([
+        'image',
+        'tags',
+        'communities',
+        'post',
+        'comments',
+        'comments.user',
+        'comments.user.profileImage',
+        'comments.user.backgroundImage',
+        'comments.replies',
+        'comments.replies.user',
+        'comments.replies.user.profileImage',
+        'comments.replies.user.backgroundImage',
+    ])->findOrFail($request->post_id);
 
     if ($post->isLikedByUser()) {
         $post->likedBy()->detach($user->id);
     } else {
         $post->likedBy()->attach($user->id);
+        // Notificar al usuario que ha dado like, enviando el post ya cargado con relaciones
+        $post->post->user->notify(new PostLiked($post, $user));
     }
 
     return back();

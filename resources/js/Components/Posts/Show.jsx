@@ -13,7 +13,7 @@ import { XMarkIcon, ChatBubbleOvalLeftIcon } from '@heroicons/react/24/solid';
 import Comment from '@/Components/Comments/Comment';
 import Image from '../Image';
 
-const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes }) => {
+const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes, notification }) => {
   const { auth, newCommentId } = usePage().props;
   const user = auth?.user || null;
 
@@ -107,6 +107,8 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
       },
     });
   };
+
+  console.log('Post:', post);
 
   const renderFollowIcon = () => {
     if (!user || user.id === post.post.user.id) return null;
@@ -212,27 +214,30 @@ const Show = ({ post, onClose, isLiked, setIsLiked, totalLikes, setTotalLikes })
               {renderFollowIcon()}
             </div>
 
-            <div className="flex justify-start items-center space-x-2 py-4 px-8 bg-[#202225]">
-              <button
-                onClick={() => toggleLike(post.id)}
-                onMouseEnter={() => setHoveredLike(true)}
-                onMouseLeave={() => setHoveredLike(false)}
-                className="text-xl focus:outline-none"
-                disabled={!user}
-              >
-                <FontAwesomeIcon
-                  icon={
-                    isLiked
-                      ? hoveredLike
-                        ? faHeartCrack
-                        : faHeartSolid
-                      : faHeartRegular
-                  }
-                  className={`w-7 h-7 transition duration-200 ${isLiked ? 'text-red-600' : 'text-white'}`}
-                />
-              </button>
-              <span className="text-lg text-white">{totalLikes}</span>
-            </div>
+            {!notification && (
+  <div className="flex justify-start items-center space-x-2 py-4 px-8 bg-[#202225]">
+    <button
+      onClick={() => toggleLike(post.id)}
+      onMouseEnter={() => setHoveredLike(true)}
+      onMouseLeave={() => setHoveredLike(false)}
+      className="text-xl focus:outline-none"
+      disabled={!user}
+    >
+      <FontAwesomeIcon
+        icon={
+          isLiked
+            ? hoveredLike
+              ? faHeartCrack
+              : faHeartSolid
+            : faHeartRegular
+        }
+        className={`w-7 h-7 transition duration-200 ${isLiked ? 'text-red-600' : 'text-white'}`}
+      />
+    </button>
+    <span className="text-lg text-white">{totalLikes}</span>
+  </div>
+)}
+
 
             <div className="px-8 py-4 bg-[#292B2F]">
               <h2 className="text-2xl font-semibold text-white">{post.titulo}</h2>

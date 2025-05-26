@@ -31,8 +31,7 @@ class HandleInertiaRequests extends Middleware
         // Cargar notificaciones no leídas (limitadas a 10)
         $notifications = [];
         if ($request->user()) {
-            $notifications = $request->user()->unreadNotifications()
-                ->take(10)
+            $notifications = $request->user()->notifications()
                 ->get()
                 ->map(function ($notification) {
                     return [
@@ -43,6 +42,10 @@ class HandleInertiaRequests extends Middleware
                     ];
                 });
         }
+
+        $unreadNotificationCount = $request->user()
+            ? $request->user()->unreadNotifications->count()
+            : 0;
 
         return [
             ...parent::share($request),
@@ -67,6 +70,7 @@ class HandleInertiaRequests extends Middleware
             'users' => User::all(),
             'newCommentId' => $newCommentId,
             'notifications' => $notifications,  // Aquí pasamos las notificaciones a Inertia
+            'unreadNotificationCount' => $unreadNotificationCount,
         ];
     }
 }
