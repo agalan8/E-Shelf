@@ -11,13 +11,18 @@ class PostShared extends Notification
 {
     use Queueable;
 
+    protected $post;
+    protected $sharer;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct($post, $sharer)
     {
-        //
+        $this->post = $post;
+        $this->sharer = $sharer;
     }
+
 
     /**
      * Get the notification's delivery channels.
@@ -26,29 +31,21 @@ class PostShared extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable)
     {
         return [
-            //
+
+            'type' => 'share',
+            'sharer_id' => $this->sharer->id,
+            'sharer_name' => $this->sharer->name,
+            'sharer_profile_image' => $this->sharer->profileImage?->path_small ?? null,
+            'post' => $this->post,
+
         ];
     }
+
+
 }

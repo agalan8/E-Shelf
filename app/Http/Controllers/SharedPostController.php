@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSharedPostRequest;
 use App\Http\Requests\UpdateSharedPostRequest;
 use App\Models\Post;
+use App\Models\RegularPost;
 use App\Models\SharedPost;
+use App\Models\User;
+use App\Notifications\PostShared;
 use Illuminate\Support\Facades\Auth;
 
 class SharedPostController extends Controller
@@ -46,6 +49,26 @@ class SharedPostController extends Controller
         $post->posteable()->associate($sharedPost);
         $post->save();
 
+        $regularPost = RegularPost::with([
+        'image',
+        'tags',
+        'communities',
+        'post',
+        'comments',
+        'comments.user',
+        'comments.user.profileImage',
+        'comments.user.backgroundImage',
+        'comments.replies',
+        'comments.replies.user',
+        'comments.replies.user.profileImage',
+        'comments.replies.user.backgroundImage',
+    ])->findOrFail($request->post_id);
+
+        $user = User::findOrFail(Auth::user()->id);
+
+        $regularPost->post->user->notify(new PostShared($regularPost, $user));
+
+
         return back();
     }
 
@@ -78,7 +101,6 @@ class SharedPostController extends Controller
      */
     public function destroy(SharedPost $sharedPost)
     {
-        dd();
 
         $sharedPost->post->delete();
         $sharedPost->delete();

@@ -1,6 +1,7 @@
 import React from "react";
 import FollowNotification from "./FollowNotification";
 import LikeNotification from "./LikeNotification";
+import ShareNotification from "./ShareNotification";
 
 export default function NotificationsPanel({ notifications, openPostModal }) {
   return (
@@ -30,6 +31,16 @@ export default function NotificationsPanel({ notifications, openPostModal }) {
                 likerName={n.data.liker_name}
                 liker_profile_image={n.data.liker_profile_image}
                 liker_id={n.data.liker_id}
+                post={n.data.post}
+                openPostModal={openPostModal} // PASAMOS LA FUNCIÓN HACIA ABAJO
+              />
+            )}
+
+            {n.data.type === "share" && (
+              <ShareNotification
+                sharerName={n.data.sharer_name}
+                sharer_profile_image={n.data.sharer_profile_image}
+                sharer_id={n.data.sharer_id}
                 post={n.data.post}
                 openPostModal={openPostModal} // PASAMOS LA FUNCIÓN HACIA ABAJO
               />
