@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\UserFollowed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,6 +21,9 @@ class FollowController extends Controller
         }
 
         $user->following()->syncWithoutDetaching([$request->followed_user_id]);
+
+        $userToFollow = User::findOrFail($request->followed_user_id);
+        $userToFollow->notify(new UserFollowed($user));
 
         return back();
     }

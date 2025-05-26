@@ -34,7 +34,8 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
 use App\Http\Controllers\PaymentController;
-
+use App\Http\Controllers\NotificationController;
+use App\Notifications\PostLiked;
 
 Route::get('/', function () {
 
@@ -142,16 +143,12 @@ Route::delete('/shared-posts/by-regular', function (Request $request) {
 })->middleware('auth')->name('shared-posts.destroyByPostId');
 
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/order-lines/{orderLineId}/download-image', [OrderLineController::class, 'downloadImage'])
-        ->name('order-lines.download-image');
-});
 // Route::resource('posts', PostController::class)->middleware('auth');
 Route::resource('regular-posts', RegularPostController::class)->middleware('auth');
 Route::resource('shared-posts', SharedPostController::class)->middleware('auth');
 Route::resource('albums', AlbumController::class)->middleware('auth');
 Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])
-    ->name('albums.eliminar-portada');
+->name('albums.eliminar-portada');
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
 Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
@@ -165,12 +162,24 @@ Route::resource('comments', CommentController::class)->middleware('auth');
 Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies'])->middleware('auth');
 Route::resource('communities', CommunityController::class)->middleware('auth');
 Route::delete('/communities/{community}/images/{imageType}', [CommunityController::class, 'destroyImage'])
-    ->name('communities.images.destroy');
+->name('communities.images.destroy');
 Route::post('/communities/{community}/join', [CommunityController::class, 'join'])->name('communities.join');
 Route::post('/communities/{community}/leave', [CommunityController::class, 'leave'])->name('communities.leave');
 Route::resource('shops', ShopController::class)->middleware('auth');
 Route::resource('shop-posts', ShopPostController::class)->middleware('auth');
 Route::resource('orders', OrderController::class)->middleware('auth');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/order-lines/{orderLineId}/download-image', [OrderLineController::class, 'downloadImage'])
+        ->name('order-lines.download-image');
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/destroy', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead'])->name('notifications.read');
+    Route::get('/notifications/more', [NotificationController::class, 'loadMore'])->name('notifications.loadMore');
+
+});
+
 
 
 
@@ -483,12 +492,15 @@ Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $image
 Route::post('/like', function (Request $request) {
 
     $user = User::findOrFail(Auth::id());
+
     $post = RegularPost::findOrFail($request->post_id);
 
     if ($post->isLikedByUser()) {
         $post->likedBy()->detach($user->id);
     } else {
         $post->likedBy()->attach($user->id);
+        // Notificar al usuario que ha dado like, enviando el post ya cargado con relaciones
+        $post->post->user->notify(new PostLiked($post, $user));
     }
 
     return back();

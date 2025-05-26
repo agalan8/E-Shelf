@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\post;
@@ -21,7 +24,8 @@ class RegularPost extends Model
         'descripcion',
     ];
 
-    public function post(){
+    public function post()
+    {
         return $this->morphOne(Post::class, 'posteable');
     }
 
@@ -30,7 +34,8 @@ class RegularPost extends Model
         return $this->hasMany(SharedPost::class);
     }
 
-    public function shopPost(){
+    public function shopPost()
+    {
         return $this->hasOne(ShopPost::class);
     }
 
@@ -44,7 +49,8 @@ class RegularPost extends Model
         return $this->belongsToMany(Tag::class);
     }
 
-    public function albums(){
+    public function albums()
+    {
         return $this->belongsToMany(Album::class);
     }
 
@@ -65,7 +71,8 @@ class RegularPost extends Model
     }
 
 
-    public function getTotalLikes(){
+    public function getTotalLikes()
+    {
         return $this->likedBy()->count();
     }
 
@@ -96,45 +103,58 @@ class RegularPost extends Model
     }
 
 
-protected static function booted()
-{
-    static::deleting(function ($RegularPost) {
-        if (! $RegularPost->isForceDeleting()) {
-            $RegularPost->sharedPosts()->delete();
+    protected static function booted()
+    {
+        static::deleting(function ($RegularPost) {
+            if (! $RegularPost->isForceDeleting()) {
+                $RegularPost->sharedPosts()->delete();
 
-            $RegularPost->shopPost?->lineasCarrito()->delete();
+                $RegularPost->shopPost?->lineasCarrito()->delete();
 
-            $RegularPost->shopPost()?->delete();
+                $RegularPost->shopPost()?->delete();
 
-            if ($RegularPost->image) {
-                $image = $RegularPost->image;
+                if ($RegularPost->image) {
+                    $image = $RegularPost->image;
 
-                $paths = [
-                    ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                    ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-                    ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
-                ];
+                    $paths = [
+                        ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                        ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                        ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
+                    ];
 
-                // Elimina las imágenes asociadas al RegularPost desde S3
-                Storage::disk('s3')->delete($paths);
+                    // Elimina las imágenes asociadas al RegularPost desde S3
+                    Storage::disk('s3')->delete($paths);
 
-                // Eliminar la imagen de la base de datos
-                $image->delete();
+                    // Eliminar la imagen de la base de datos
+                    $image->delete();
+                }
+
+                // Eliminar la relación con el modelo Post
+                $RegularPost->post()->delete();
+
+                // Desvincular tags, comunidades y álbumes
+                $RegularPost->tags()->detach();
+                $RegularPost->communities()->detach();
+                $RegularPost->albums()->detach();
+
+                // $allRelatedNotifications = DatabaseNotification::where('type', 'App\Notifications\PostLiked')->get();
+
+                // foreach ($allRelatedNotifications as $notification) {
+                //     $data = $notification->data;
+
+                //     if (isset($data['post']['id']) && $data['post']['id'] == $RegularPost->id) {
+                //         $notification->delete();
+                //     }
+                // }
+
+                DB::table('notifications')
+                ->whereIn('type', ['App\Notifications\PostLiked', 'App\Notifications\PostShared'])
+                ->whereRaw("(data::json->>'post_id')::int = ?", [$RegularPost->id])
+                ->delete();
+
+
+
             }
-
-            // Eliminar la relación con el modelo Post
-            $RegularPost->post()->delete();
-
-            // Desvincular tags, comunidades y álbumes
-            $RegularPost->tags()->detach();
-            $RegularPost->communities()->detach();
-            $RegularPost->albums()->detach();
-        }
-    });
-}
-
-
-
-
-
+        });
+    }
 }
