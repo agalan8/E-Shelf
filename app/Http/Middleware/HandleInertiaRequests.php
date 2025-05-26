@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\RegularPost;
 use App\Models\Social;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -31,14 +32,30 @@ class HandleInertiaRequests extends Middleware
         // Cargar notificaciones no leídas (limitadas a 10)
         $notifications = [];
         if ($request->user()) {
-            $notifications = $request->user()->notifications()
+            $notifications = $request->user()->unreadNotifications()
+                ->orderBy('created_at', 'desc')
+                ->take(10)
                 ->get()
                 ->map(function ($notification) {
                     return [
                         'id' => $notification->id,
                         'type' => $notification->data['type'] ?? 'other',
-                        'data' => $notification->data,
                         'created_at' => $notification->created_at->diffForHumans(),
+                        // Para follower, verificamos que 'follower_id' exista antes de buscar
+                        'follower' => isset($notification->data['follower_id'])
+                            ? User::with('profileImage')->find($notification->data['follower_id'])
+                            : null,
+
+                        // Para sharer, igual, verificamos que 'sharer_id' exista antes de buscar
+                        'sharer' => isset($notification->data['sharer_id'])
+                            ? User::with('profileImage')->find($notification->data['sharer_id'])
+                            : null,
+                        'liker' => isset($notification->data['liker_id'])
+                            ? User::with('profileImage')->find($notification->data['liker_id'])
+                            : null,
+                        'post' => isset($notification->data['post_id'])
+                            ? RegularPost::with('image', 'tags', 'communities', 'post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->find($notification->data['post_id'])
+                            : null,
                     ];
                 });
         }

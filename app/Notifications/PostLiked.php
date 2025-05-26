@@ -39,9 +39,7 @@ class PostLiked extends Notification
 
             'type' => 'like',
             'liker_id' => $this->liker->id,
-            'liker_name' => $this->liker->name,
-            'liker_profile_image' => $this->liker->profileImage?->path_small ?? null,
-            'post' => $this->post,
+            'post_id' => $this->post->id,
 
         ];
     }

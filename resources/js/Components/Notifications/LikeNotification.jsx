@@ -2,20 +2,20 @@ import { Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 
-export default function LikeNotification({ likerName, liker_profile_image, liker_id, post, openPostModal }) {
+export default function LikeNotification({ liker, post, openPostModal }) {
   return (
     <>
       {/* Contenedor del usuario: todo es enlace al perfil */}
       <Link
-        href={route('users.show', { user: liker_id })}
+        href={route('users.show', { user: liker.id })}
         className="flex items-center justify-between hover:bg-gray-700 p-2 rounded transition-colors"
-        title={`Perfil de ${likerName}`}
+        title={`Perfil de ${liker.name}`}
       >
         <div className="flex items-center space-x-3">
-          {liker_profile_image ? (
+          {liker.profile_image ? (
             <img
-              src={liker_profile_image}
-              alt={`${likerName} avatar`}
+              src={liker.profile_image.path_small}
+              alt={`${liker.name} avatar`}
               className="h-10 w-10 rounded-full object-cover"
             />
           ) : (
@@ -24,7 +24,7 @@ export default function LikeNotification({ likerName, liker_profile_image, liker
             </div>
           )}
           <p className="text-white">
-            <strong>{likerName}</strong> le gustó tu publicación.
+            <strong>{liker.name}</strong> le gustó tu publicación.
           </p>
         </div>
         <FontAwesomeIcon icon={faHeart} className="text-purple-300 w-8 h-8" />

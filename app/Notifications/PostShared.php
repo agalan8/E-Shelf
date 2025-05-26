@@ -40,9 +40,7 @@ class PostShared extends Notification
 
             'type' => 'share',
             'sharer_id' => $this->sharer->id,
-            'sharer_name' => $this->sharer->name,
-            'sharer_profile_image' => $this->sharer->profileImage?->path_small ?? null,
-            'post' => $this->post,
+            'post_id' => $this->post->id,
 
         ];
     }

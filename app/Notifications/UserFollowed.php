@@ -40,9 +40,6 @@ class UserFollowed extends Notification
 
             'type' => 'follow',
             'follower_id' => $this->follower->id,
-            'follower_name' => $this->follower->name,
-            'follower_profile_image' => $this->follower->profileImage->path_small,
-
         ];
     }
 

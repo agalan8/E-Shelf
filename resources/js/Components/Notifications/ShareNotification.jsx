@@ -2,20 +2,20 @@ import { Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRetweet } from '@fortawesome/free-solid-svg-icons';
 
-export default function ShareNotification({ sharerName, sharer_profile_image, sharer_id, post, openPostModal }) {
+export default function ShareNotification({ sharer, post, openPostModal }) {
   return (
     <>
       {/* Contenedor del usuario: todo es enlace al perfil */}
       <Link
-        href={route('users.show', { user: sharer_id })}
+        href={route('users.show', { user: sharer.id })}
         className="flex items-center justify-between hover:bg-gray-700 p-2 rounded transition-colors"
-        title={`Perfil de ${sharerName}`}
+        title={`Perfil de ${sharer.name}`}
       >
         <div className="flex items-center space-x-3">
-          {sharer_profile_image ? (
+          {sharer.profile_image ? (
             <img
-              src={sharer_profile_image}
-              alt={`${sharerName} avatar`}
+              src={sharer.profile_image.path_small}
+              alt={`${sharer.name} avatar`}
               className="h-10 w-10 rounded-full object-cover"
             />
           ) : (
@@ -24,7 +24,7 @@ export default function ShareNotification({ sharerName, sharer_profile_image, sh
             </div>
           )}
           <p className="text-white">
-            <strong>{sharerName}</strong> compartió tu publicación.
+            <strong>{sharer.name}</strong> compartió tu publicación.
           </p>
         </div>
         <FontAwesomeIcon icon={faRetweet} className="text-purple-300 w-8 h-8" />

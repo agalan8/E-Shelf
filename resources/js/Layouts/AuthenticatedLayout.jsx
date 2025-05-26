@@ -66,6 +66,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
   const closeNotif = () => {
     setIsNotifVisible(false);
     setTimeout(() => setIsNotifOpen(false), 300);
+    router.post("/notifications/read", {}, { preserveScroll: true });
   };
 
   // Función que abre modal full screen con el post
@@ -108,12 +109,6 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideNotif);
     };
-  }, [isNotifVisible]);
-
-  useEffect(() => {
-    if (isNotifVisible) {
-      router.post("/notifications/read", {}, { preserveScroll: true });
-    }
   }, [isNotifVisible]);
 
   const handleSearch = (query, filter) => {

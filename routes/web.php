@@ -490,20 +490,7 @@ Route::post('/like', function (Request $request) {
 
     $user = User::findOrFail(Auth::id());
 
-    $post = RegularPost::with([
-        'image',
-        'tags',
-        'communities',
-        'post',
-        'comments',
-        'comments.user',
-        'comments.user.profileImage',
-        'comments.user.backgroundImage',
-        'comments.replies',
-        'comments.replies.user',
-        'comments.replies.user.profileImage',
-        'comments.replies.user.backgroundImage',
-    ])->findOrFail($request->post_id);
+    $post = RegularPost::findOrFail($request->post_id);
 
     if ($post->isLikedByUser()) {
         $post->likedBy()->detach($user->id);
