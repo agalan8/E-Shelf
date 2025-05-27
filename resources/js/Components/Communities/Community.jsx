@@ -20,7 +20,7 @@ export default function Community({ community }) {
   const [buttonHovered, setButtonHovered] = useState(false);
 
   const canEdit = auth.user && (auth.user.is_admin || auth.user.id === community.user_id);
-  const isMember = community.members.some(member => member.id === auth.user.id);
+  const isMember = community.memberships.some(membership => membership.user_id === auth.user.id && membership.community_role_id === 3);
   const isOwner = auth.user && auth.user.id === community.user_id;
 
   const handleOpenEditModal = (e) => {

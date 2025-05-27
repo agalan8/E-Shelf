@@ -5,7 +5,7 @@ import Image from '../Image';
 
 const Edit = ({ post, onClose, tags }) => {
   const { props } = usePage();
-  const userCommunities = props.auth.user.communities || [];
+  const userCommunities = props.auth.communities || [];
 
   const [titulo, setTitulo] = useState(post?.titulo || '');
   const [descripcion, setDescripcion] = useState(post?.descripcion || '');

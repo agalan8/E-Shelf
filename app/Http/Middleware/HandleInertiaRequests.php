@@ -25,6 +25,12 @@ class HandleInertiaRequests extends Middleware
             if ($user) {
                 $user->load('socials', 'profileImage', 'backgroundImage');
             }
+
+            $communities = $user->communityMemberships()
+                ->with('community') // carga la relación community
+                ->get()
+                ->pluck('community') // extrae las comunidades
+                ->filter(); // elimina posibles null (por seguridad)
         }
 
         $newCommentId = session('newCommentId');
@@ -75,7 +81,7 @@ class HandleInertiaRequests extends Middleware
                         'following',
                         'profileImage',
                         'backgroundImage',
-                        'communities',
+                        'communityMemberships',
                         'shop',
                         'lineasCarrito',
                         'lineasCarrito.shopPost',
@@ -84,6 +90,7 @@ class HandleInertiaRequests extends Middleware
                         'lineasCarrito.shopPost.post.user'
                     )
                     : null,
+                'communities' => $communities ?? null,
             ],
             'userEdit' => $user ?? null,
             'socials' => Social::all(),

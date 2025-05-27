@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCommunityRequest;
 use App\Http\Requests\UpdateCommunityRequest;
 use App\Models\Community;
+use App\Models\CommunityMembership;
 use App\Models\Image;
 use FFI\CData;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -24,11 +25,11 @@ class CommunityController extends Controller
     public function index()
     {
         $communities = Community::select('id', 'nombre', 'descripcion', 'visibilidad', 'user_id')
-            ->with('user', 'profileImage', 'backgroundImage', 'members')
+            ->with('user', 'profileImage', 'backgroundImage', 'memberships')
             ->get()
             ->map(function ($community) {
-                $community->getTotalMembers = $community->getTotalMembers(); // Asumiendo que es un método
-                $community->getTotalPosts = $community->getTotalPosts(); // Asumiendo que es un método
+                $community->getTotalMembers = $community->getTotalMembers();
+                $community->getTotalPosts = $community->getTotalPosts();
                 return $community;
             });
 
@@ -63,7 +64,12 @@ class CommunityController extends Controller
             'user_id' => Auth::user()->id,
         ]);
 
-        $community->members()->attach(Auth::user()->id);
+        CommunityMembership::create([
+            'user_id' => Auth::user()->id,
+            'community_id' => $community->id,
+            'community_role_id' => 1,
+        ]);
+
 
         if ($request->hasFile('profile_image')) {
 
@@ -127,7 +133,7 @@ class CommunityController extends Controller
             'user',
             'profileImage',
             'backgroundImage',
-            'members',
+            'memberships',
         ]);
 
         $community->getTotalMembers = $community->getTotalMembers();
@@ -324,10 +330,18 @@ class CommunityController extends Controller
 
     public function join(Community $community)
     {
-        $user = Auth::user();
 
-        if (!$community->members->contains($user->id)) {
-            $community->members()->attach($user->id);
+        if($community->visibilidad === 'publico') {
+
+            CommunityMembership::create([
+                'user_id' => Auth::user()->id,
+                'community_id' => $community->id,
+                'community_role_id' => 3,
+            ]);
+        }
+
+        if($community->visibilidad === 'privado'){
+            // Crear notificacion para el administrador de la comunidad
         }
 
         return back();
@@ -335,6 +349,7 @@ class CommunityController extends Controller
 
     public function leave(Community $community)
     {
+
         $user = Auth::user();
 
         foreach ($user->posts as $post) {
@@ -343,9 +358,8 @@ class CommunityController extends Controller
             }
         }
 
-        if ($community->members->contains($user->id)) {
-            $community->members()->detach($user->id);
-        }
+        $community->memberships()->where('user_id', Auth::id())->delete();
+
 
         return back();
     }

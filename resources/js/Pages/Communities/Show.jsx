@@ -10,7 +10,8 @@ import Post from '@/Components/Posts/Post';
 const Show = ({ community, auth, posts, tags }) => {
   const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
-  const isMemberInitial = community.members?.some(m => m.id === auth.user?.id);
+  const isMemberInitial =  community.memberships.some(membership => membership.user_id === auth.user.id && membership.community_role_id === 3);
+
   const [isMember, setIsMember] = useState(isMemberInitial);
   const [loading, setLoading] = useState(false);
   const [hovering, setHovering] = useState(false);
