@@ -160,6 +160,8 @@ Route::resource('comments', CommentController::class)->middleware('auth');
 // Ruta para obtener las respuestas de un comentario
 Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies'])->middleware('auth');
 Route::resource('communities', CommunityController::class)->middleware('auth');
+Route::post('/communities/accept', [CommunityController::class, 'accept'])->name('communities.accept');
+Route::post('/communities/deny', [CommunityController::class, 'deny'])->name('communities.deny');
 Route::delete('/communities/{community}/images/{imageType}', [CommunityController::class, 'destroyImage'])
     ->name('communities.images.destroy');
 Route::post('/communities/{community}/join', [CommunityController::class, 'join'])->name('communities.join');

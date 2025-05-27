@@ -242,14 +242,16 @@ useEffect(() => {
       )}
 
       {isModalOpen && (
-        <Edit
-          user={user}
-          socials={socials}
-          onClose={() => setIsModalOpen(false)}
-          mustVerifyEmail={mustVerifyEmail}
-          status={status}
-        />
-      )}
+  <Edit
+    isOpen={isModalOpen}
+    user={user}
+    socials={socials}
+    onClose={() => setIsModalOpen(false)}
+    mustVerifyEmail={mustVerifyEmail}
+    status={status}
+  />
+)}
+
 
       {modalPost && (
         <Show

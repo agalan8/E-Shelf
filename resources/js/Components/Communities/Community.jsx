@@ -9,6 +9,7 @@ import {
   faCheck,
   faXmark,
   faTrash,
+  faLock,
 } from '@fortawesome/free-solid-svg-icons';
 import Edit from './Edit';
 
@@ -18,10 +19,17 @@ export default function Community({ community }) {
   const [hovered, setHovered] = useState(false);
   const [loading, setLoading] = useState(false);
   const [buttonHovered, setButtonHovered] = useState(false);
+  const [requestSent, setRequestSent] = useState(false); // Para mostrar "Solicitud enviada"
 
   const canEdit = auth.user && (auth.user.is_admin || auth.user.id === community.user_id);
-  const isMember = community.memberships.some(membership => membership.user_id === auth.user.id && membership.community_role_id === 3);
+  const isMember = community.memberships.some(membership => membership.user_id === auth.user.id && (membership.community_role_id === 3 || membership.community_role_id === 2)
+    );
+  const isPending = community.memberships.some(membership => membership.user_id === auth.user.id && membership.community_role_id === 4);
   const isOwner = auth.user && auth.user.id === community.user_id;
+
+  const isPrivate = community.visibilidad === 'privado';
+
+  const showRequestSent = requestSent || isPending;
 
   const handleOpenEditModal = (e) => {
     e.stopPropagation();
@@ -29,11 +37,16 @@ export default function Community({ community }) {
   };
   const handleCloseEditModal = () => setEditModalOpen(false);
 
-  const handleJoin = (e) => {
+  const handleJoinOrRequest = (e) => {
     e.stopPropagation();
     setLoading(true);
     router.post(route('communities.join', community.id), {}, {
-      onFinish: () => setLoading(false),
+      onFinish: () => {
+        setLoading(false);
+        if (isPrivate && !isMember) {
+          setRequestSent(true);
+        }
+      },
       preserveScroll: true,
     });
   };
@@ -57,13 +70,18 @@ export default function Community({ community }) {
   };
 
   const handleCardClick = () => {
-    router.visit(route('communities.show', community.id));
+    // Solo permitir clic si es pública o es miembro o dueño
+    if (!isPrivate || isMember || isOwner) {
+      router.visit(route('communities.show', community.id));
+    }
   };
 
   return (
     <>
       <div
-        className="relative w-[500px] h-60 rounded-2xl overflow-hidden shadow-lg group transition cursor-pointer"
+        className={`relative w-[500px] h-60 rounded-2xl overflow-hidden shadow-lg group transition
+          ${(!isPrivate || isMember || isOwner) ? 'cursor-pointer' : 'cursor-not-allowed opacity-70'}
+        `}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onClick={handleCardClick}
@@ -144,34 +162,47 @@ export default function Community({ community }) {
             </div>
 
             {auth.user && !isOwner && (
-              <button
-                onClick={isMember ? handleLeave : handleJoin}
-                disabled={loading}
-                onMouseEnter={() => setButtonHovered(true)}
-                onMouseLeave={() => setButtonHovered(false)}
-                className={`w-24 flex items-center justify-center space-x-1 px-1 py-1.5 rounded border-2 text-base whitespace-nowrap transition-all duration-200
-                  ${isMember
-                    ? 'bg-white text-[#9C7FB3] font-extrabold border-[#876aa0] hover:bg-[#FDECEA] hover:text-red-600 hover:border-red-500'
-                    : 'bg-[#9C7FB3] text-white font-extrabold hover:bg-[#876aa0] border-transparent'}
-                  `}
-              >
-                {loading ? (
-                  '...'
-                ) : isMember ? (
-                  <>
-                    <FontAwesomeIcon
-                      icon={buttonHovered ? faXmark : faCheck}
-                      className="w-4 h-4 transition-all duration-200"
-                    />
-                    <span>{buttonHovered ? 'Salir' : 'Unido'}</span>
-                  </>
+              <>
+                {isPrivate && !isMember ? (
+                  <button
+                    onClick={handleJoinOrRequest}
+                    disabled={loading || showRequestSent}
+                    className="w-36 flex items-center justify-center space-x-2 px-2 py-1.5 rounded border-2 bg-[#9C7FB3] text-white font-extrabold border-transparent hover:bg-[#876aa0] transition-all duration-200"
+                  >
+                    <FontAwesomeIcon icon={faLock} className="w-4 h-4" />
+                    <span>{showRequestSent ? 'Solicitud enviada' : 'Solicitar unirse'}</span>
+                  </button>
                 ) : (
-                  <>
-                    <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
-                    <span>Unirse</span>
-                  </>
+                  <button
+                    onClick={isMember ? handleLeave : handleJoinOrRequest}
+                    disabled={loading}
+                    onMouseEnter={() => setButtonHovered(true)}
+                    onMouseLeave={() => setButtonHovered(false)}
+                    className={`w-24 flex items-center justify-center space-x-1 px-1 py-1.5 rounded border-2 text-base whitespace-nowrap transition-all duration-200
+                      ${isMember
+                        ? 'bg-white text-[#9C7FB3] font-extrabold border-[#876aa0] hover:bg-[#FDECEA] hover:text-red-600 hover:border-red-500'
+                        : 'bg-[#9C7FB3] text-white font-extrabold hover:bg-[#876aa0] border-transparent'}
+                      `}
+                  >
+                    {loading ? (
+                      '...'
+                    ) : isMember ? (
+                      <>
+                        <FontAwesomeIcon
+                          icon={buttonHovered ? faXmark : faCheck}
+                          className="w-4 h-4 transition-all duration-200"
+                        />
+                        <span>{buttonHovered ? 'Salir' : 'Unido'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+                        <span>Unirse</span>
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </>
             )}
           </div>
         </div>

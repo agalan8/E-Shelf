@@ -7,13 +7,18 @@ use App\Http\Requests\UpdateCommunityRequest;
 use App\Models\Community;
 use App\Models\CommunityMembership;
 use App\Models\Image;
+use App\Models\User;
+use App\Notifications\CommunityAccepted;
+use App\Notifications\CommunityDenied;
+use App\Notifications\CommunityJoinRequest;
 use FFI\CData;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
-
+use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 
 class CommunityController extends Controller
 {
@@ -341,8 +346,25 @@ class CommunityController extends Controller
         }
 
         if($community->visibilidad === 'privado'){
-            // Crear notificacion para el administrador de la comunidad
-        }
+            $user = User::findOrFail(Auth::user()->id);
+
+            CommunityMembership::create([
+                'user_id' => Auth::user()->id,
+                'community_id' => $community->id,
+                'community_role_id' => 4,
+            ]);
+
+            $adminUsers = CommunityMembership::where('community_id', $community->id)
+                ->whereIn('community_role_id', [1, 2]) // 1: owner, 2: admin
+                ->with('user')
+                ->get()
+                ->pluck('user');
+
+            // Enviar la notificación a cada uno
+            foreach ($adminUsers as $adminUser) {
+                $adminUser->notify(new  CommunityJoinRequest($community, $user));
+            }
+                }
 
         return back();
     }
@@ -360,6 +382,77 @@ class CommunityController extends Controller
 
         $community->memberships()->where('user_id', Auth::id())->delete();
 
+        if($community->visibilidad ==='privado'){
+            return redirect()->route('mis-comunidades');
+        }
+
+
+        return back();
+    }
+
+public function accept(Request $request)
+{
+    $request->validate([
+        'community_id' => 'required|exists:communities,id',
+        'user_id' => 'required|exists:users,id',
+        'notification_id' => 'required|exists:notifications,id',
+    ]);
+
+    // Verifica si la notificación aún existe
+    $notification = DatabaseNotification::find($request->notification_id);
+    if (!$notification) {
+        return back()->with('info', 'Esta solicitud ya fue procesada por otro administrador.');
+    }
+
+    // Asegura que el membership exista y actualiza el rol
+    $communityMembership = CommunityMembership::where('community_id', $request->community_id)
+        ->where('user_id', $request->user_id)
+        ->firstOrFail();
+
+    $communityMembership->update(['community_role_id' => 3]);
+
+    // Elimina todas las notificaciones relacionadas con esta solicitud
+    DatabaseNotification::whereRaw("data::json->>'requester_id' = ?", [(string) $request->user_id])
+        ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
+        ->whereRaw("data::json->>'type' = ?", ['request'])
+        ->delete();
+
+    // Notifica al usuario que fue aceptado
+    $requester = User::findOrFail($request->user_id);
+    $community = Community::findOrFail($request->community_id);
+    $requester->notify(new CommunityAccepted($community));
+
+    return back()->with('success', 'Solicitud aceptada y notificaciones eliminadas.');
+}
+
+
+    public function deny(Request $request)
+    {
+        $request->validate([
+            'community_id' => 'required|exists:communities,id',
+            'user_id' => 'required|exists:users,id',
+            'notification_id' => 'required|exists:notifications,id',
+        ]);
+
+        $notificaciones = DatabaseNotification::whereRaw("data::json->>'requester_id' = ?", [(string) $request->user_id])
+    ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
+    ->whereRaw("data::json->>'type' = ?", ['request']);
+
+
+        if (!$notificaciones->exists()) {
+            return back();
+        }
+
+        $notificaciones->delete();
+        $communityMembership = CommunityMembership::where('community_id', $request->community_id)
+            ->where('user_id', $request->user_id)
+            ->firstOrFail();
+
+        $communityMembership->delete();
+
+        $requester = User::findOrFail($request->user_id);
+        $community = Community::findOrFail($request->community_id);
+        $requester->notify(new CommunityDenied($community));
 
         return back();
     }
