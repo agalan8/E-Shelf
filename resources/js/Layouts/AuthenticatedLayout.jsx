@@ -223,7 +223,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
       {isCartOpen && (
         <div
           ref={cartPanelRef}
-          className={`fixed top-0 right-0 w-[450px] h-full bg-[#2F3136] text-white border-l border-[#232428] z-40 transform transition-transform duration-300 ease-in-out ${
+          className={`fixed top-0 right-0 w-[400px] h-full bg-[#2F3136] text-white border-l border-[#232428] z-40 transform transition-transform duration-300 ease-in-out ${
             isCartVisible ? "translate-x-0" : "translate-x-full"
           }`}
         >
