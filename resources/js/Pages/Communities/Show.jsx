@@ -6,11 +6,14 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import Image from '@/Components/Image';
 import Post from '@/Components/Posts/Post';
+import CommunitySubnav from '@/Components/Subnavs/CommunitySubnav';
 
 const Show = ({ community, auth, posts, tags }) => {
   const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
-  const isMemberInitial = community.members?.some(m => m.id === auth.user?.id);
+  const isMemberInitial =  community.memberships.some(membership => membership.user_id === auth.user.id && (membership.community_role_id === 3 || membership.community_role_id === 2)
+    );
+
   const [isMember, setIsMember] = useState(isMemberInitial);
   const [loading, setLoading] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -69,7 +72,7 @@ const Show = ({ community, auth, posts, tags }) => {
   };
 
   return (
-    <Layout>
+    <Layout subnav={<CommunitySubnav currentCommunity={community} />}>
       <div className="community-profile">
         {/* Fondo de portada */}
         <div className="w-full h-[350px] overflow-hidden flex items-center justify-center relative">

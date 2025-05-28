@@ -23,15 +23,30 @@ class Community extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function members()
+    // public function members()
+    // {
+    //     return $this->belongsToMany(User::class);
+    // }
+
+    // public function getTotalMembers()
+    // {
+    //     return $this->members()->count();
+    // }
+
+    public function memberships()
     {
-        return $this->belongsToMany(User::class);
+        return $this->hasMany(CommunityMembership::class);
     }
 
     public function getTotalMembers()
     {
-        return $this->members()->count();
+        return $this->memberships()
+            ->whereHas('communityRole', function ($query) {
+                $query->where('name', '!=', 'pending');
+            })
+            ->count();
     }
+
 
  public function posts()
 {
@@ -71,7 +86,7 @@ class Community extends Model
             $community->posts()->detach();
 
             // Desvincular miembros relacionados
-            $community->members()->detach();
+            $community->memberships()->delete();
         }
     });
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CommunityMembershipController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LineaCarritoController;
 use App\Http\Controllers\OrderController;
@@ -45,30 +46,29 @@ Route::get('/', function () {
 
     Session::forget('openAuthModal');
 
-    if(Auth::check()){
+    if (Auth::check()) {
         return Inertia::render('Explorar', [
-    'posts' => RegularPost::with(
-        'image',
-        'post',
-        'post.user',
-        'tags',
-        'communities',
-        'post.user.profileImage',
-        'post.user.backgroundImage',
-        'comments',
-        'comments.user',
-        'comments.user.profileImage',
-        'comments.user.backgroundImage',
-        'comments.replies',
-        'comments.replies.user',
-        'comments.replies.user.profileImage',
-        'comments.replies.user.backgroundImage'
-    )
-    ->doesntHave('shopPost') // Aquí se filtran los que NO tienen shopPost relacionado
-    ->orderBy('created_at', 'desc')
-    ->get(),
-]);
-
+            'posts' => RegularPost::with(
+                'image',
+                'post',
+                'post.user',
+                'tags',
+                'communities',
+                'post.user.profileImage',
+                'post.user.backgroundImage',
+                'comments',
+                'comments.user',
+                'comments.user.profileImage',
+                'comments.user.backgroundImage',
+                'comments.replies',
+                'comments.replies.user',
+                'comments.replies.user.profileImage',
+                'comments.replies.user.backgroundImage'
+            )
+                ->doesntHave('shopPost') // Aquí se filtran los que NO tienen shopPost relacionado
+                ->orderBy('created_at', 'desc')
+                ->get(),
+        ]);
     }
 
     return Inertia::render('Welcome', [
@@ -86,7 +86,7 @@ Route::get('/explorar', function () {
 
 
     return Inertia::render('Explorar', [
-        'posts' => RegularPost::with('image', 'tags', 'communities','post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->doesntHave('shopPost')->orderBy('created_at', 'desc')->get()->map(function ($post) {
+        'posts' => RegularPost::with('image', 'tags', 'communities', 'post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->doesntHave('shopPost')->orderBy('created_at', 'desc')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
             return $post;
@@ -139,7 +139,6 @@ Route::delete('/shared-posts/by-regular', function (Request $request) {
     $sharedPost->delete();
 
     return back();
-
 })->middleware('auth')->name('shared-posts.destroyByPostId');
 
 
@@ -147,8 +146,7 @@ Route::delete('/shared-posts/by-regular', function (Request $request) {
 Route::resource('regular-posts', RegularPostController::class)->middleware('auth');
 Route::resource('shared-posts', SharedPostController::class)->middleware('auth');
 Route::resource('albums', AlbumController::class)->middleware('auth');
-Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])
-->name('albums.eliminar-portada');
+Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])->name('albums.eliminar-portada');
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
 Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
@@ -161,24 +159,27 @@ Route::resource('comments', CommentController::class)->middleware('auth');
 // Ruta para obtener las respuestas de un comentario
 Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies'])->middleware('auth');
 Route::resource('communities', CommunityController::class)->middleware('auth');
-Route::delete('/communities/{community}/images/{imageType}', [CommunityController::class, 'destroyImage'])
-->name('communities.images.destroy');
+Route::post('/communities/accept', [CommunityController::class, 'accept'])->name('communities.accept');
+Route::post('/communities/deny', [CommunityController::class, 'deny'])->name('communities.deny');
+Route::post('/communities/makeAdmin', [CommunityController::class, 'makeAdmin'])->name('communities.makeAdmin');
+Route::post('/communities/removeAdmin', [CommunityController::class, 'removeAdmin'])->name('communities.removeAdmin');
+Route::post('/communities/kickUser', [CommunityController::class, 'kickUser'])->name('communities.kickUser');
+Route::delete('/communities/{community}/images/{imageType}', [CommunityController::class, 'destroyImage'])->name('communities.images.destroy');
 Route::post('/communities/{community}/join', [CommunityController::class, 'join'])->name('communities.join');
 Route::post('/communities/{community}/leave', [CommunityController::class, 'leave'])->name('communities.leave');
+Route::get('/communities/{community}/members', [CommunityController::class, 'members'])->name('communities.members');
 Route::resource('shops', ShopController::class)->middleware('auth');
 Route::resource('shop-posts', ShopPostController::class)->middleware('auth');
 Route::resource('orders', OrderController::class)->middleware('auth');
 Route::middleware(['auth'])->group(function () {
-    Route::get('/order-lines/{orderLineId}/download-image', [OrderLineController::class, 'downloadImage'])
-        ->name('order-lines.download-image');
-});
+Route::get('/order-lines/{orderLineId}/download-image', [OrderLineController::class, 'downloadImage'])->name('order-lines.download-image');});
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/{id}/destroy', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead'])->name('notifications.read');
     Route::get('/notifications/more', [NotificationController::class, 'loadMore'])->name('notifications.loadMore');
-
 });
+Route::resource('community-memberships', CommunityMembershipController::class)->middleware('auth');
 
 
 
@@ -212,44 +213,44 @@ Route::get('/posts-seguidos', function () {
     $userIds = $user->following()->pluck('followed_user_id')->push($user->id);
 
     // RegularPosts de usuarios seguidos o propios
- $regularPosts = RegularPost::whereHas('post', function ($query) use ($userIds) {
+    $regularPosts = RegularPost::whereHas('post', function ($query) use ($userIds) {
         $query->whereIn('user_id', $userIds);
     })
-    ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
-    ->with([
-        'image',
-        'post.user.profileImage',
-        'post.user.backgroundImage',
-        'tags',
-        'communities',
-        'comments.user.profileImage',
-        'comments.user.backgroundImage',
-        'comments.replies.user.profileImage',
-        'comments.replies.user.backgroundImage',
-        'likedBy'
-    ])
-    ->get();
+        ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
+        ->with([
+            'image',
+            'post.user.profileImage',
+            'post.user.backgroundImage',
+            'tags',
+            'communities',
+            'comments.user.profileImage',
+            'comments.user.backgroundImage',
+            'comments.replies.user.profileImage',
+            'comments.replies.user.backgroundImage',
+            'likedBy'
+        ])
+        ->get();
 
 
-$sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
+    $sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
         $query->whereIn('user_id', $userIds);
     })
-    ->whereHas('regularPost') // Asegurarse de que tiene un RegularPost
-    ->whereDoesntHave('regularPost.shopPost') // Excluir si su RegularPost tiene ShopPost
-    ->with([
-        'regularPost.image',
-        'regularPost.post.user.profileImage',
-        'regularPost.post.user.backgroundImage',
-        'regularPost.tags',
-        'regularPost.communities',
-        'regularPost.comments.user.profileImage',
-        'regularPost.comments.user.backgroundImage',
-        'regularPost.comments.replies.user.profileImage',
-        'regularPost.comments.replies.user.backgroundImage',
-        'regularPost.likedBy',
-        'post.user.profileImage', // quien hizo el share
-    ])
-    ->get();
+        ->whereHas('regularPost') // Asegurarse de que tiene un RegularPost
+        ->whereDoesntHave('regularPost.shopPost') // Excluir si su RegularPost tiene ShopPost
+        ->with([
+            'regularPost.image',
+            'regularPost.post.user.profileImage',
+            'regularPost.post.user.backgroundImage',
+            'regularPost.tags',
+            'regularPost.communities',
+            'regularPost.comments.user.profileImage',
+            'regularPost.comments.user.backgroundImage',
+            'regularPost.comments.replies.user.profileImage',
+            'regularPost.comments.replies.user.backgroundImage',
+            'regularPost.likedBy',
+            'post.user.profileImage', // quien hizo el share
+        ])
+        ->get();
 
 
     // Mapear ambos tipos al mismo formato base
@@ -298,30 +299,27 @@ Route::get('/mis-albums', function () {
     return Inertia::render('Albums/MisAlbums', [
         'user' => $user,
         'albums' => $user->albums()->with('posts', 'user', 'user.profileImage', 'user.backgroundImage', 'coverImage', 'posts.image')->orderBy('created_at', 'desc')->get(),
-        'posts' => $user->posts()->with('posteable','posteable.image', 'posteable.tags', 'posteable.communities', 'user')->get(),
+        'posts' => $user->posts()->with('posteable', 'posteable.image', 'posteable.tags', 'posteable.communities', 'user')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
 
-Route::get('mis-comunidades', function(){
+Route::get('mis-comunidades', function () {
 
     $userId = Auth::user()->id;
     $user = User::findOrFail($userId);
 
+    $communities = $user->communities();
+    $communities->each->load('user', 'profileImage', 'backgroundImage', 'memberships');
+    $sorted = $communities->sortByDesc('created_at')->values();
+
     return Inertia::render('Communities/MisComunidades', [
         'user' => $user,
-        'communities' => $user->communities()
-            ->with('user', 'profileImage', 'backgroundImage', 'members')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($community) {
-                $community->getTotalMembers = $community->getTotalMembers(); // Asumiendo que estos son métodos personalizados
-                $community->getTotalPosts = $community->getTotalPosts();
-                return $community;
-    }),
-
+        'communities' => $sorted->map(function ($community) {
+            $community->getTotalMembers = $community->getTotalMembers();
+            $community->getTotalPosts = $community->getTotalPosts();
+            return $community;
+        }),
     ]);
-
-
 })->middleware('auth')->name('mis-comunidades');
 
 Route::post('albums/{album}/posts', function (Request $request, Album $album) {
@@ -365,7 +363,7 @@ Route::post('/images/update', function (Request $request) {
         $path_medium = "public/users/{$user->id}/profile_image/medium/{$user->id}.{$extension}";
         $path_small = "public/users/{$user->id}/profile_image/small/{$user->id}.{$extension}";
 
-        if($user->profileImage){
+        if ($user->profileImage) {
             $paths = [
                 ltrim(parse_url($user->profileImage->path_small, PHP_URL_PATH), '/'),
             ];
@@ -376,11 +374,11 @@ Route::post('/images/update', function (Request $request) {
         }
 
 
-        $smallImage = ImageIntervention::read($imagen)->scale( height: 350)->encode();
+        $smallImage = ImageIntervention::read($imagen)->scale(height: 350)->encode();
 
         Storage::disk('s3')->put($path_small, $smallImage, 'public');
 
-        if($user->profileImage){
+        if ($user->profileImage) {
             // Actualizamos la foto asociada al post
             $user->profileImage()->update([
                 'path_small' => $path_aws . $path_small,
@@ -394,9 +392,7 @@ Route::post('/images/update', function (Request $request) {
             ]);
 
             $image->imageable()->associate($user)->save();
-
         }
-
     }
 
     if ($request->hasFile('background_image')) {
@@ -408,7 +404,7 @@ Route::post('/images/update', function (Request $request) {
         $path_medium = "public/users/{$user->id}/background_image/medium/{$user->id}.{$extension}";
         $path_small = "public/users/{$user->id}/background_image/small/{$user->id}.{$extension}";
 
-        if($user->backgroundImage){
+        if ($user->backgroundImage) {
             $paths = [
                 ltrim(parse_url($user->backgroundImage->path_original, PHP_URL_PATH), '/'),
                 ltrim(parse_url($user->backgroundImage->path_medium, PHP_URL_PATH), '/'),
@@ -421,12 +417,12 @@ Route::post('/images/update', function (Request $request) {
 
 
         $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
-        $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
+        $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
 
         Storage::disk('s3')->put($path_original, $imagen, 'public');
         Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
-        if($user->backgroundImage){
+        if ($user->backgroundImage) {
             // Actualizamos la foto asociada al post
             $user->backgroundImage()->update([
                 'path_original' => $path_aws . $path_original,
@@ -443,9 +439,7 @@ Route::post('/images/update', function (Request $request) {
             ]);
 
             $image->imageable()->associate($user)->save();
-
         }
-
     }
 
     $user->save();
@@ -517,18 +511,18 @@ Route::get('/buscar', function (Request $request) {
             ->get();
     } elseif ($filter === 'Publicaciones') {
         $posts = RegularPost::where('titulo', 'ilike', "%{$query}%")
-    ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
-    ->with([
-        'post.user.profileImage',
-        'tags',
-        'image',
-        'communities',
-        'comments',
-        'comments.user',
-        'comments.replies',
-        'comments.replies.user'
-    ])
-    ->get();
+            ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
+            ->with([
+                'post.user.profileImage',
+                'tags',
+                'image',
+                'communities',
+                'comments',
+                'comments.user',
+                'comments.replies',
+                'comments.replies.user'
+            ])
+            ->get();
 
 
         // Añadir propiedades calculadas a cada post
@@ -540,7 +534,7 @@ Route::get('/buscar', function (Request $request) {
             $post->post_type = 'regular';
             return $post;
         });
-    } elseif ($filter === 'Comunidades'){
+    } elseif ($filter === 'Comunidades') {
 
         $comunidades = Community::where('nombre', 'ilike', "%{$query}%")
             ->with('profileImage', 'backgroundImage', 'members')
@@ -551,8 +545,7 @@ Route::get('/buscar', function (Request $request) {
             $community->getTotalPosts = $community->getTotalPosts();
             return $community;
         });
-    }
-    else {
+    } else {
         $results = collect();
     }
 
@@ -576,4 +569,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

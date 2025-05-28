@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Community;
 use App\Models\RegularPost;
 use App\Models\User;
 use App\Notifications\PostLiked;
@@ -42,24 +43,32 @@ $request->user()->unreadNotifications()
         ->get()
         ->map(function ($notification) {
             return [
-                'id' => $notification->id,
-                'type' => $notification->data['type'] ?? 'other',
-                'created_at' => $notification->created_at->diffForHumans(),
-                'follower' => isset($notification->data['follower_id'])
-                    ? User::with('profileImage')->find($notification->data['follower_id'])
-                    : null,
-                'sharer' => isset($notification->data['sharer_id'])
-                    ? User::with('profileImage')->find($notification->data['sharer_id'])
-                    : null,
-                'liker' => isset($notification->data['liker_id'])
-                    ? User::with('profileImage')->find($notification->data['liker_id'])
-                    : null,
-                'mentioner' => isset($notification->data['mentioner_id'])
+                         'id' => $notification->id,
+                        'type' => $notification->data['type'] ?? 'other',
+                        'created_at' => $notification->created_at->diffForHumans(),
+                        // Para follower, verificamos que 'follower_id' exista antes de buscar
+                        'follower' => isset($notification->data['follower_id'])
+                            ? User::with('profileImage')->find($notification->data['follower_id'])
+                            : null,
+                        // Para sharer, igual, verificamos que 'sharer_id' exista antes de buscar
+                        'sharer' => isset($notification->data['sharer_id'])
+                            ? User::with('profileImage')->find($notification->data['sharer_id'])
+                            : null,
+                        'liker' => isset($notification->data['liker_id'])
+                            ? User::with('profileImage')->find($notification->data['liker_id'])
+                            : null,
+                        'mentioner' => isset($notification->data['mentioner_id'])
                             ? User::with('profileImage')->find($notification->data['mentioner_id'])
                             : null,
-                'post' => isset($notification->data['post_id'])
-                    ? RegularPost::with('image', 'post.user.profileImage')->find($notification->data['post_id'])
-                    : null,
+                        'requester' => isset($notification->data['requester_id'])
+                            ? User::with('profileImage')->find($notification->data['requester_id'])
+                            : null,
+                        'post' => isset($notification->data['post_id'])
+                            ? RegularPost::with('image', 'tags', 'communities', 'post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->find($notification->data['post_id'])
+                            : null,
+                        'community' => isset($notification->data['community_id'])
+                            ? Community::with('profileImage')->find($notification->data['community_id'])
+                            : null,
             ];
         });
 

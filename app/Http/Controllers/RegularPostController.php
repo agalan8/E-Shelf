@@ -30,6 +30,8 @@ class RegularPostController extends Controller
     {
         $posts = RegularPost::orderBy('created_at')->with('post.user', 'image', 'tags', 'communities')->get();
 
+
+
         return Inertia::render('Posts/Index', [
             'posts' => $posts,
             'tags' => Tag::all(),
@@ -41,9 +43,16 @@ class RegularPostController extends Controller
      */
     public function create()
     {
+        $user = User::findOrFail(Auth::id());
+
+        $communities = $user->communityMemberships()
+            ->with('community') // carga la relación community
+            ->get()
+            ->pluck('community') // extrae las comunidades
+            ->filter(); // elimina posibles null (por seguridad)
         return Inertia::render('Posts/Create', [
             'tags' => Tag::all(),
-            'communities' => Auth::user()->communities,
+            'communities' => $communities,
         ]);
     }
 

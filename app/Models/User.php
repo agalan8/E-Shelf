@@ -113,14 +113,34 @@ class User extends Authenticatable
         return $this->belongsToMany(RegularPost::class, 'likes');
     }
 
+    // public function ownedCommunities()
+    // {
+    //     return $this->hasMany(Community::class);
+    // }
+
+    // public function communities()
+    // {
+    //     return $this->belongsToMany(Community::class);
+    // }
+
     public function ownedCommunities()
     {
         return $this->hasMany(Community::class);
     }
 
-    public function communities()
+    public function communities(){
+            return $this->communityMemberships()
+            ->whereHas('communityRole', function ($query) {
+                $query->where('name', '!=', 'pending');
+            })
+            ->with('community')
+            ->get()
+            ->pluck('community');
+    }
+
+    public function communityMemberships()
     {
-        return $this->belongsToMany(Community::class);
+        return $this->hasMany(CommunityMembership::class);
     }
 
     public function shop(){
