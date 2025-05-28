@@ -146,8 +146,7 @@ Route::delete('/shared-posts/by-regular', function (Request $request) {
 Route::resource('regular-posts', RegularPostController::class)->middleware('auth');
 Route::resource('shared-posts', SharedPostController::class)->middleware('auth');
 Route::resource('albums', AlbumController::class)->middleware('auth');
-Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])
-    ->name('albums.eliminar-portada');
+Route::delete('/albums/{album}/eliminar-portada', [AlbumController::class, 'eliminarPortada'])->name('albums.eliminar-portada');
 Route::resource('users', UserController::class)->middleware(AdminMiddleware::class)->except('show');
 Route::resource('users', UserController::class)->only('show');
 Route::resource('tags', TagController::class)->middleware(AdminMiddleware::class);
@@ -162,17 +161,18 @@ Route::get('comments/{comment}/replies', [CommentController::class, 'loadReplies
 Route::resource('communities', CommunityController::class)->middleware('auth');
 Route::post('/communities/accept', [CommunityController::class, 'accept'])->name('communities.accept');
 Route::post('/communities/deny', [CommunityController::class, 'deny'])->name('communities.deny');
-Route::delete('/communities/{community}/images/{imageType}', [CommunityController::class, 'destroyImage'])
-    ->name('communities.images.destroy');
+Route::post('/communities/makeAdmin', [CommunityController::class, 'makeAdmin'])->name('communities.makeAdmin');
+Route::post('/communities/removeAdmin', [CommunityController::class, 'removeAdmin'])->name('communities.removeAdmin');
+Route::post('/communities/kickUser', [CommunityController::class, 'kickUser'])->name('communities.kickUser');
+Route::delete('/communities/{community}/images/{imageType}', [CommunityController::class, 'destroyImage'])->name('communities.images.destroy');
 Route::post('/communities/{community}/join', [CommunityController::class, 'join'])->name('communities.join');
 Route::post('/communities/{community}/leave', [CommunityController::class, 'leave'])->name('communities.leave');
+Route::get('/communities/{community}/members', [CommunityController::class, 'members'])->name('communities.members');
 Route::resource('shops', ShopController::class)->middleware('auth');
 Route::resource('shop-posts', ShopPostController::class)->middleware('auth');
 Route::resource('orders', OrderController::class)->middleware('auth');
 Route::middleware(['auth'])->group(function () {
-    Route::get('/order-lines/{orderLineId}/download-image', [OrderLineController::class, 'downloadImage'])
-        ->name('order-lines.download-image');
-});
+Route::get('/order-lines/{orderLineId}/download-image', [OrderLineController::class, 'downloadImage'])->name('order-lines.download-image');});
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/{id}/destroy', [NotificationController::class, 'destroy'])->name('notifications.destroy');

@@ -336,7 +336,7 @@ class CommunityController extends Controller
     public function join(Community $community)
     {
 
-        if($community->visibilidad === 'publico') {
+        if ($community->visibilidad === 'publico') {
 
             CommunityMembership::create([
                 'user_id' => Auth::user()->id,
@@ -345,7 +345,7 @@ class CommunityController extends Controller
             ]);
         }
 
-        if($community->visibilidad === 'privado'){
+        if ($community->visibilidad === 'privado') {
             $user = User::findOrFail(Auth::user()->id);
 
             CommunityMembership::create([
@@ -364,7 +364,7 @@ class CommunityController extends Controller
             foreach ($adminUsers as $adminUser) {
                 $adminUser->notify(new  CommunityJoinRequest($community, $user));
             }
-                }
+        }
 
         return back();
     }
@@ -382,7 +382,7 @@ class CommunityController extends Controller
 
         $community->memberships()->where('user_id', Auth::id())->delete();
 
-        if($community->visibilidad ==='privado'){
+        if ($community->visibilidad === 'privado') {
             return redirect()->route('mis-comunidades');
         }
 
@@ -390,40 +390,40 @@ class CommunityController extends Controller
         return back();
     }
 
-public function accept(Request $request)
-{
-    $request->validate([
-        'community_id' => 'required|exists:communities,id',
-        'user_id' => 'required|exists:users,id',
-        'notification_id' => 'required|exists:notifications,id',
-    ]);
+    public function accept(Request $request)
+    {
+        $request->validate([
+            'community_id' => 'required|exists:communities,id',
+            'user_id' => 'required|exists:users,id',
+            'notification_id' => 'required|exists:notifications,id',
+        ]);
 
-    // Verifica si la notificación aún existe
-    $notification = DatabaseNotification::find($request->notification_id);
-    if (!$notification) {
-        return back()->with('info', 'Esta solicitud ya fue procesada por otro administrador.');
+        // Verifica si la notificación aún existe
+        $notification = DatabaseNotification::find($request->notification_id);
+        if (!$notification) {
+            return back()->with('info', 'Esta solicitud ya fue procesada por otro administrador.');
+        }
+
+        // Asegura que el membership exista y actualiza el rol
+        $communityMembership = CommunityMembership::where('community_id', $request->community_id)
+            ->where('user_id', $request->user_id)
+            ->firstOrFail();
+
+        $communityMembership->update(['community_role_id' => 3]);
+
+        // Elimina todas las notificaciones relacionadas con esta solicitud
+        DatabaseNotification::whereRaw("data::json->>'requester_id' = ?", [(string) $request->user_id])
+            ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
+            ->whereRaw("data::json->>'type' = ?", ['request'])
+            ->delete();
+
+        // Notifica al usuario que fue aceptado
+        $requester = User::findOrFail($request->user_id);
+        $community = Community::findOrFail($request->community_id);
+        $requester->notify(new CommunityAccepted($community));
+
+        return back()->with('success', 'Solicitud aceptada y notificaciones eliminadas.');
     }
-
-    // Asegura que el membership exista y actualiza el rol
-    $communityMembership = CommunityMembership::where('community_id', $request->community_id)
-        ->where('user_id', $request->user_id)
-        ->firstOrFail();
-
-    $communityMembership->update(['community_role_id' => 3]);
-
-    // Elimina todas las notificaciones relacionadas con esta solicitud
-    DatabaseNotification::whereRaw("data::json->>'requester_id' = ?", [(string) $request->user_id])
-        ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
-        ->whereRaw("data::json->>'type' = ?", ['request'])
-        ->delete();
-
-    // Notifica al usuario que fue aceptado
-    $requester = User::findOrFail($request->user_id);
-    $community = Community::findOrFail($request->community_id);
-    $requester->notify(new CommunityAccepted($community));
-
-    return back()->with('success', 'Solicitud aceptada y notificaciones eliminadas.');
-}
 
 
     public function deny(Request $request)
@@ -435,8 +435,8 @@ public function accept(Request $request)
         ]);
 
         $notificaciones = DatabaseNotification::whereRaw("data::json->>'requester_id' = ?", [(string) $request->user_id])
-    ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
-    ->whereRaw("data::json->>'type' = ?", ['request']);
+            ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
+            ->whereRaw("data::json->>'type' = ?", ['request']);
 
 
         if (!$notificaciones->exists()) {
@@ -455,5 +455,80 @@ public function accept(Request $request)
         $requester->notify(new CommunityDenied($community));
 
         return back();
+    }
+
+    public function members($communityId)
+    {
+        $community = Community::with(['memberships' => function ($query) {
+            $query->where('community_role_id', '!=', 4);
+        }, 'memberships.user.profileImage', 'memberships.user.backgroundImage'])->findOrFail($communityId);
+
+        $community->getTotalMembers = $community->getTotalMembers();
+        $community->getTotalPosts = $community->getTotalPosts();
+
+        $user = User::findOrFail(Auth::user()->id);
+
+        $authUserRole = $community->memberships
+            ->firstWhere('user_id', $user->id)
+            ?->community_role_id;
+
+        return Inertia::render('Communities/Members', [
+            'community' => $community,
+            'authUserRole' => $authUserRole,
+        ]);
+    }
+
+    public function makeAdmin(Request $request)
+    {
+
+
+        $request->validate([
+            'community_id' => 'required|exists:communities,id',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        CommunityMembership::where('community_id', $request->community_id)
+            ->where('user_id', $request->user_id)
+            ->update(['community_role_id' => 2]); // Rol admin
+
+        return back();
+    }
+
+    public function removeAdmin(Request $request)
+    {
+
+
+        $request->validate([
+            'community_id' => 'required|exists:communities,id',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        CommunityMembership::where('community_id', $request->community_id)
+            ->where('user_id', $request->user_id)
+            ->update(['community_role_id' => 3]); // Rol admin
+
+        return back();
+    }
+
+    public function kickUser(Request $request){
+
+        $request->validate([
+            'community_id' => 'required|exists:communities,id',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $community = Community::findOrFail($request->community_id);
+        $user = User::findOrFail($request->user_id);
+
+        foreach ($user->posts as $post) {
+            if ($post->posteable->communities->contains($community->id)) {
+                $post->posteable->communities()->detach($community->id);
+            }
+        }
+
+        $community->memberships()->where('user_id', $user->id)->delete();
+
+        return back();
+
     }
 }
