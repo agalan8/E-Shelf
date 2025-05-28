@@ -287,28 +287,38 @@ const Members = ({ community, auth, authUserRole }) => {
                                                 "opacity 0.3s ease, transform 0.3s ease",
                                         }}
                                     >
-                                        {/* Botón hacer/quitar admin para owner */}
-                                        {authUserRole === 1 && membership.user.id !== auth.user.id && (
-                                            <button
-                                                title={
-                                                    membership.community_role_id === 2
-                                                        ? "Quitar admin"
-                                                        : "Hacer admin"
-                                                }
-                                                onClick={() =>
-                                                    handleToggleAdmin(
-                                                        membership.user.id,
-                                                        membership.community_role_id
-                                                    )
-                                                }
-                                                className="text-indigo-600 hover:text-indigo-800"
-                                            >
-                                                <FontAwesomeIcon icon={faUserPlus} />
-                                            </button>
-                                        )}
+                                        {/* Botón hacer/quitar admin */}
+                                        {authUserRole === 1 &&
+                                            membership.user.id !== auth.user.id && (
+                                                <button
+                                                    title={
+                                                        membership.community_role_id === 2
+                                                            ? "Quitar admin"
+                                                            : "Hacer admin"
+                                                    }
+                                                    onClick={() =>
+                                                        handleToggleAdmin(
+                                                            membership.user.id,
+                                                            membership.community_role_id
+                                                        )
+                                                    }
+                                                    className="text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 px-1.5 py-0.5 rounded bg-indigo-100 hover:bg-indigo-200 text-xs font-semibold"
+                                                >
+                                                    <FontAwesomeIcon
+                                                        className="w-3 h-3"
+                                                        icon={faUserPlus}
+                                                    />
+                                                    <span>
+                                                        {membership.community_role_id === 2
+                                                            ? "Quitar admin"
+                                                            : "Hacer admin"}
+                                                    </span>
+                                                </button>
+                                            )}
 
                                         {/* Botón expulsar */}
-                                        {(authUserRole === 1 ||
+                                        {((authUserRole === 1 &&
+                                            membership.user.id !== auth.user.id) ||
                                             (authUserRole === 2 &&
                                                 membership.community_role_id > 2)) && (
                                             <button
@@ -319,9 +329,13 @@ const Members = ({ community, auth, authUserRole }) => {
                                                         membership.community_role_id
                                                     )
                                                 }
-                                                className="text-red-600 hover:text-red-800"
+                                                className="text-red-600 hover:text-red-800 flex items-center space-x-1 px-1.5 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs font-semibold"
                                             >
-                                                <FontAwesomeIcon icon={faUserMinus} />
+                                                <FontAwesomeIcon
+                                                    className="w-3 h-3"
+                                                    icon={faUserMinus}
+                                                />
+                                                <span>Expulsar</span>
                                             </button>
                                         )}
                                     </div>

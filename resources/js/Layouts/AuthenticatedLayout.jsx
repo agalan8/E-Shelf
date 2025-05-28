@@ -87,25 +87,23 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
     };
   }, [isCartVisible]);
 
-useEffect(() => {
-  function handleClickOutsideNotif(event) {
-    // Si el modalPost está abierto, no cerramos el panel de notificaciones
-    if (modalPost) return;
+  useEffect(() => {
+    function handleClickOutsideNotif(event) {
+      if (modalPost) return;
 
-    if (notifPanelRef.current && !notifPanelRef.current.contains(event.target)) {
-      closeNotif();
+      if (notifPanelRef.current && !notifPanelRef.current.contains(event.target)) {
+        closeNotif();
+      }
     }
-  }
-  if (isNotifVisible) {
-    document.addEventListener("mousedown", handleClickOutsideNotif);
-  } else {
-    document.removeEventListener("mousedown", handleClickOutsideNotif);
-  }
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutsideNotif);
-  };
-}, [isNotifVisible, modalPost]);
-
+    if (isNotifVisible) {
+      document.addEventListener("mousedown", handleClickOutsideNotif);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsideNotif);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideNotif);
+    };
+  }, [isNotifVisible, modalPost]);
 
   const handleSearch = (query, filter) => {
     console.log("Buscando:", query, "Filtro:", filter);
@@ -123,52 +121,59 @@ useEffect(() => {
           </Link>
         </div>
         <div className="flex-1 overflow-y-auto py-4 px-2 space-y-3 flex flex-col items-center">
-          <NavLink title="Home" href={route("posts-seguidos")} active={route().current("posts-seguidos")} className="flex justify-center">
+          <NavLink title="Home" href={route("posts-seguidos")} active={!isNotifOpen && route().current("posts-seguidos")} className="flex justify-center">
             <HomeIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("explorar")} active={route().current("explorar")} className="flex justify-center">
+          <NavLink href={route("explorar")} active={!isNotifOpen && route().current("explorar")} className="flex justify-center">
             <GlobeAsiaAustraliaIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("users.show", { user: user.id })} active={route().current("users.show")} className="flex justify-center">
+          <NavLink href={route("users.show", { user: user.id })} active={!isNotifOpen && route().current("users.show")} className="flex justify-center">
             <UserIcon className="h-9 w-9" />
           </NavLink>
+
+          {/* NOTIFICACIONES */}
           <button
             onClick={() => (isNotifOpen ? closeNotif() : openNotif())}
-            className="mt-2 flex items-center justify-center text-white hover:text-gray-300 px-2 py-2 rounded-xl hover:bg-[#2A2D2F] relative"
+            className={`mt-2 flex items-center justify-center px-2 py-2 rounded-xl relative transition-colors duration-200 ${
+              isNotifOpen ? "bg-[#7A27BC]" : "hover:bg-[#2A2D2F]"
+            }`}
             title="Notificaciones"
           >
-            <FontAwesomeIcon icon={faBell} className="h-9 w-9" />
+            <FontAwesomeIcon icon={faBell} className="h-9 w-9 text-white" />
             {unreadNotificationCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-[#E0B0FE] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {unreadNotificationCount}
               </span>
             )}
           </button>
-          <NavLink href={route("regular-posts.create")} active={route().current("regular-posts.create")} className="flex justify-center mt-4">
+
+          <NavLink href={route("regular-posts.create")} active={!isNotifOpen && route().current("regular-posts.create")} className="flex justify-center mt-4">
             <ArrowUpTrayIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("shops.show", { shop: user.shop.id })} active={route().current("shops.show")} className="flex justify-center">
+          <NavLink href={route("shops.show", { shop: user.shop.id })} active={!isNotifOpen && route().current("shops.show")} className="flex justify-center">
             <FontAwesomeIcon icon={faStore} className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("communities.index")} active={route().current("communities.index")} className="flex justify-center">
+          <NavLink href={route("communities.index")} active={!isNotifOpen && route().current("communities.index")} className="flex justify-center">
             <FontAwesomeIcon icon={faUsers} className="h-9 w-9" />
           </NavLink>
+
           {user.is_admin && (
             <div className="flex flex-col space-y-3 border-t border-gray-700 pt-3">
-              <NavLink href={route("users.index")} active={route().current("users.index")} className="flex justify-center">
+              <NavLink href={route("users.index")} active={!isNotifOpen && route().current("users.index")} className="flex justify-center">
                 <FontAwesomeIcon icon={faUsersGear} className="h-9 w-9" />
               </NavLink>
-              <NavLink href={route("regular-posts.index")} active={route().current("regular-posts.index")} className="flex justify-center">
+              <NavLink href={route("regular-posts.index")} active={!isNotifOpen && route().current("regular-posts.index")} className="flex justify-center">
                 <RectangleStackIcon className="h-9 w-9" />
               </NavLink>
-              <NavLink href={route("tags.index")} active={route().current("tags.index")} className="flex justify-center">
+              <NavLink href={route("tags.index")} active={!isNotifOpen && route().current("tags.index")} className="flex justify-center">
                 <SwatchIcon className="h-9 w-9" />
               </NavLink>
-              <NavLink href={route("socials.index")} active={route().current("socials.index")} className="flex justify-center">
+              <NavLink href={route("socials.index")} active={!isNotifOpen && route().current("socials.index")} className="flex justify-center">
                 <AtSymbolIcon className="h-9 w-9" />
               </NavLink>
             </div>
           )}
+
           <div className="flex justify-center">
             <button onClick={() => setIsModalOpen(true)} className="flex justify-center hover:text-gray-300 text-sm px-2 py-2 rounded hover:bg-[#2A2D2F]">
               <Cog8ToothIcon className="h-9 w-9" />

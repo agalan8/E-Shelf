@@ -461,7 +461,8 @@ class CommunityController extends Controller
     {
         $community = Community::with(['memberships' => function ($query) {
             $query->where('community_role_id', '!=', 4);
-        }, 'memberships.user.profileImage', 'memberships.user.backgroundImage'])->findOrFail($communityId);
+        }, 'memberships.user.profileImage', 'memberships.user.backgroundImage', 'profileImage',
+            'backgroundImage',])->findOrFail($communityId);
 
         $community->getTotalMembers = $community->getTotalMembers();
         $community->getTotalPosts = $community->getTotalPosts();
