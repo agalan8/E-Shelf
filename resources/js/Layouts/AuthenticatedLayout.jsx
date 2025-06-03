@@ -120,7 +120,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
             <ApplicationLogo className="block h-9 w-auto fill-current text-white" />
           </Link>
         </div>
-        <div className="flex-1 overflow-y-auto py-4 px-2 space-y-3 flex flex-col items-center">
+        <div className="flex-1 overflow-y-auto py-4 px-1 space-y-2 flex flex-col items-center">
           <NavLink title="Home" href={route("posts-seguidos")} active={!isNotifOpen && route().current("posts-seguidos")} className="flex justify-center">
             <HomeIcon className="h-9 w-9" />
           </NavLink>

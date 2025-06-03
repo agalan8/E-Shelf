@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Scrollbar en navegadores WebKit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 4px; /* ancho de la barra */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #c9c9c7;
+  border-radius: 6px;
+}
