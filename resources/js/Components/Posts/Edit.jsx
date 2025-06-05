@@ -194,12 +194,18 @@ const Edit = ({ post, onClose, tags }) => {
               <LoadScript googleMapsApiKey="AIzaSyCTy_UZS2tqbYIoYFUDkreos9Q8vq4pkEc" libraries={libraries}>
                 <StandaloneSearchBox onLoad={ref => (searchBoxRef.current = ref)} onPlacesChanged={onPlacesChanged}>
                   <input
-                    type="text"
-                    placeholder="Escribe una ubicación"
-                    className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] text-white"
-                    value={localizacion}
-                    readOnly
-                  />
+  type="text"
+  placeholder="Escribe una ubicación"
+  className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] text-white"
+  value={localizacion}
+  onChange={(e) => setLocalizacion(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  }}
+/>
+
                 </StandaloneSearchBox>
 
                 <GoogleMap
