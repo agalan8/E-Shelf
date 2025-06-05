@@ -138,7 +138,7 @@ const Post = ({
             {postType === "shared" && (
                 <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg select-none z-10 max-w-[140px] text-center">
                     Compartido por <br />
-                    <span className="font-bold">{post.post.user.name}</span>
+                    <span className="font-bold">{post.shared_by.name}</span>
                 </div>
             )}
 
