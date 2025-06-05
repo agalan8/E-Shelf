@@ -76,9 +76,9 @@ class UserController extends Controller
     {
 
         return Inertia::render('Users/Show', [
-            'user' => $user->load('profileImage', 'backgroundImage', 'shop'),
-            'followers' => $user->getTotalFollowers(),
-            'following' => $user->getTotalFollowing(),
+            'user' => $user->load('profileImage', 'backgroundImage', 'shop', 'followers.profileImage', 'followers.backgroundImage', 'following.profileImage', 'following.backgroundImage'),
+            'totalFollowers' => $user->getTotalFollowers(),
+            'totalFollowing' => $user->getTotalFollowing(),
             'posts' => $user->posts()->with('posteable.image','posteable.tags','posteable.communities', 'posteable', 'user', 'user.profileImage', 'user.backgroundImage', 'posteable.post', 'posteable.post.user', 'posteable.post.user.profileImage', 'posteable.post.user.backgroundImage', 'posteable.comments', 'posteable.comments.user', 'posteable.comments.user.profileImage', 'posteable.comments.user.backgroundImage', 'posteable.comments.replies', 'posteable.comments.replies.user', 'posteable.comments.replies.user.profileImage', 'posteable.comments.replies.user.backgroundImage')->orderBy('created_at', 'desc')
             ->get()->map(function ($post) {
             $post->getTotalLikes = $post->posteable->getTotalLikes();
