@@ -75,6 +75,7 @@ class CommentController extends Controller
         } else if ($request->commentable_type === Comment::class) {
 
             $parentComment = Comment::findOrFail($request->commentable_id);
+            $post = RegularPost::findOrFail($parentComment->commentable_id);
             $comment->commentable()->associate($parentComment);
         }
 

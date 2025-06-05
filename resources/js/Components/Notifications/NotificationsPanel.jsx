@@ -18,25 +18,25 @@ export default function NotificationsPanel({ notifications: initialNotifications
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const loadMore = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const offset = notifications.length;
-      const res = await axios.get(`/notifications/more?offset=${offset}`);
-      if (res.data.length === 0) {
-        setHasMore(false);
-      } else {
-        setNotifications((prev) => [
-          ...prev,
-          ...res.data.map((n) => ({ ...n, isHiding: false })),
-        ]);
-      }
-    } catch (error) {
-      console.error("Error al cargar más notificaciones", error);
+const loadMore = async () => {
+  if (loading) return;
+  setLoading(true);
+  try {
+    const res = await axios.get(`/notifications/more`);
+    if (res.data.length === 0) {
+      setHasMore(false);
+    } else {
+      setNotifications((prev) => [
+        ...prev,
+        ...res.data.map((n) => ({ ...n, isHiding: false })),
+      ]);
     }
-    setLoading(false);
-  };
+  } catch (error) {
+    console.error("Error al cargar más notificaciones", error);
+  }
+  setLoading(false);
+};
+
 
   const markAsRead = (id) => {
     setNotifications((prev) =>
