@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
-import { router, Link } from '@inertiajs/react';
+import { router, Link, Head } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
 import Image from '@/Components/Image';
-import { Head } from '@inertiajs/react';
-import Post from '@/Components/Posts/Post'; // Importamos el componente de Post
+import Post from '@/Components/Posts/Post';
+import FollowersModal from '@/Components/Users/FollowersModal';
+import FollowingModal from '@/Components/Users/FollowingModal';
 
-const Show = ({ user, auth, followers, following, posts, tags }) => {
+const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
   const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
   const isFollowingInitial = auth.user?.following?.some(f => f.id === user.id);
   const [followingState, setFollowing] = useState(isFollowingInitial);
   const [hovering, setHovering] = useState(false);
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [showFollowingModal, setShowFollowingModal] = useState(false);
 
-  console.log('posts:',posts)
 
   const handleFollowToggle = () => {
     if (!auth.user) return;
@@ -24,12 +26,12 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
     if (followingState) {
       router.delete(`/unfollow/${user.id}`, {
         onSuccess: () => setFollowing(false),
-        preserveScroll: true
+        preserveScroll: true,
       });
     } else {
       router.post('/follow', { followed_user_id: user.id }, {
         onSuccess: () => setFollowing(true),
-        preserveScroll: true
+        preserveScroll: true,
       });
     }
   };
@@ -61,8 +63,9 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
 
   return (
     <Layout subnav={<UsersSubnav currentUser={user} />}>
+      <Head title={user.name} />
       <div className="user-profile">
-        {/* Fondo de portada - Se extiende hasta el contenedor de las publicaciones */}
+        {/* Fondo de portada */}
         <div className="w-full h-[500px] overflow-hidden flex items-center justify-center bg-white relative">
           {user.background_image?.path_original ? (
             <Image
@@ -74,7 +77,7 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
             <div className="w-full h-full bg-white" />
           )}
 
-          {/* Franja con efecto blur */}
+          {/* Franja inferior con imagen y datos */}
           <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 backdrop-blur-sm flex items-center py-6">
             <div className="flex items-center gap-6 ml-6">
               {/* Imagen de perfil */}
@@ -93,19 +96,22 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
                 </div>
               )}
 
-              {/* Contadores de Seguidores y Seguidos */}
+              {/* Contadores */}
               <div className="flex items-center gap-8">
-                <div className="text-center">
-                  <p className="font-semibold text-white">{followers}</p>
+                {/* Seguidores */}
+                <div className="text-center cursor-pointer" onClick={() => setShowFollowersModal(true)}>
+                  <p className="font-semibold text-white">{totalFollowers}</p>
                   <p className="text-base text-white">Seguidores</p>
                 </div>
-                <div className="text-center">
-                  <p className="font-semibold text-white">{following}</p>
+
+                {/* Siguiendo */}
+                <div className="text-center cursor-pointer" onClick={() => setShowFollowingModal(true)}>
+                  <p className="font-semibold text-white">{totalFollowing}</p>
                   <p className="text-base text-white">Siguiendo</p>
                 </div>
               </div>
 
-              {/* Icono de seguir */}
+              {/* Botón seguir */}
               <div className="flex items-center">
                 {renderIcon()}
               </div>
@@ -114,7 +120,7 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
         </div>
       </div>
 
-      {/* Mis publicaciones debajo de la biografía */}
+      {/* Publicaciones */}
       <div className="mt-1">
         {posts.length === 0 ? (
           <p>No tienes publicaciones aún.</p>
@@ -125,13 +131,35 @@ const Show = ({ user, auth, followers, following, posts, tags }) => {
                 {posts
                   .filter((_, index) => index % 3 === colIndex)
                   .map((post) => (
-                    <Post key={post.posteable.id} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} isSharedByUser={post.isSharedByUser} getTotalShares={post.getTotalShares} post={post.posteable} tags={tags} />
+                    <Post
+                      key={post.posteable.id}
+                      isLikedByUser={post.isLikedByUser}
+                      getTotalLikes={post.getTotalLikes}
+                      isSharedByUser={post.isSharedByUser}
+                      getTotalShares={post.getTotalShares}
+                      post={post.posteable}
+                      tags={tags}
+                    />
                   ))}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Modal de seguidores */}
+      <FollowersModal
+        isOpen={showFollowersModal}
+        onClose={() => setShowFollowersModal(false)}
+        followers={user.followers}
+      />
+
+      {/* Modal de siguiendo */}
+      <FollowingModal
+        isOpen={showFollowingModal}
+        onClose={() => setShowFollowingModal(false)}
+        following={user.following}
+      />
     </Layout>
   );
 };
