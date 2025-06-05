@@ -70,7 +70,7 @@ export default function PostIndex() {
             } else if (sortField === 'created_at') {
                 return sortDirection === 'asc' ? new Date(a.created_at) - new Date(b.created_at) : new Date(b.created_at) - new Date(a.created_at);
             } else if (sortField === 'user_name') {
-                return sortDirection === 'asc' ? a.user.name.localeCompare(b.user.name) : b.user.name.localeCompare(a.user.name);
+                return sortDirection === 'asc' ? a.post.user.name.localeCompare(b.post.user.name) : b.post.user.name.localeCompare(a.post.user.name);
             }
             return 0;
         });
