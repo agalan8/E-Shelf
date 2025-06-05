@@ -46,10 +46,12 @@ class RegularPostController extends Controller
         $user = User::findOrFail(Auth::id());
 
         $communities = $user->communityMemberships()
+            ->where('community_role_id', '!=', 4) // aplica el filtro aquí
             ->with('community') // carga la relación community
             ->get()
             ->pluck('community') // extrae las comunidades
-            ->filter(); // elimina posibles null (por seguridad)
+            ->filter(); // elimina posibles null por seguridad
+
         return Inertia::render('Posts/Create', [
             'tags' => Tag::all(),
             'communities' => $communities,

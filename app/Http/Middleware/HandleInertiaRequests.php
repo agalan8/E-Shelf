@@ -28,6 +28,7 @@ class HandleInertiaRequests extends Middleware
             }
 
             $communities = $user->communityMemberships()
+                ->where('community_role_id', '!=', 4)
                 ->with('community') // carga la relación community
                 ->get()
                 ->pluck('community') // extrae las comunidades
