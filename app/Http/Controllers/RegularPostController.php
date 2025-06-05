@@ -15,6 +15,7 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image as ImageIntervention;
@@ -63,13 +64,15 @@ class RegularPostController extends Controller
      */
     public function store(StoreRegularPostRequest $request)
     {
-
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'localizacion' => 'required|string|max:255',
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'localizacion' => 'nullable|string|max:255',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
         ]);
+
 
         DB::beginTransaction();
 
@@ -94,8 +97,8 @@ class RegularPostController extends Controller
             $path_medium = "public/posts/{$RegularPost->id}/medium/{$RegularPost->id}.{$extension}";
             $path_small = "public/posts/{$RegularPost->id}/small/{$RegularPost->id}.{$extension}";
 
-            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
-            $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
+            $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
+            $small_Image = ImageIntervention::read($imagen)->scale(height: 450)->encode();
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
 
 
@@ -103,13 +106,14 @@ class RegularPostController extends Controller
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
             Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
-
             $image = new Image([
                 'path_original' => $path_aws . $path_original,
                 'path_medium' => $path_aws . $path_medium,
                 'path_small' => $path_aws . $path_small,
                 'type' => 'RegularPost',
                 'localizacion' => $request->localizacion,
+                'latitud' => $request->latitud,
+                'longitud' => $request->longitud,
 
             ]);
 
@@ -118,7 +122,7 @@ class RegularPostController extends Controller
 
         $tags = $request->input('tags');
 
-        if($tags != null) {
+        if ($tags != null) {
             foreach ($tags as $tag) {
                 $RegularPost->tags()->attach(Tag::findOrFail($tag));
             }
@@ -126,13 +130,13 @@ class RegularPostController extends Controller
 
         $communities = $request->input('communities');
 
-        if($communities != null) {
+        if ($communities != null) {
             foreach ($communities as $community) {
                 $RegularPost->communities()->attach(Community::findOrFail($community));
             }
         }
 
-        if($request->has('add_to_store')){
+        if ($request->has('add_to_store')) {
 
             $user = User::findOrFail(Auth::user()->id);
 
@@ -156,18 +160,17 @@ class RegularPostController extends Controller
 
             $post->posteable()->associate($ShopPost);
             $post->save();
-
         }
 
         DB::commit();
 
         $user = User::findOrFail(Auth::id());
 
-        if($request->has('add_to_store')) {
+        if ($request->has('add_to_store')) {
             return redirect()->route('shops.show', $user->shop->id);
         }
 
-        return redirect()->route('users.show', $user );
+        return redirect()->route('users.show', $user);
     }
 
     /**
@@ -196,6 +199,8 @@ class RegularPostController extends Controller
             'descripcion' => 'required|string',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'localizacion' => 'nullable|string|max:255',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
         ]);
 
         DB::beginTransaction();
@@ -205,6 +210,8 @@ class RegularPostController extends Controller
         $RegularPost->titulo = $request->titulo;
         $RegularPost->descripcion = $request->descripcion;
         $RegularPost->image->localizacion = $request->localizacion;
+        $RegularPost->image->latitud = $request->latitud;
+        $RegularPost->image->longitud = $request->longitud;
 
         // Actualizar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
@@ -225,8 +232,8 @@ class RegularPostController extends Controller
             // Eliminar del bucket S3
             Storage::disk('s3')->delete($paths);
 
-            $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
-            $small_Image = ImageIntervention::read($imagen)->scale( height: 450)->encode();
+            $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
+            $small_Image = ImageIntervention::read($imagen)->scale(height: 450)->encode();
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
 
 
@@ -235,10 +242,14 @@ class RegularPostController extends Controller
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
             Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
+
+
+
+
             // Actualizamos la foto asociada al post
             $RegularPost->image()->update([
                 'path_original' => $path_aws . $path_original,
-                'path_medium' =>$path_aws . $path_medium,
+                'path_medium' => $path_aws . $path_medium,
                 'path_small' => $path_aws . $path_small,
             ]);
         }
@@ -248,7 +259,7 @@ class RegularPostController extends Controller
 
         $RegularPost->tags()->detach();
 
-        if($tags != null) {
+        if ($tags != null) {
             foreach ($tags as $tag) {
                 $RegularPost->tags()->attach(Tag::findOrFail($tag));
             }
@@ -258,7 +269,7 @@ class RegularPostController extends Controller
 
         $communities = $request->input('communities');
 
-        if($communities != null) {
+        if ($communities != null) {
             foreach ($communities as $community) {
                 $RegularPost->communities()->attach(Community::findOrFail($community));
             }

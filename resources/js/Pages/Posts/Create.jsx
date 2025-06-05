@@ -5,6 +5,25 @@ import { ArrowUpTrayIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStore } from "@fortawesome/free-solid-svg-icons";
 
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  StandaloneSearchBox,
+} from "@react-google-maps/api";
+
+const containerStyle = {
+  width: "100%",
+  height: "300px",
+};
+
+const centerDefault = {
+  lat: 40.4168,
+  lng: -3.7038,
+};
+
+const libraries = ["places"];
+
 const PostCreate = () => {
   const { tags, communities } = usePage().props;
 
@@ -29,6 +48,12 @@ const PostCreate = () => {
 
   // Estado para el input de precio
   const [precio, setPrecio] = useState("");
+
+  // Estado para latitud y longitud seleccionadas en el mapa
+  const [locationCoords, setLocationCoords] = useState({ lat: null, lng: null });
+
+  // Ref para SearchBox de Google Maps
+  const searchBoxRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -82,6 +107,66 @@ const PostCreate = () => {
     );
   };
 
+  // Cuando cambia la búsqueda de lugares en Google Maps
+const onPlacesChanged = () => {
+  const places = searchBoxRef.current.getPlaces();
+  if (places.length === 0) return;
+
+  const place = places[0];
+  const location = place.geometry.location;
+  const lat = location.lat();
+  const lng = location.lng();
+
+  // Extraer ciudad (locality) y país del address_components
+  let city = "";
+  let country = "";
+
+  place.address_components.forEach((component) => {
+    const types = component.types;
+    if (types.includes("locality")) {
+      city = component.long_name;
+    }
+    if (types.includes("country")) {
+      country = component.long_name;
+    }
+  });
+
+  const formatted = `${city}${city && country ? ", " : ""}${country}`;
+
+  setLocationCoords({ lat, lng });
+  setLocalizacion(formatted || `${lat},${lng}`);
+};
+
+  // Cuando el usuario clica en el mapa para poner el marcador
+ const onMapClick = (e) => {
+  const lat = e.latLng.lat();
+  const lng = e.latLng.lng();
+
+  setLocationCoords({ lat, lng });
+
+      const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng }, language: "es" }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const place = results[0];
+        let city = "";
+        let country = "";
+
+        place.address_components.forEach((component) => {
+          if (component.types.includes("locality")) {
+            city = component.long_name;
+          }
+          if (component.types.includes("country")) {
+            country = component.long_name;
+          }
+        });
+
+        const formatted = `${city}${city && country ? ", " : ""}${country}`;
+        setLocalizacion(formatted || `${lat},${lng}`);
+      }
+    });
+
+};
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -91,6 +176,11 @@ const PostCreate = () => {
     formData.append("titulo", titulo);
     formData.append("descripcion", descripcion);
     formData.append("localizacion", localizacion);
+
+    if (locationCoords.lat && locationCoords.lng) {
+      formData.append("latitud", locationCoords.lat);
+      formData.append("longitud", locationCoords.lng);
+    }
 
     selectedTags.forEach((tag) => {
       formData.append("tags[]", tag.id);
@@ -152,10 +242,10 @@ const PostCreate = () => {
             </div>
 
             {/* Contenedor formulario con alto completo y flex */}
-            <div className="w-[35%] bg-[#303136] p-6 shadow h-[90vh] flex flex-col">
+            <div className="w-[35%] bg-[#303136] p-1 shadow h-[90vh] flex flex-col">
               <form
                 onSubmit={handleSubmit}
-                className="space-y-4 flex flex-col flex-grow overflow-y-auto"
+                className="space-y-4 flex flex-col flex-grow overflow-y-auto p-6"
               >
                 <div>
                   <label
@@ -191,20 +281,39 @@ const PostCreate = () => {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="localizacion"
-                    className="block text-lg font-semibold text-white"
-                  >
+                  <label className="block text-lg font-semibold text-white">
                     Localización
                   </label>
-                  <input
-                    type="text"
-                    id="localizacion"
-                    value={localizacion}
-                    onChange={(e) => setLocalizacion(e.target.value)}
-                    className="w-full mt-2 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
-                    required
-                  />
+
+                  <LoadScript
+                    googleMapsApiKey="AIzaSyCTy_UZS2tqbYIoYFUDkreos9Q8vq4pkEc"
+                    libraries={libraries}
+                  >
+                    <StandaloneSearchBox
+            onLoad={(ref) => (searchBoxRef.current = ref)}
+            onPlacesChanged={onPlacesChanged}
+            >
+            <input
+                type="text"
+                placeholder="Escribe una ubicación"
+                className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                value={localizacion}    // <- Aquí va value, no defaultValue
+                onChange={(e) => setLocalizacion(e.target.value)}
+            />
+            </StandaloneSearchBox>
+
+
+                    <GoogleMap
+                      mapContainerStyle={containerStyle}
+                      center={locationCoords.lat && locationCoords.lng ? locationCoords : centerDefault}
+                      zoom={locationCoords.lat && locationCoords.lng ? 8 : 8}
+                      onClick={onMapClick}
+                    >
+                      {locationCoords.lat && locationCoords.lng && (
+                        <Marker position={locationCoords} />
+                      )}
+                    </GoogleMap>
+                  </LoadScript>
                 </div>
 
                 <div>
@@ -254,8 +363,8 @@ const PostCreate = () => {
                           .map((tag) => (
                             <div
                               key={tag.id}
-                              className="cursor-pointer p-2 hover:bg-opacity-80 bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
                               onClick={() => handleTagSelect(tag)}
+                              className="p-2 cursor-pointer hover:bg-gray-200"
                             >
                               {tag.nombre}
                             </div>
@@ -270,15 +379,15 @@ const PostCreate = () => {
                     Comunidades
                   </label>
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {selectedCommunities.map((com) => (
+                    {selectedCommunities.map((community) => (
                       <div
-                        key={com.id}
+                        key={community.id}
                         className="bg-gray-200 px-2 py-1 rounded flex items-center space-x-2"
                       >
-                        <span>{com.nombre}</span>
+                        <span>{community.nombre}</span>
                         <button
                           type="button"
-                          onClick={() => handleCommunityRemove(com.id)}
+                          onClick={() => handleCommunityRemove(community.id)}
                           className="text-red-500"
                         >
                           ✕
@@ -300,24 +409,26 @@ const PostCreate = () => {
                       <div className="absolute w-full mt-1 border rounded bg-white shadow-md z-10 max-h-40 overflow-y-auto">
                         <input
                           type="text"
-                          placeholder="Buscar comunidades..."
+                          placeholder="Buscar..."
                           value={communitySearchTerm}
-                          onChange={(e) => setCommunitySearchTerm(e.target.value)}
+                          onChange={(e) =>
+                            setCommunitySearchTerm(e.target.value)
+                          }
                           className="w-full p-2 border-b rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
                         />
                         {communities
-                          .filter((com) =>
-                            com.nombre
+                          .filter((community) =>
+                            community.nombre
                               .toLowerCase()
                               .includes(communitySearchTerm.toLowerCase())
                           )
-                          .map((com) => (
+                          .map((community) => (
                             <div
-                              key={com.id}
-                              className="cursor-pointer p-2 hover:bg-opacity-80 bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
-                              onClick={() => handleCommunitySelect(com)}
+                              key={community.id}
+                              onClick={() => handleCommunitySelect(community)}
+                              className="p-2 cursor-pointer hover:bg-gray-200"
                             >
-                              {com.nombre}
+                              {community.nombre}
                             </div>
                           ))}
                       </div>
@@ -374,14 +485,12 @@ const PostCreate = () => {
                     />
                   </div>
 
-                  <div className="mt-8 flex justify-end">
-                    <button
-                      type="submit"
-                      className="bg-blue-500 text-white py-3 px-6 rounded font-bold hover:bg-blue-600"
-                    >
-                      Crear Publicación
-                    </button>
-                  </div>
+                <button
+                  type="submit"
+                  className="bg-purple-600 text-white rounded px-4 py-2 mt-5 hover:bg-purple-700"
+                >
+                  Crear publicación
+                </button>
                 </div>
               </form>
             </div>
