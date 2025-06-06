@@ -194,6 +194,7 @@ class RegularPostController extends Controller
      */
     public function update(UpdateRegularPostRequest $request, $id)
     {
+        dd($request->all());
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',

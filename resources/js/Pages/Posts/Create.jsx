@@ -4,7 +4,6 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { ArrowUpTrayIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStore } from "@fortawesome/free-solid-svg-icons";
-
 import {
   GoogleMap,
   LoadScript,
@@ -12,66 +11,44 @@ import {
   StandaloneSearchBox,
 } from "@react-google-maps/api";
 
-const containerStyle = {
-  width: "100%",
-  height: "300px",
-};
-
-const centerDefault = {
-  lat: 40.4168,
-  lng: -3.7038,
-};
-
+const containerStyle = { width: "100%", height: "300px" };
+const centerDefault = { lat: 40.4168, lng: -3.7038 };
 const libraries = ["places"];
 
 const PostCreate = () => {
   const { tags, communities } = usePage().props;
-
   const [imageFile, setImageFile] = useState(null);
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [localizacion, setLocalizacion] = useState("");
+  const [ultimaLocalizacion, setUltimaLocalizacion] = useState("");
   const [imageUploaded, setImageUploaded] = useState(false);
-
   const [selectedTags, setSelectedTags] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef();
-
   const [selectedCommunities, setSelectedCommunities] = useState([]);
   const [communitySearchTerm, setCommunitySearchTerm] = useState("");
   const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] = useState(false);
   const communityDropdownRef = useRef();
-
-  // Estado para el botón "Añadir a tienda"
   const [isStoreActive, setIsStoreActive] = useState(false);
-
-  // Estado para el input de precio
   const [precio, setPrecio] = useState("");
-
-  // Estado para latitud y longitud seleccionadas en el mapa
   const [locationCoords, setLocationCoords] = useState({ lat: null, lng: null });
-
-  // Ref para SearchBox de Google Maps
   const searchBoxRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
         setIsDropdownOpen(false);
-      }
       if (
         communityDropdownRef.current &&
-        !communityDropdownRef.current.contains(event.target)
-      ) {
+        !communityDropdownRef.current.contains(e.target)
+      )
         setIsCommunityDropdownOpen(false);
-      }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
+    return () =>
       document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
   const handleImageUpload = (e) => {
@@ -86,117 +63,98 @@ const PostCreate = () => {
   };
 
   const handleTagSelect = (tag) => {
-    if (!selectedTags.some((t) => t.id === tag.id)) {
+    if (!selectedTags.some((t) => t.id === tag.id))
       setSelectedTags([...selectedTags, tag]);
-    }
+  };
+  const handleTagRemove = (id) =>
+    setSelectedTags(selectedTags.filter((t) => t.id !== id));
+
+  const handleCommunitySelect = (c) => {
+    if (!selectedCommunities.some((x) => x.id === c.id))
+      setSelectedCommunities([...selectedCommunities, c]);
+  };
+  const handleCommunityRemove = (id) =>
+    setSelectedCommunities(selectedCommunities.filter((c) => c.id !== id));
+
+  const onPlacesChanged = () => {
+    const places = searchBoxRef.current.getPlaces();
+    if (!places.length) return;
+    const place = places[0];
+    const loc = place.geometry.location;
+    const lat = loc.lat(), lng = loc.lng();
+
+    let city = "", country = "";
+    place.address_components.forEach((comp) => {
+      if (comp.types.includes("locality")) city = comp.long_name;
+      if (comp.types.includes("country")) country = comp.long_name;
+    });
+    const formatted = `${city}${city && country ? ", " : ""}${country}`;
+
+    setLocationCoords({ lat, lng });
+    setLocalizacion(formatted || `${lat},${lng}`);
+    setUltimaLocalizacion(formatted || `${lat},${lng}`);
   };
 
-  const handleTagRemove = (tagId) => {
-    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId));
-  };
+  const onMapClick = (e) => {
+    const lat = e.latLng.lat(), lng = e.latLng.lng();
+    setLocationCoords({ lat, lng });
 
-  const handleCommunitySelect = (community) => {
-    if (!selectedCommunities.some((c) => c.id === community.id)) {
-      setSelectedCommunities([...selectedCommunities, community]);
-    }
-  };
-
-  const handleCommunityRemove = (communityId) => {
-    setSelectedCommunities(
-      selectedCommunities.filter((c) => c.id !== communityId)
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode(
+      { location: { lat, lng }, language: "es" },
+      (results, status) => {
+        if (status === "OK" && results[0]) {
+          const place = results[0];
+          let city = "", country = "";
+          place.address_components.forEach((c) => {
+            if (c.types.includes("locality")) city = c.long_name;
+            if (c.types.includes("country")) country = c.long_name;
+          });
+          const formatted = `${city}${city && country ? ", " : ""}${country}`;
+          setLocalizacion(formatted || `${lat},${lng}`);
+          setUltimaLocalizacion(formatted || `${lat},${lng}`);
+        }
+      }
     );
   };
 
-  // Cuando cambia la búsqueda de lugares en Google Maps
-const onPlacesChanged = () => {
-  const places = searchBoxRef.current.getPlaces();
-  if (places.length === 0) return;
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const formData = new FormData();
 
-  const place = places[0];
-  const location = place.geometry.location;
-  const lat = location.lat();
-  const lng = location.lng();
+  if (imageFile) formData.append("imagen", imageFile);
+  formData.append("titulo", titulo);
+  formData.append("descripcion", descripcion);
 
-  // Extraer ciudad (locality) y país del address_components
-  let city = "";
-  let country = "";
+  const trimmedLoc = localizacion.trim();
+  const trimmedUltimaLoc = ultimaLocalizacion.trim();
 
-  place.address_components.forEach((component) => {
-    const types = component.types;
-    if (types.includes("locality")) {
-      city = component.long_name;
-    }
-    if (types.includes("country")) {
-      country = component.long_name;
-    }
-  });
+  if (!trimmedLoc || trimmedLoc !== trimmedUltimaLoc) {
+    // Input vacío o modificado: enviar última localización válida
+    formData.append("localizacion", trimmedUltimaLoc);
+  } else {
+    // No ha sido modificado: enviar tal cual
+    formData.append("localizacion", trimmedLoc);
+  }
 
-  const formatted = `${city}${city && country ? ", " : ""}${country}`;
+  if (locationCoords.lat && locationCoords.lng) {
+    formData.append("latitud", locationCoords.lat);
+    formData.append("longitud", locationCoords.lng);
+  }
 
-  setLocationCoords({ lat, lng });
-  setLocalizacion(formatted || `${lat},${lng}`);
+  selectedTags.forEach((t) => formData.append("tags[]", t.id));
+  selectedCommunities.forEach((c) =>
+    formData.append("communities[]", c.id)
+  );
+
+  if (isStoreActive) {
+    formData.append("add_to_store", "1");
+    formData.append("precio", precio);
+  }
+
+  router.post(route("regular-posts.store"), formData);
 };
 
-  // Cuando el usuario clica en el mapa para poner el marcador
- const onMapClick = (e) => {
-  const lat = e.latLng.lat();
-  const lng = e.latLng.lng();
-
-  setLocationCoords({ lat, lng });
-
-      const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: { lat, lng }, language: "es" }, (results, status) => {
-      if (status === "OK" && results[0]) {
-        const place = results[0];
-        let city = "";
-        let country = "";
-
-        place.address_components.forEach((component) => {
-          if (component.types.includes("locality")) {
-            city = component.long_name;
-          }
-          if (component.types.includes("country")) {
-            country = component.long_name;
-          }
-        });
-
-        const formatted = `${city}${city && country ? ", " : ""}${country}`;
-        setLocalizacion(formatted || `${lat},${lng}`);
-      }
-    });
-
-};
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    if (imageFile) {
-      formData.append("imagen", imageFile);
-    }
-    formData.append("titulo", titulo);
-    formData.append("descripcion", descripcion);
-    formData.append("localizacion", localizacion);
-
-    if (locationCoords.lat && locationCoords.lng) {
-      formData.append("latitud", locationCoords.lat);
-      formData.append("longitud", locationCoords.lng);
-    }
-
-    selectedTags.forEach((tag) => {
-      formData.append("tags[]", tag.id);
-    });
-
-    selectedCommunities.forEach((community) => {
-      formData.append("communities[]", community.id);
-    });
-
-    if (isStoreActive) {
-      formData.append("add_to_store", "1");
-      formData.append("precio", precio);
-    }
-
-    router.post(route("regular-posts.store"), formData);
-  };
 
   return (
     <AuthenticatedLayout
@@ -207,7 +165,7 @@ const onPlacesChanged = () => {
       }
     >
       <Head title="Crear publicación" />
-      <div className="w-[100%] mx-auto">
+      <div className="w-full mx-auto">
         {!imageUploaded ? (
           <div className="flex flex-col items-center justify-center space-y-4">
             <h1 className="text-6xl font-bold text-white mt-40">
@@ -241,22 +199,18 @@ const onPlacesChanged = () => {
               </button>
             </div>
 
-            {/* Contenedor formulario con alto completo y flex */}
             <div className="w-[35%] bg-[#303136] p-1 shadow h-[90vh] flex flex-col">
               <form
                 onSubmit={handleSubmit}
                 className="space-y-4 flex flex-col flex-grow overflow-y-auto p-6"
               >
+                {/* Título */}
                 <div>
-                  <label
-                    htmlFor="titulo"
-                    className="block text-lg font-semibold text-white"
-                  >
+                  <label className="block text-lg font-semibold text-white">
                     Título
                   </label>
                   <input
                     type="text"
-                    id="titulo"
                     value={titulo}
                     onChange={(e) => setTitulo(e.target.value)}
                     className="w-full mt-2 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
@@ -264,15 +218,12 @@ const onPlacesChanged = () => {
                   />
                 </div>
 
+                {/* Descripción */}
                 <div>
-                  <label
-                    htmlFor="descripcion"
-                    className="block text-lg font-semibold text-white"
-                  >
+                  <label className="block text-lg font-semibold text-white">
                     Descripción
                   </label>
                   <textarea
-                    id="descripcion"
                     value={descripcion}
                     onChange={(e) => setDescripcion(e.target.value)}
                     className="w-full mt-2 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
@@ -280,33 +231,36 @@ const onPlacesChanged = () => {
                   />
                 </div>
 
+                {/* Localización */}
                 <div>
                   <label className="block text-lg font-semibold text-white">
                     Localización
                   </label>
-
                   <LoadScript
                     googleMapsApiKey="AIzaSyCTy_UZS2tqbYIoYFUDkreos9Q8vq4pkEc"
                     libraries={libraries}
                   >
                     <StandaloneSearchBox
-            onLoad={(ref) => (searchBoxRef.current = ref)}
-            onPlacesChanged={onPlacesChanged}
-            >
-            <input
-                type="text"
-                placeholder="Escribe una ubicación"
-                className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
-                value={localizacion}    // <- Aquí va value, no defaultValue
-                onChange={(e) => setLocalizacion(e.target.value)}
-            />
-            </StandaloneSearchBox>
-
+                      onLoad={(ref) => (searchBoxRef.current = ref)}
+                      onPlacesChanged={onPlacesChanged}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Escribe una ubicación"
+                        value={localizacion}
+                        onChange={(e) => setLocalizacion(e.target.value)}
+                        className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                      />
+                    </StandaloneSearchBox>
 
                     <GoogleMap
                       mapContainerStyle={containerStyle}
-                      center={locationCoords.lat && locationCoords.lng ? locationCoords : centerDefault}
-                      zoom={locationCoords.lat && locationCoords.lng ? 8 : 8}
+                      center={
+                        locationCoords.lat && locationCoords.lng
+                          ? locationCoords
+                          : centerDefault
+                      }
+                      zoom={8}
                       onClick={onMapClick}
                     >
                       {locationCoords.lat && locationCoords.lng && (
@@ -316,7 +270,8 @@ const onPlacesChanged = () => {
                   </LoadScript>
                 </div>
 
-                <div>
+                {/* Etiquetas y comunidades */}
+<div>
                   <label className="block text-lg font-semibold text-white">
                     Etiquetas
                   </label>
@@ -435,46 +390,36 @@ const onPlacesChanged = () => {
                     )}
                   </div>
                 </div>
-
+                {/* Tienda y precio */}
                 <div className="mt-4">
                   <div className="flex justify-center mt-3 mb-4 min-h-[50px]">
                     <button
                       type="button"
                       onClick={() => {
-                        if (isStoreActive) {
-                          setPrecio(""); // Limpia precio si se desactiva
-                        }
+                        if (isStoreActive) setPrecio("");
                         setIsStoreActive(!isStoreActive);
                       }}
-                      className={`flex items-center gap-2 py-3 px-6 rounded-md font-bold transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7A27BC]
-                          ${
-                            isStoreActive
-                              ? "bg-[#7A27BC] text-white border border-[#7A27BC]"
-                              : "bg-transparent text-white border border-[#7A27BC] hover:text-white hover:scale-105"
-                          }
-                        `}
+                      className={`flex items-center gap-2 py-3 px-6 rounded-md font-bold transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7A27BC] ${
+                        isStoreActive
+                          ? "bg-[#7A27BC] text-white border border-[#7A27BC]"
+                          : "bg-transparent text-white border border-[#7A27BC] hover:scale-105"
+                      }`}
                       style={{ minWidth: "180px" }}
                     >
                       <FontAwesomeIcon icon={faStore} />
                       Añadir a tienda
                     </button>
                   </div>
-
-                  {/* Input precio con efecto */}
                   <div
                     className={`overflow-hidden transition-all duration-500 ease-in-out ${
                       isStoreActive ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <label
-                      htmlFor="precio"
-                      className="block text-lg font-semibold text-white mb-1"
-                    >
+                    <label className="block text-lg font-semibold text-white mb-1">
                       Precio
                     </label>
                     <input
                       type="number"
-                      id="precio"
                       min="0"
                       step="0.01"
                       value={precio}
@@ -485,12 +430,12 @@ const onPlacesChanged = () => {
                     />
                   </div>
 
-                <button
-                  type="submit"
-                  className="bg-purple-600 text-white rounded px-4 py-2 mt-5 hover:bg-purple-700"
-                >
-                  Crear publicación
-                </button>
+                  <button
+                    type="submit"
+                    className="bg-purple-600 text-white rounded px-4 py-2 mt-5 hover:bg-purple-700"
+                  >
+                    Crear publicación
+                  </button>
                 </div>
               </form>
             </div>
