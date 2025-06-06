@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import ImageInput from "@/Components/ImageInput";
@@ -8,11 +8,22 @@ export default function Create({ onClose }) {
   const [descripcion, setDescripcion] = useState("");
   const [imagePerfil, setImagePerfil] = useState(null);
   const [imageFondo, setImageFondo] = useState(null);
-  const [visibilidad, setVisibilidad] = useState("publico"); // público por defecto
+  const [visibilidad, setVisibilidad] = useState("publico");
   const [isVisible, setIsVisible] = useState(false);
+
+  const modalRef = useRef(null);
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 10);
+
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSubmit = (e) => {
@@ -22,7 +33,6 @@ export default function Create({ onClose }) {
     formData.append("nombre", nombre);
     formData.append("descripcion", descripcion);
     formData.append("visibilidad", visibilidad);
-
     if (imagePerfil) formData.append("profile_image", imagePerfil);
     if (imageFondo) formData.append("background_image", imageFondo);
 
@@ -43,6 +53,7 @@ export default function Create({ onClose }) {
       }`}
     >
       <div
+        ref={modalRef}
         className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl h-auto flex flex-col overflow-hidden relative transform transition-all duration-300 ${
           isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
         }`}
@@ -77,7 +88,6 @@ export default function Create({ onClose }) {
               />
             </div>
 
-            {/* Visibilidad */}
             <div>
               <label className="block text-sm font-medium mb-2">Visibilidad</label>
               <div className="flex gap-6">
@@ -106,9 +116,7 @@ export default function Create({ onClose }) {
               </div>
             </div>
 
-            {/* Inputs de imágenes uno al lado del otro */}
             <div className="flex flex-wrap gap-4">
-              {/* Imagen de perfil */}
               <div className="flex-1 min-w-[200px]">
                 <ImageInput
                   name="profile_image"
@@ -117,8 +125,6 @@ export default function Create({ onClose }) {
                   previewClassName="rounded-full w-[145px] h-[145px] object-cover"
                 />
               </div>
-
-              {/* Imagen de fondo */}
               <div className="flex-1 min-w-[200px]">
                 <ImageInput
                   name="background_image"
@@ -137,12 +143,13 @@ export default function Create({ onClose }) {
               >
                 Cancelar
               </button>
-              <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500"
-              >
-                Crear Comunidad
-              </button>
+<button
+  type="submit"
+  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-500"
+>
+  Crear Comunidad
+</button>
+
             </div>
           </form>
         </div>

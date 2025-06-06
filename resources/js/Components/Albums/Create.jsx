@@ -22,9 +22,6 @@ const Create = ({ onClose, posts }) => {
         }
     };
 
-    console.log("Selected Posts:", selectedPosts);
-    console.log("posts:", posts);
-
     const handleTogglePost = (postId) => {
         setSelectedPosts((prev) =>
             prev.includes(postId)
@@ -66,13 +63,25 @@ const Create = ({ onClose, posts }) => {
         setTimeout(() => onClose(), 300);
     };
 
+    // Función para cerrar modal al hacer clic en el overlay
+    const handleOverlayClick = () => {
+        handleClose();
+    };
+
+    // Evita que el clic dentro del modal propague al overlay
+    const handleModalClick = (e) => {
+        e.stopPropagation();
+    };
+
     return (
         <div
+            onClick={handleOverlayClick} // detecta clics en el fondo
             className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ${
                 isVisible ? "opacity-100" : "opacity-0"
             }`}
         >
             <div
+                onClick={handleModalClick} // evita cierre si se clickea dentro
                 className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-5xl h-[70vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
                     isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
                 }`}
@@ -110,19 +119,18 @@ const Create = ({ onClose, posts }) => {
                                         Descripción
                                     </label>
                                     <textarea
-                                        value={descripcion}
-                                        onChange={(e) =>
-                                            setDescripcion(e.target.value)
-                                        }
-                                        className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white"
-                                    />
+  value={descripcion}
+  onChange={(e) => setDescripcion(e.target.value)}
+  className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white h-[120px] resize-none"
+/>
+
                                 </div>
                                 <div className="text-center">
                                     {!imageUploaded ? (
                                         <div className="flex flex-col items-center space-y-3 mt-20">
                                             <label className="cursor-pointer border-dashed border-2 border-gray-500 rounded-md px-6 py-4 hover:bg-white hover:bg-opacity-10">
                                                 <span>
-                                                    Sube tu imagen de portada
+                                                    Sube una imagen de portada
                                                 </span>
                                                 <input
                                                     type="file"
@@ -174,7 +182,7 @@ const Create = ({ onClose, posts }) => {
                                             }
                                             className={`relative rounded cursor-pointer transition-all ${
                                                 selectedPosts.includes(post.posteable.id)
-                                                    ? "border-4 border-blue-500 bg-blue-100 bg-opacity-10"
+                                                    ? "border-4 border-purple-500 bg-purple-100 bg-opacity-10"
                                                     : "border border-gray-600"
                                             }`}
                                         >
@@ -194,7 +202,6 @@ const Create = ({ onClose, posts }) => {
                     )}
                 </div>
 
-                {/* Contenedor de botones en la parte inferior derecha */}
                 <div className="absolute bottom-6 right-6 flex gap-4">
                     {step === 1 && (
                         <>
@@ -208,7 +215,7 @@ const Create = ({ onClose, posts }) => {
                             <button
                                 type="button"
                                 onClick={handleNextStep}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500"
+                                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-500"
                             >
                                 Siguiente
                             </button>
@@ -226,7 +233,7 @@ const Create = ({ onClose, posts }) => {
                             <button
                                 type="submit"
                                 onClick={handleSubmit}
-                                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500"
+                                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-500"
                             >
                                 Crear Álbum
                             </button>

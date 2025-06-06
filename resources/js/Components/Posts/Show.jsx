@@ -245,60 +245,45 @@ const Show = ({
                             </Link>
                             {renderFollowIcon()}
                         </div>
-                        {!notification && (
-                            <div className="flex justify-between items-center py-4 px-8 bg-[#202225]">
-                                <div className="flex items-center space-x-2">
-                                    <button
-                                        onClick={() => toggleLike(post.id)}
-                                        onMouseEnter={() =>
-                                            setHoveredLike(true)
-                                        }
-                                        onMouseLeave={() =>
-                                            setHoveredLike(false)
-                                        }
-                                        className="text-xl focus:outline-none"
-                                        disabled={!user}
-                                        title={
-                                            isLiked ? "Quitar like" : "Dar like"
-                                        }
-                                    >
-                                        <FontAwesomeIcon
-                                            icon={
-                                                isLiked
-                                                    ? hoveredLike
-                                                        ? faHeartCrack
-                                                        : faHeartSolid
-                                                    : faHeartRegular
-                                            }
-                                            className={`w-7 h-7 transition duration-200 ${
-                                                isLiked
-                                                    ? "text-red-600"
-                                                    : "text-white"
-                                            }`}
-                                        />
-                                    </button>
-                                    <span className="text-lg text-white">
-                                        {totalLikes}
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => setShowMap((prev) => !prev)}
-                                    className="text-xl focus:outline-none text-white hover:text-blue-500 transition-colors"
-                                    title={
-                                        showMap
-                                            ? "Ocultar mapa"
-                                            : "Mostrar mapa"
-                                    }
-                                >
-                                    <FontAwesomeIcon
-                                        icon={faMapLocationDot}
-                                        className="w-7 h-7"
-                                    />
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex justify-between items-center py-4 px-8 bg-[#202225]">
+    {!notification && (
+        <div className="flex items-center space-x-2">
+            <button
+                onClick={() => toggleLike(post.id)}
+                onMouseEnter={() => setHoveredLike(true)}
+                onMouseLeave={() => setHoveredLike(false)}
+                className="text-xl focus:outline-none"
+                disabled={!user}
+                title={isLiked ? "Quitar like" : "Dar like"}
+            >
+                <FontAwesomeIcon
+                    icon={
+                        isLiked
+                            ? hoveredLike
+                                ? faHeartCrack
+                                : faHeartSolid
+                            : faHeartRegular
+                    }
+                    className={`w-7 h-7 transition duration-200 ${
+                        isLiked ? "text-red-600" : "text-white"
+                    }`}
+                />
+            </button>
+            <span className="text-lg text-white">{totalLikes}</span>
+        </div>
+    )}
+    {/* Botón del mapa visible siempre */}
+    <button
+        onClick={() => setShowMap((prev) => !prev)}
+        className="text-xl focus:outline-none text-white hover:text-purple-400 transition-colors"
+        title={showMap ? "Ocultar mapa" : "Mostrar mapa"}
+    >
+        <FontAwesomeIcon icon={faMapLocationDot} className="w-7 h-7" />
+    </button>
+</div>
+
                         <div
-                            className={`transition-[max-height,opacity] duration-500 ease-in-out px-8 py-4 bg-[#202225] rounded ${
+                            className={`transition-[max-height,opacity] duration-500 ease-in-out px-8 bg-[#202225] rounded ${
                                 showMap
                                     ? "max-h-[400px] opacity-100"
                                     : "max-h-0 opacity-0 py-0"

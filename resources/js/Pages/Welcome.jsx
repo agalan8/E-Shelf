@@ -36,11 +36,10 @@ export default function Welcome({ openAuthModal, status, canResetPassword }) {
                         }}
                     >
                         <img
-                            src="/logo.png"
+                            src="/logo_full.png"
                             alt="E"
                             className="w-auto h-20 object-contain mr-2"
                         />
-                        -Shelf
                     </h1>
                     <h2
                         className="text-6xl mb-6 max-w-[65vw]"

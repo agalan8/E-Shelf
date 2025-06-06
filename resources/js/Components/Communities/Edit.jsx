@@ -15,7 +15,6 @@ export default function EditCommunity({ community, onClose }) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Pequeña demora para activar la animación de entrada
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
@@ -66,16 +65,28 @@ export default function EditCommunity({ community, onClose }) {
     setTimeout(() => onClose(), 300);
   };
 
+  // Cierra modal al hacer clic en el overlay
+  const handleOverlayClick = () => {
+    handleClose();
+  };
+
+  // Evita que el clic dentro del modal cierre el modal
+  const handleModalClick = (e) => {
+    e.stopPropagation();
+  };
+
   return (
     <div
       className={`fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 transition-opacity duration-300 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
+      onClick={handleOverlayClick} // clic en overlay cierra modal
     >
       <div
         className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl p-6 relative transform transition-all duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
         }`}
+        onClick={handleModalClick} // evita cerrar modal al hacer clic dentro
       >
         <button
           onClick={handleClose}

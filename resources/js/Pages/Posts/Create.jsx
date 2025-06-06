@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { ArrowUpTrayIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStore } from "@fortawesome/free-solid-svg-icons";
+import { faStore, faCamera, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import {
   GoogleMap,
   LoadScript,
@@ -160,28 +160,39 @@ const handleSubmit = (e) => {
     <AuthenticatedLayout
       header={
         <h2 className="font-semibold leading-tight text-white">
-          Crear publicación
+          Crear Publicación
         </h2>
       }
     >
       <Head title="Crear publicación" />
       <div className="w-full mx-auto">
         {!imageUploaded ? (
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <h1 className="text-6xl font-bold text-white mt-40">
-              Sube tu imagen
-            </h1>
-            <label className="cursor-pointer flex flex-col items-center justify-center mt-4 p-10 border-2 border-dashed border-gray-400 rounded-lg hover:bg-[#7A27BC] hover:bg-opacity-15 transition">
-              <ArrowUpTrayIcon className="h-16 w-16 text-gray-400 mb-2" />
-              <span className="text-white">Haz clic para subir una imagen</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </label>
-          </div>
+  <div className="flex flex-col items-center justify-center h-96 text-white mt-24">
+    <label
+      htmlFor="image-upload"
+      className="group relative cursor-pointer text-gray-400 transition-colors"
+      title="Subir imagen"
+    >
+      <FontAwesomeIcon
+        icon={faCamera}
+        className="w-96 h-96 transition-transform duration-200 group-hover:scale-105"
+      />
+      <FontAwesomeIcon
+        icon={faCirclePlus}
+        className="absolute bottom-2 -right-4 w-28 h-28 border-4 border-[#373841] rounded-full bg-[#373841] text-[#E0B0FF] text-opacity-60 transition-transform duration-200 group-hover:scale-110"
+      />
+      <input
+        id="image-upload"
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
+    </label>
+    <p className="mt-4 text-2xl">
+      ¡Haz clic en el icono para subir una Publicación!
+    </p>
+  </div>
         ) : (
           <div className="flex items-center gap-6 mt-4 h-[90vh]">
             <div className="w-[65%] relative ml-6">

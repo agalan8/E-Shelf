@@ -10,6 +10,7 @@ import {
   faXmark,
   faTrash,
   faLock,
+  faClock,
 } from '@fortawesome/free-solid-svg-icons';
 import Edit from './Edit';
 
@@ -22,9 +23,14 @@ export default function Community({ community }) {
   const [requestSent, setRequestSent] = useState(false); // Para mostrar "Solicitud enviada"
 
   const canEdit = auth.user && (auth.user.is_admin || auth.user.id === community.user_id);
-  const isMember = community.memberships.some(membership => membership.user_id === auth.user.id && (membership.community_role_id === 3 || membership.community_role_id === 2)
-    );
-  const isPending = community.memberships.some(membership => membership.user_id === auth.user.id && membership.community_role_id === 4);
+  const isMember = community.memberships.some(
+    (membership) =>
+      membership.user_id === auth.user.id &&
+      (membership.community_role_id === 3 || membership.community_role_id === 2)
+  );
+  const isPending = community.memberships.some(
+    (membership) => membership.user_id === auth.user.id && membership.community_role_id === 4
+  );
   const isOwner = auth.user && auth.user.id === community.user_id;
 
   const isPrivate = community.visibilidad === 'privado';
@@ -40,24 +46,32 @@ export default function Community({ community }) {
   const handleJoinOrRequest = (e) => {
     e.stopPropagation();
     setLoading(true);
-    router.post(route('communities.join', community.id), {}, {
-      onFinish: () => {
-        setLoading(false);
-        if (isPrivate && !isMember) {
-          setRequestSent(true);
-        }
-      },
-      preserveScroll: true,
-    });
+    router.post(
+      route('communities.join', community.id),
+      {},
+      {
+        onFinish: () => {
+          setLoading(false);
+          if (isPrivate && !isMember) {
+            setRequestSent(true);
+          }
+        },
+        preserveScroll: true,
+      }
+    );
   };
 
   const handleLeave = (e) => {
     e.stopPropagation();
     setLoading(true);
-    router.post(route('communities.leave', community.id), {}, {
-      onFinish: () => setLoading(false),
-      preserveScroll: true,
-    });
+    router.post(
+      route('communities.leave', community.id),
+      {},
+      {
+        onFinish: () => setLoading(false),
+        preserveScroll: true,
+      }
+    );
   };
 
   const handleDelete = (e) => {
@@ -79,8 +93,12 @@ export default function Community({ community }) {
   return (
     <>
       <div
-        className={`relative w-[500px] h-60 rounded-2xl overflow-hidden shadow-lg group transition
-          ${(!isPrivate || isMember || isOwner) ? 'cursor-pointer' : 'cursor-not-allowed opacity-70'}
+        className={`relative w-[500px] h-60 rounded-2xl overflow-hidden shadow-xl shadow-gray-900 group transition
+          ${
+            !isPrivate || isMember || isOwner
+              ? 'cursor-pointer'
+              : 'cursor-not-allowed opacity-70'
+          }
         `}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -125,9 +143,7 @@ export default function Community({ community }) {
         {/* Franja inferior */}
         <div
           className={`absolute bottom-0 w-full px-4 py-2 flex items-center justify-between ${
-            community.background_image
-              ? 'bg-black/30 backdrop-blur-md'
-              : 'bg-[#2d2e38]'
+            community.background_image ? 'bg-black/30 backdrop-blur-md' : 'bg-[#2d2e38]'
           }`}
         >
           {/* Perfil + nombre */}
@@ -167,9 +183,12 @@ export default function Community({ community }) {
                   <button
                     onClick={handleJoinOrRequest}
                     disabled={loading || showRequestSent}
-                    className="w-36 flex items-center justify-center space-x-2 px-2 py-1.5 rounded border-2 bg-[#9C7FB3] text-white font-extrabold border-transparent hover:bg-[#876aa0] transition-all duration-200"
+                    className="flex items-center justify-center space-x-2 px-3 py-2 rounded border-2 bg-purple-400 text-white font-extrabold border-transparent hover:bg-purple-600 transition-all duration-200 max-w-[180px] min-w-[140px] whitespace-normal break-words text-center"
                   >
-                    <FontAwesomeIcon icon={faLock} className="w-4 h-4" />
+                    <FontAwesomeIcon
+                      icon={showRequestSent ? faClock : faLock}
+                      className="w-4 h-4"
+                    />
                     <span>{showRequestSent ? 'Solicitud enviada' : 'Solicitar unirse'}</span>
                   </button>
                 ) : (
@@ -179,9 +198,11 @@ export default function Community({ community }) {
                     onMouseEnter={() => setButtonHovered(true)}
                     onMouseLeave={() => setButtonHovered(false)}
                     className={`w-24 flex items-center justify-center space-x-1 px-1 py-1.5 rounded border-2 text-base whitespace-nowrap transition-all duration-200
-                      ${isMember
-                        ? 'bg-white text-[#9C7FB3] font-extrabold border-[#876aa0] hover:bg-[#FDECEA] hover:text-red-600 hover:border-red-500'
-                        : 'bg-[#9C7FB3] text-white font-extrabold hover:bg-[#876aa0] border-transparent'}
+                      ${
+                        isMember
+                          ? 'bg-white text-[#9C7FB3] font-extrabold border-[#876aa0] hover:bg-[#FDECEA] hover:text-red-600 hover:border-red-500'
+                          : 'bg-[#9C7FB3] text-white font-extrabold hover:bg-[#876aa0] border-transparent'
+                      }
                       `}
                   >
                     {loading ? (
@@ -208,9 +229,7 @@ export default function Community({ community }) {
         </div>
       </div>
 
-      {editModalOpen && (
-        <Edit community={community} onClose={handleCloseEditModal} />
-      )}
+      {editModalOpen && <Edit community={community} onClose={handleCloseEditModal} />}
     </>
   );
 }

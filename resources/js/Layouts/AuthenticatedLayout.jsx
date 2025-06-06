@@ -114,10 +114,10 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
 
   return (
     <div className="h-screen flex bg-[#373841] relative overflow-x-hidden min-w-0">
-      <aside className="bg-[#1A1D1F] text-white w-20 flex-shrink-0 h-full border-r border-gray-800 hidden sm:flex flex-col z-50">
-        <div className="flex items-center justify-center h-16 border-b border-gray-700 px-4">
+      <aside className="bg-[#1A1D1F] text-white w-20 flex-shrink-0 h-full border-r border-purple-950 hidden sm:flex flex-col z-50">
+        <div className="flex items-center justify-center h-16 border-b border-purple-950 px-4">
           <Link href="/">
-            <ApplicationLogo className="block h-9 w-auto fill-current text-white" />
+            <ApplicationLogo className="block h-10 w-auto fill-current text-white" />
           </Link>
         </div>
         <div className="flex-1 overflow-y-auto py-4 px-1 space-y-2 flex flex-col items-center">
@@ -158,7 +158,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
           </NavLink>
 
           {user.is_admin && (
-            <div className="flex flex-col space-y-3 border-t border-gray-700 pt-3">
+            <div className="flex flex-col space-y-3 border-t border-purple-950 pt-3">
               <NavLink href={route("users.index")} active={!isNotifOpen && route().current("users.index")} className="flex justify-center">
                 <FontAwesomeIcon icon={faUsersGear} className="h-9 w-9" />
               </NavLink>
@@ -234,7 +234,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
       {isNotifOpen && (
         <div
           ref={notifPanelRef}
-          className={`fixed overflow-y-auto top-0 left-20 w-[450px] h-full bg-[#2F3136] text-white border-r border-[#232428] z-40 transform transition-transform duration-300 ease-in-out ${
+          className={`fixed overflow-y-auto top-0 left-20 w-[450px] h-full bg-[#2F3136] text-white border-r border-[#232428] z-40 transform transition-transform duration-300 ease-in-out shadow-2xl shadow-purple-800 ${
             isNotifVisible ? "translate-x-0" : "-translate-x-full"
           }`}
         >
