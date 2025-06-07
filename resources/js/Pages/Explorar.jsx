@@ -23,7 +23,7 @@ export default function Explorar({ auth, posts, tags }) {
                 <div className="mx-auto max-w-8xl p-1">
 
                     {/* Mostrar los posts */}
-                    <div className="flex gap-2">
+                    <div className="flex flex-col md:flex-row gap-2">
                 {[0, 1, 2].map((colIndex) => (
                     <div key={colIndex} className="flex flex-col gap-2 flex-1">
                     {posts

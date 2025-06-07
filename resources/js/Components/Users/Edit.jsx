@@ -53,12 +53,16 @@ export default function Edit({ isOpen, onClose, mustVerifyEmail, status, socials
       }`}
     >
       <div
-        className={`w-full max-w-5xl h-[90vh] bg-[#36393F] rounded-2xl shadow-xl flex flex-col overflow-hidden transform transition-all duration-300 ${
-          visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-        }`}
+        className={`
+          w-full max-w-5xl bg-[#36393F] rounded-2xl shadow-xl flex flex-col overflow-hidden transform transition-all duration-300
+          ${visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
+          sm:rounded-2xl sm:h-[90vh] sm:max-w-5xl
+          h-screen max-w-full
+        `}
+        style={{ maxHeight: '100dvh' }} // Para soportar altura real en móviles modernos
       >
         {/* Barra superior */}
-        <div className="w-full bg-[#292B2F] text-white flex items-center justify-between p-4">
+        <div className="w-full bg-[#292B2F] text-white flex items-center justify-between p-4 sm:p-4 p-2">
           <button
             onClick={handleClose}
             className="text-white text-2xl font-bold"
@@ -70,11 +74,12 @@ export default function Edit({ isOpen, onClose, mustVerifyEmail, status, socials
         </div>
 
         {/* Contenido */}
-        <div className="flex flex-row w-full h-full">
+        <div className="flex flex-row w-full flex-1 sm:flex-row flex-col
+          sm:overflow-hidden overflow-y-auto">
           {/* Navegación */}
-          <div className="w-1/4 bg-[#2F3136] text-white p-6 space-y-4 pt-5">
+          <div className="sm:w-1/4 w-full bg-[#2F3136] text-white sm:p-6 p-3 space-y-4 sm:pt-5 pt-3 flex-shrink-0">
             <h3 className="text-base font-semibold">Editar perfil</h3>
-            <div className="flex flex-col gap-2 text-sm font-medium">
+            <div className="flex sm:flex-col flex-row gap-2 text-sm font-medium">
               <SubNavLink
                 href="#update-images"
                 active={activeTab === 'perfil'}
@@ -82,10 +87,10 @@ export default function Edit({ isOpen, onClose, mustVerifyEmail, status, socials
                   e.preventDefault();
                   setActiveTab('perfil');
                 }}
-                className="flex"
+                className="flex items-center"
               >
                 <PencilIcon className="h-6 w-6" />
-                <span>Perfil</span>
+                <span className="ml-2">Perfil</span>
               </SubNavLink>
 
               <SubNavLink
@@ -95,16 +100,17 @@ export default function Edit({ isOpen, onClose, mustVerifyEmail, status, socials
                   e.preventDefault();
                   setActiveTab('seguridad');
                 }}
-                className="flex"
+                className="flex items-center"
               >
                 <LockClosedIcon className="h-6 w-6" />
-                <span>Privacidad y Seguridad</span>
+                <span className="ml-2">Privacidad y Seguridad</span>
               </SubNavLink>
             </div>
           </div>
 
           {/* Formularios */}
-          <div className="w-3/4 p-6 pt-5 pb-24 flex flex-col justify-between overflow-y-auto">
+          <div className="sm:w-3/4 w-full sm:p-6 p-3 sm:pt-5 pt-3 sm:pb-8 pb-3 flex flex-col
+            sm:overflow-y-auto overflow-visible sm:h-[calc(90vh-64px)] h-auto">
             <div className="space-y-6 flex-grow">
               {activeTab === 'perfil' && (
                 <>

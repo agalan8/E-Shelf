@@ -56,7 +56,10 @@ export default function Create({ onClose }) {
         ref={modalRef}
         className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl h-auto flex flex-col overflow-hidden relative transform transition-all duration-300 ${
           isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
-        }`}
+        }
+        p-2 sm:p-6
+        max-h-[95vh] sm:max-h-none
+        `}
       >
         <button
           onClick={handleClose}
@@ -65,7 +68,7 @@ export default function Create({ onClose }) {
           <XMarkIcon className="w-6 h-6" />
         </button>
 
-        <div className="p-6 text-white">
+        <div className="p-2 sm:p-6 text-white">
           <h2 className="text-2xl font-bold mb-6">Crear Comunidad</h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
@@ -116,21 +119,21 @@ export default function Create({ onClose }) {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-4">
-              <div className="flex-1 min-w-[200px]">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4">
+              <div className="flex-1 min-w-[140px] sm:min-w-[200px]">
                 <ImageInput
                   name="profile_image"
                   label="Imagen de perfil"
                   onChange={setImagePerfil}
-                  previewClassName="rounded-full w-[145px] h-[145px] object-cover"
+                  previewClassName="rounded-full w-[100px] h-[100px] sm:w-[145px] sm:h-[145px] object-cover"
                 />
               </div>
-              <div className="flex-1 min-w-[200px]">
+              <div className="flex-1 min-w-[140px] sm:min-w-[200px]">
                 <ImageInput
                   name="background_image"
                   label="Imagen de fondo"
                   onChange={setImageFondo}
-                  previewClassName="w-[325px] h-[145px] object-cover rounded-md"
+                  previewClassName="w-[200px] h-[90px] sm:w-[325px] sm:h-[145px] object-cover rounded-md"
                 />
               </div>
             </div>

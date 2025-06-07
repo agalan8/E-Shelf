@@ -31,8 +31,15 @@ const FollowersModal = ({ isOpen, onClose, followers }) => {
         onClick={(e) => e.stopPropagation()} // evitar cierre si clic dentro del modal
         className={`bg-[#36393F] rounded-lg shadow-lg w-full max-w-lg p-6 relative transform transition-all duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
-        }`}
-        style={{ height: '70vh', display: 'flex', flexDirection: 'column' }}
+        }
+        sm:max-w-lg sm:p-6
+        max-w-full w-[95vw] p-2`} // Añadido para móvil
+        style={{
+          height: '70vh',
+          maxHeight: '90vh', // Mejor manejo en móvil
+          display: 'flex',
+          flexDirection: 'column'
+        }}
       >
         <button
           onClick={handleClose}

@@ -33,7 +33,7 @@ export default function AuthModal({ isOpen, onClose, status, canResetPassword })
                         ${state === "entering" || state === "entered" ? "opacity-100" : "opacity-0"}`}
                 >
                     <div
-                        className={`bg-[#18191C] rounded-lg shadow-lg w-full h-full max-w-full min-h-full flex relative transform transition-all duration-300
+                        className={`bg-[#18191C] rounded-lg shadow-lg w-full h-full max-w-full min-h-full flex flex-col md:flex-row relative transform transition-all duration-300
                             ${state === "entering" || state === "entered" ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
                     >
                         <button
@@ -45,14 +45,14 @@ export default function AuthModal({ isOpen, onClose, status, canResetPassword })
 
                         {/* Imagen lateral */}
                         <div
-                            className="w-2/3 bg-cover bg-center"
+                            className="hidden md:block md:w-2/3 bg-cover bg-center"
                             style={{ backgroundImage: "url('/fondo_landing.jpg')" }}
                         ></div>
 
                         {/* Formulario + botones */}
-                        <div className="w-1/3 flex pt-32 flex-col items-center p-6 relative min-h-[400px]">
+                        <div className="w-full md:w-1/3 flex pt-16 md:pt-32 flex-col items-center p-4 md:p-6 relative min-h-[400px] max-h-screen overflow-y-auto bg-[#18191C]">
                             {/* Botones de cambio */}
-                            {!showForgotPassword && (  // Ocultar los botones cuando se muestre el formulario de "Forgot Password"
+                            {!showForgotPassword && (
                                 <div className="bg-zinc-800 rounded-full p-1 flex overflow-hidden w-full mb-6 relative">
                                     {/* Elipse de fondo que se mueve */}
                                     <div
@@ -60,7 +60,6 @@ export default function AuthModal({ isOpen, onClose, status, canResetPassword })
                                             currentView === "login" ? "translate-x-0" : "translate-x-full"
                                         } bg-gradient-to-r from-[#8a2ad4] to-[#a32bff] rounded-full`}
                                     ></div>
-
                                     {/* Botón Iniciar sesión */}
                                     <button
                                         onClick={() => setCurrentView("login")}
@@ -87,7 +86,7 @@ export default function AuthModal({ isOpen, onClose, status, canResetPassword })
                             )}
 
                             {/* Formulario dinámico */}
-                            <div className="pl-4 pr-4 w-full flex flex-col items-center mb-2">
+                            <div className="pl-2 pr-2 md:pl-4 md:pr-4 w-full flex flex-col items-center mb-2">
                                 {currentView === "register" && !showForgotPassword && (
                                     <RegisterForm
                                         onClose={onClose}
@@ -100,13 +99,13 @@ export default function AuthModal({ isOpen, onClose, status, canResetPassword })
                                         status={status}
                                         canResetPassword={canResetPassword}
                                         onSwitchToRegister={() => setCurrentView("register")}
-                                        onSwitchToForgotPassword={handleForgotPasswordClick}  // Aquí cambiamos la función
+                                        onSwitchToForgotPassword={handleForgotPasswordClick}
                                     />
                                 )}
-                                {showForgotPassword && (  // Mostrar el formulario de "Forgot Password"
+                                {showForgotPassword && (
                                     <ForgotPasswordForm
                                         onClose={onClose}
-                                        onSwitchToLogin={handleBackToLogin}  // Al volver al login
+                                        onSwitchToLogin={handleBackToLogin}
                                     />
                                 )}
                             </div>

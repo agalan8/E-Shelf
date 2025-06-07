@@ -93,7 +93,7 @@ export default function Community({ community }) {
   return (
     <>
       <div
-        className={`relative w-[500px] h-60 rounded-2xl overflow-hidden shadow-xl shadow-gray-900 group transition
+        className={`relative w-full max-w-sm h-52 sm:w-[500px] sm:h-60 sm:max-w-none rounded-2xl overflow-hidden shadow-xl shadow-gray-900 group transition
           ${
             !isPrivate || isMember || isOwner
               ? 'cursor-pointer'
@@ -119,8 +119,10 @@ export default function Community({ community }) {
         {/* Botones de editar/eliminar */}
         {canEdit && (
           <div
-            className={`absolute top-3 right-3 flex space-x-2 z-10 transition-all duration-300
-              ${hovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}
+            className={`
+              absolute top-3 right-3 flex space-x-2 z-10 transition-all duration-300
+              opacity-100 translate-y-0 pointer-events-auto
+              sm:${hovered ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}
             `}
           >
             <button

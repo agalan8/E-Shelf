@@ -207,30 +207,36 @@ const Show = ({
                 }`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex w-full h-full">
+                {/* Botón cerrar SIEMPRE visible en móvil, oculto en lg+ */}
+                <button
+                    onClick={handleClose}
+                    className="absolute top-2 left-2 p-1 bg-black bg-opacity-50 rounded-full transition-opacity duration-200 opacity-100 z-20 block lg:hidden"
+                >
+                    <XMarkIcon className="w-9 h-9 text-white" />
+                </button>
+                <div className="flex flex-col lg:flex-row w-full h-full overflow-y-auto lg:overflow-y-visible">
                     <div
-                        className="w-4/5 h-full flex justify-center items-center bg-black relative"
+                        className="w-full lg:w-4/5 h-[60vh] sm:h-72 lg:h-full flex justify-center items-center bg-black relative"
                         onMouseEnter={() => setHoveringImage(true)}
                         onMouseLeave={() => setHoveringImage(false)}
                     >
                         <Image
-                            src={`${
-                                post.image.path_original
-                            }?t=${new Date().getTime()}`}
+                            src={`${post.image.path_original}?t=${new Date().getTime()}`}
                             alt={post.titulo}
-                            className="object-contain max-w-full max-h-full cursor-pointer"
+                            className="object-contain max-w-full max-h-[60vh] sm:max-h-72 lg:max-h-full cursor-pointer"
                             onClick={handleImageClick}
                         />
+                        {/* Botón cerrar SOLO visible en hover en escritorio */}
                         {hoveringImage && (
                             <button
                                 onClick={handleClose}
-                                className="absolute top-2 left-2 p-1 bg-black bg-opacity-50 rounded-full transition-opacity duration-200 opacity-100"
+                                className="absolute top-2 left-2 p-1 bg-black bg-opacity-50 rounded-full transition-opacity duration-200 opacity-100 hidden lg:block"
                             >
                                 <XMarkIcon className="w-9 h-9 text-white" />
                             </button>
                         )}
                     </div>
-                    <div className="w-1/4 h-full overflow-y-auto relative bg-[#18191C] flex flex-col">
+                    <div className="w-full lg:w-1/4 h-auto lg:h-full lg:overflow-y-auto relative bg-[#18191C] flex flex-col">
                         <div className="flex items-center space-x-3 p-8 bg-[#292B2F]">
                             <Link href={route("users.show", post.post.user.id)}>
                                 {post.post.user.profile_image?.path_small ? (
@@ -354,68 +360,72 @@ const Show = ({
                             />
                         </div>
 
-{/* Contenedor EXIF */}
-<div
-  className={`transition-[max-height,opacity] duration-500 ease-in-out px-8 bg-[#202225] rounded overflow-hidden ${
-    showExif ? "max-h-[400px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
-  }`}
->
-  {/* Encabezado: Fecha y Marca/Modelo */}
-  <div className="flex justify-between items-center text-white text-base mb-6">
-    <div className="flex items-center gap-2">
-      <FontAwesomeIcon icon={faClockRotateLeft} className="w-5 h-5" />
-      {post.image.fecha_hora
-        ? (() => {
-            const [date, time] = post.image.fecha_hora.split(" ");
-            const [year, month, day] = date.split(":");
-            return `${day}/${month}/${year} ${time}`;
-          })()
-        : "No disponible"}
-    </div>
-    <div className="flex items-center gap-2">
-      <FontAwesomeIcon icon={faCamera} className="w-5 h-5" />
-      {post.image.marca || "No disponible"} | {post.image.modelo || "No disponible"}
-    </div>
-  </div>
+                        {/* Contenedor EXIF */}
+                        <div
+                          className={`transition-[max-height,opacity] duration-500 ease-in-out px-4 sm:px-8 bg-[#202225] rounded overflow-hidden ${
+                            showExif
+                              ? "max-h-[3000px] sm:max-h-[400px] opacity-100 py-4"
+                              : "max-h-0 opacity-0 py-0"
+                          } ${
+                            showExif ? "static" : ""
+                          }`}
+                          style={{
+                            position: showExif ? "static" : undefined,
+                          }}
+                        >
+                          {/* Encabezado: Fecha y Marca/Modelo */}
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-white text-base mb-6 gap-2">
+                            <div className="flex items-center gap-2">
+                              <FontAwesomeIcon icon={faClockRotateLeft} className="w-5 h-5" />
+                              {post.image.fecha_hora
+                                ? (() => {
+                                    const [date, time] = post.image.fecha_hora.split(" ");
+                                    const [year, month, day] = date.split(":");
+                                    return `${day}/${month}/${year} ${time}`;
+                                  })()
+                                : "No disponible"}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <FontAwesomeIcon icon={faCamera} className="w-5 h-5" />
+                              {post.image.marca || "No disponible"} | {post.image.modelo || "No disponible"}
+                            </div>
+                          </div>
 
-  {/* Tres listas debajo */}
-  <div className="flex gap-12 text-white text-base justify-center items-start">
-    {/* Lista 1: Diafragma, ISO */}
-    <ul className="space-y-4 flex-1">
-      <li className="flex items-center gap-2">
-        <img src="/exposure_icon.png" alt="Apertura" className="w-5 h-5" />
-        f/{post.image.diafragma || "No disponible"}
-      </li>
-      <li className="flex items-center gap-2">
-        <img src="/iso_icon.png" alt="ISO" className="w-5 h-5" />
-        {post.image.iso !== null ? post.image.iso : "No disponible"}
-      </li>
-    </ul>
+                          {/* Tres listas debajo */}
+                          <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-white text-base justify-center items-start">
+                            {/* Lista 1: Diafragma, ISO */}
+                            <ul className="space-y-4 flex-1">
+                              <li className="flex items-center gap-2">
+                                <img src="/exposure_icon.png" alt="Apertura" className="w-5 h-5" />
+                                f/{post.image.diafragma || "No disponible"}
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <img src="/iso_icon.png" alt="ISO" className="w-5 h-5" />
+                                {post.image.iso !== null ? post.image.iso : "No disponible"}
+                              </li>
+                            </ul>
 
-    {/* Lista 2: Exposición, Longitud focal */}
-    <ul className="space-y-4 flex-1">
-      <li className="flex items-center gap-2">
-        <FontAwesomeIcon icon={faStopwatch} className="w-5 h-5" />
-        {post.image.exposicion || "No disponible"} s
-      </li>
-      <li className="flex items-center gap-2">
-        <img src="/focal_icon.png" alt="Focal" className="w-5 h-5" />
-        {post.image.longitud_focal || "No disponible"}
-      </li>
-    </ul>
+                            {/* Lista 2: Exposición, Longitud focal */}
+                            <ul className="space-y-4 flex-1">
+                              <li className="flex items-center gap-2">
+                                <FontAwesomeIcon icon={faStopwatch} className="w-5 h-5" />
+                                {post.image.exposicion || "No disponible"} s
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <img src="/focal_icon.png" alt="Focal" className="w-5 h-5" />
+                                {post.image.longitud_focal || "No disponible"}
+                              </li>
+                            </ul>
 
-    {/* Lista 3: Flash */}
-    <ul className="space-y-4 flex-1">
-      <li className="flex items-center gap-2">
-        <FontAwesomeIcon icon={faBoltLightning} className="w-5 h-5" />
-        {post.image.flash !== null ? (post.image.flash ? "Sí" : "No") : "No disponible"}
-      </li>
-    </ul>
-  </div>
-</div>
-
-
-
+                            {/* Lista 3: Flash */}
+                            <ul className="space-y-4 flex-1">
+                              <li className="flex items-center gap-2">
+                                <FontAwesomeIcon icon={faBoltLightning} className="w-5 h-5" />
+                                {post.image.flash !== null ? (post.image.flash ? "Sí" : "No") : "No disponible"}
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                         <div className="px-8 py-4 bg-[#292B2F] flex-shrink-0">
                             <h2 className="text-2xl font-semibold text-white">
                                 {post.titulo}

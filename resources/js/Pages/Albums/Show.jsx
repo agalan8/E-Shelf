@@ -51,9 +51,9 @@ const Show = ({ album, userPosts, tags }) => {
             }
         >
             <Head title="Mis Álbumes" />
-            <div className="container mx-auto p-4">
+            <div className="container mx-auto p-2 sm:p-4">
                 {/* Enlace para volver */}
-                <div className="mb-4">
+                <div className="mb-2 sm:mb-4">
                     <Link
                         href={route("mis-albums")}
                         className="text-purple-500 hover:text-purple-700 font-semibold"
@@ -63,13 +63,13 @@ const Show = ({ album, userPosts, tags }) => {
                 </div>
 
                 {/* Título y botón en una sola línea */}
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-white text-3xl font-semibold">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-4 gap-2">
+                    <h1 className="text-white text-2xl sm:text-3xl font-semibold">
                         {album.nombre}
                     </h1>
                     <button
                         onClick={handleOpenAddPostsModal}
-                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md"
+                        className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md w-full sm:w-auto"
                     >
                         <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
                         Añadir Publicaciones al Álbum
@@ -77,7 +77,7 @@ const Show = ({ album, userPosts, tags }) => {
                 </div>
 
                 {/* Descripción */}
-                <div className="text-md text-white mb-4">
+                <div className="text-md text-white mb-2 sm:mb-4">
                     <strong>Descripción:</strong>
                     <p>{album.descripcion}</p>
                 </div>
@@ -89,15 +89,12 @@ const Show = ({ album, userPosts, tags }) => {
                     </p>
                 ) : (
                     <div className="w-full py-2">
-                        <div className="w-full p-1">
-                            <div className="flex gap-2">
+                        <div className="w-full p-0 sm:p-1">
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 {[0, 1, 2].map((colIndex) => (
-                                    <div key={colIndex} className="">
+                                    <div key={colIndex} className="flex-1">
                                         {posts
-                                            .filter(
-                                                (_, index) =>
-                                                    index % 3 === colIndex
-                                            )
+                                            .filter((_, index) => index % 3 === colIndex)
                                             .map((post) => (
                                                 <div
                                                     key={post.id}
@@ -105,12 +102,8 @@ const Show = ({ album, userPosts, tags }) => {
                                                 >
                                                     {/* Ícono eliminar */}
                                                     <button
-                                                        onClick={() =>
-                                                            handleDeletePost(
-                                                                post.id
-                                                            )
-                                                        }
-                                                        className="absolute top-2 right-2 z-10 text-red-500 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 hover:scale-125"
+                                                        onClick={() => handleDeletePost(post.id)}
+                                                        className="absolute top-2 right-2 z-10 text-red-500 opacity-100 pointer-events-auto sm:opacity-0 sm:pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 hover:scale-125"
                                                         aria-label="Eliminar publicación"
                                                     >
                                                         <FontAwesomeIcon

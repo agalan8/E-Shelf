@@ -60,11 +60,11 @@ const MisAlbums = ({ albums, posts, user }) => {
       subnav={<UsersSubnav currentUser={user} />}
     >
       <Head title="Mis Álbumes" />
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-2 sm:p-4">
         {albums.length > 0 && (
-          <div className="flex justify-between items-center my-5">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center my-3 sm:my-5 gap-4">
             {/* Filtros */}
-            <div className="flex space-x-4 items-center">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 items-stretch sm:items-center">
               <select
                 value={order}
                 onChange={(e) => setOrder(e.target.value)}
@@ -99,7 +99,7 @@ const MisAlbums = ({ albums, posts, user }) => {
             {/* Botón de crear */}
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center"
+              className="w-full sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center justify-center"
             >
               <FontAwesomeIcon icon={faPlus} className="mr-2" />
               Crear Álbum
@@ -109,7 +109,7 @@ const MisAlbums = ({ albums, posts, user }) => {
 
         {/* Si no hay álbumes */}
         {albums.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-96 text-white mt-24">
+          <div className="flex flex-col items-center justify-center h-80 sm:h-96 text-white mt-12 sm:mt-24">
             <button
               onClick={() => setIsCreateModalOpen(true)}
               className="group relative text-gray-400 transition-colors"
@@ -117,17 +117,17 @@ const MisAlbums = ({ albums, posts, user }) => {
             >
               <FontAwesomeIcon
                 icon={faPanorama}
-                className="w-80 h-80 transition-transform duration-200 group-hover:scale-105"
+                className="w-40 h-40 sm:w-80 sm:h-80 transition-transform duration-200 group-hover:scale-105"
               />
               <FontAwesomeIcon
                 icon={faCirclePlus}
-                className="absolute bottom-9 -right-4 w-20 h-20 border-4 border-[#373841] rounded-full bg-[#373841] text-[#E0B0FF] text-opacity-60 transition-transform duration-200 group-hover:scale-110"
+                className="absolute bottom-2 -right-2 sm:bottom-9 sm:-right-4 w-10 h-10 sm:w-20 sm:h-20 border-4 border-[#373841] rounded-full bg-[#373841] text-[#E0B0FF] text-opacity-60 transition-transform duration-200 group-hover:scale-110"
               />
             </button>
-            <p className="mt-4 text-lg">No tienes álbumes aún. ¡Haz clic en el icono para crear uno!</p>
+            <p className="mt-4 text-base sm:text-lg text-center">No tienes álbumes aún. ¡Haz clic en el icono para crear uno!</p>
           </div>
         ) : (
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 gap-y-20 max-w-[1400px] mx-auto justify-items-center">
+          <div className="mt-6 sm:mt-12 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-10 sm:gap-2 sm:gap-y-20 max-w-full sm:max-w-[1400px] mx-auto justify-items-center">
             {filteredAndSortedAlbums.map((album) => (
               <Album key={album.id} album={album} />
             ))}

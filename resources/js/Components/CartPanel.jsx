@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
+import { faMoneyBillWave, faXmark } from '@fortawesome/free-solid-svg-icons';
 
-export default function CartPanel() {
+export default function CartPanel({ onClose }) {
   const { auth } = usePage().props;
   const lineasCarrito = auth.user?.lineas_carrito || [];
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,16 @@ export default function CartPanel() {
 
   return (
     <div className="p-4 w-[400px] relative" style={{ paddingBottom: '100px', overflow: 'hidden' }}>
-              <h1 className="text-3xl font-semibold mb-8">Carrito</h1>
+      {/* Botón cerrar solo en móvil */}
+      <button
+        className="absolute top-4 right-4 z-20 block md:hidden text-white text-2xl"
+        onClick={onClose || (() => console.log('Cerrar carrito'))}
+        aria-label="Cerrar carrito"
+        type="button"
+      >
+        <FontAwesomeIcon icon={faXmark} />
+      </button>
+      <h1 className="text-3xl font-semibold mb-8">Carrito</h1>
 
       {lineasCarrito.length === 0 ? (
         <div className="text-white text-center py-16">Tu carrito está vacío</div>

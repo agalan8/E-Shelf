@@ -83,9 +83,11 @@ export default function EditCommunity({ community, onClose }) {
       onClick={handleOverlayClick} // clic en overlay cierra modal
     >
       <div
-        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl p-6 relative transform transition-all duration-300 ${
-          isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
-        }`}
+        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl p-2 sm:p-6 relative transform transition-all duration-300
+    ${isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'}
+    max-h-[95vh] overflow-y-auto
+    sm:w-11/12 sm:max-w-3xl
+    `}
         onClick={handleModalClick} // evita cerrar modal al hacer clic dentro
       >
         <button
@@ -99,7 +101,7 @@ export default function EditCommunity({ community, onClose }) {
 
         <h2 className="text-white text-xl font-bold mb-4">Editar Comunidad</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-[#36393F] p-4 rounded">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-[#36393F] p-2 sm:p-4 rounded">
           <div>
             <label htmlFor="nombre" className="block text-white font-semibold mb-1">
               Nombre
@@ -124,7 +126,7 @@ export default function EditCommunity({ community, onClose }) {
               value={data.descripcion}
               onChange={e => setData('descripcion', e.target.value)}
               rows={4}
-              className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
+              className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff] resize-none"
               required
             />
             {errors.descripcion && <p className="text-red-500 mt-1">{errors.descripcion}</p>}
@@ -160,26 +162,26 @@ export default function EditCommunity({ community, onClose }) {
             {errors.visibilidad && <p className="text-red-500 mt-1">{errors.visibilidad}</p>}
           </div>
 
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-4">
+            <div className="flex-1 min-w-[150px] sm:min-w-[200px]">
               <ImageInput
                 name="profile_image"
                 label="Imagen de perfil"
                 onChange={file => setData('profile_image', file)}
                 initialImage={community.profile_image?.path_small || null}
-                previewClassName="rounded-full w-[145px] h-[145px] object-cover"
+                previewClassName="rounded-full w-[100px] h-[100px] sm:w-[145px] sm:h-[145px] object-cover"
                 onDelete={eliminarImagenPerfil}
               />
               {errors.profile_image && <p className="text-red-500">{errors.profile_image}</p>}
             </div>
 
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 min-w-[150px] sm:min-w-[200px]">
               <ImageInput
                 name="background_image"
                 label="Imagen de fondo"
                 onChange={file => setData('background_image', file)}
                 initialImage={community.background_image?.path_medium || null}
-                previewClassName="w-[325px] h-[145px] object-cover rounded-md"
+                previewClassName="w-[200px] h-[90px] sm:w-[325px] sm:h-[145px] object-cover rounded-md"
                 onDelete={eliminarImagenFondo}
               />
               {errors.background_image && <p className="text-red-500">{errors.background_image}</p>}

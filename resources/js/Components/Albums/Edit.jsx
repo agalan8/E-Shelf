@@ -65,9 +65,10 @@ const Edit = ({ album, onClose }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-4xl p-10 relative transform transition-all duration-300 ${
-          isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
-        }`}
+        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-4xl p-4 sm:p-10 relative transform transition-all duration-300
+          ${isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'}
+          max-h-[95vh] overflow-y-auto
+        `}
       >
         <button
           onClick={handleClose}
@@ -121,7 +122,7 @@ const Edit = ({ album, onClose }) => {
               }}
               initialImage={album.cover_image?.path_medium || null}
               onDelete={eliminarPortada}
-              previewClassName="w-[500px] h-[223px] object-cover rounded-md"
+              previewClassName="w-[300px] h-[134px] sm:w-[500px] sm:h-[223px] object-cover rounded-md"
             />
           </div>
           {errors.portada && <p className="text-red-500 mt-2 text-center">{errors.portada}</p>}

@@ -202,7 +202,7 @@ const Edit = ({ post, onClose, tags }) => {
                 isVisible ? "opacity-100" : "opacity-0"
             }`}
         >
-            <div className="bg-[#1f1f1f] rounded-lg shadow-lg w-11/12 h-[90vh] flex overflow-hidden relative transform transition-all duration-300">
+            <div className="bg-[#1f1f1f] rounded-lg shadow-lg w-11/12 h-[90vh] flex flex-col md:flex-row overflow-hidden relative transform transition-all duration-300 md:h-[90vh] md:w-11/12">
                 <button
                     onClick={handleClose}
                     className="absolute top-4 right-4 text-white hover:text-red-400 z-10"
@@ -211,12 +211,12 @@ const Edit = ({ post, onClose, tags }) => {
                 </button>
 
                 {/* Imagen */}
-                <div className="w-2/3 flex items-center justify-center bg-[#292B2F] p-6">
+                <div className="w-full md:w-2/3 flex items-center justify-center bg-[#292B2F] p-28 md:p-6 min-h-[200px] max-h-[40vh] md:max-h-full  md:mb-0">
                     <div className="flex flex-col items-center justify-center w-full h-full">
                         <Image
                             src={previewImage}
                             alt="Imagen actual"
-                            className="max-h-full max-w-full object-contain rounded shadow-2xl shadow-black"
+                            className="max-h-60 md:max-h-full max-w-full object-contain rounded shadow-2xl shadow-black"
                         />
                         <label className="cursor-pointer mt-3 text-white hover:underline">
                             <ArrowUpTrayIcon className="w-5 h-5 inline mr-2" />
@@ -232,7 +232,7 @@ const Edit = ({ post, onClose, tags }) => {
                 </div>
 
                 {/* Formulario */}
-                <div className="w-1/3 p-6 bg-[#272729] overflow-y-auto text-white">
+                <div className="w-full md:w-1/3 p-4 md:p-6 bg-[#272729] overflow-y-auto text-white max-h-[60vh] md:max-h-full">
                     <h2 className="text-xl font-bold mb-6">Editar Publicación</h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <input

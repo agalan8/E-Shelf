@@ -12,14 +12,14 @@ export default function UsersSubnav({ currentUser }) {
     console.log(currentUser);
 
     return (
-        <div className="flex flex-col gap-2 text-sm font-medium">
+        <div className="flex flex-col gap-2 text-sm font-medium text-white">
             <SubNavLink
                 href={route("users.show", { user: currentUser.id })}
                 active={route().current("users.show")}
-                className="flex"
+                className="flex items-center text-white"
             >
-                <RectangleGroupIcon className="h-6 w-6" />
-                <span>Publicaciones</span>
+                <RectangleGroupIcon className="h-6 w-6 text-white" />
+                <span className="ml-2 text-white">Publicaciones</span>
             </SubNavLink>
 
             {currentUser.id === user.id && (
@@ -27,41 +27,39 @@ export default function UsersSubnav({ currentUser }) {
                     <SubNavLink
                         href={route("mis-albums")}
                         active={route().current("mis-albums")}
-                        className="flex"
+                        className="flex items-center text-white"
                     >
-                        <BookOpenIcon className="h-6 w-6" />
-                        <span>Mis Álbumes</span>
+                        <BookOpenIcon className="h-6 w-6 text-white" />
+                        <span className="ml-2 text-white">Mis Álbumes</span>
                     </SubNavLink>
                     <SubNavLink
                         href={route("mis-comunidades")}
                         active={route().current("mis-comunidades")}
-                        className="flex"
+                        className="flex items-center text-white"
                     >
-                        <FontAwesomeIcon icon={faUsers} className="h-6 w-6" />
-                        <span>Mis Comunidades</span>
+                        <FontAwesomeIcon icon={faUsers} className="h-6 w-6 text-white" />
+                        <span className="ml-2 text-white">Mis Comunidades</span>
                     </SubNavLink>
                     <SubNavLink
                         href={route("orders.index")}
                         active={route().current("orders.index")}
-                        className="flex"
+                        className="flex items-center text-white"
                     >
-                        <FontAwesomeIcon icon={faReceipt} className="h-6 w-6" />
-                        <span>Mis Compras</span>
+                        <FontAwesomeIcon icon={faReceipt} className="h-6 w-6 text-white" />
+                        <span className="ml-2 text-white">Mis Compras</span>
                     </SubNavLink>
                 </>
             )}
 
             {currentUser.id !== user.id && (
-                <>
-                    <SubNavLink
-                        href={route("shops.show", { shop: currentUser.shop.id })}
-                        active={route().current("shops.show", { shop: currentUser.shop.id })}
-                        className="flex"
-                    >
-                        <FontAwesomeIcon icon={faStore} className="h-6 w-6" />
-                        <span>Tienda</span>
-                    </SubNavLink>
-                </>
+                <SubNavLink
+                    href={route("shops.show", { shop: currentUser.shop.id })}
+                    active={route().current("shops.show", { shop: currentUser.shop.id })}
+                    className="flex items-center text-white"
+                >
+                    <FontAwesomeIcon icon={faStore} className="h-6 w-6 text-white" />
+                    <span className="ml-2 text-white">Tienda</span>
+                </SubNavLink>
             )}
         </div>
     );

@@ -56,32 +56,32 @@ export default function OrderIndex() {
             <div className="max-w-5xl mx-auto py-8 px-6">
 
 {/* FILTROS */}
-<div className="mb-12 flex flex-wrap gap-4 items-end justify-center">
-  <div>
+<div className="mb-12 flex flex-wrap gap-4 items-end justify-center sm:flex-row flex-col">
+  <div className="w-full sm:w-auto">
     <label className="block text-sm font-medium text-white">Desde</label>
     <input
       type="date"
       value={fromDate}
       onChange={e => setFromDate(e.target.value)}
-      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full"
     />
   </div>
 
-  <div>
+  <div className="w-full sm:w-auto">
     <label className="block text-sm font-medium text-white">Hasta</label>
     <input
       type="date"
       value={toDate}
       onChange={e => setToDate(e.target.value)}
-      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full"
     />
   </div>
 
-  <div>
+  <div className="w-full sm:w-auto">
     <select
       value={filterYear}
       onChange={e => setFilterYear(e.target.value)}
-      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full"
     >
       <option value="">Todos los años</option>
       {years.map(year => (
@@ -90,11 +90,11 @@ export default function OrderIndex() {
     </select>
   </div>
 
-  <div>
+  <div className="w-full sm:w-auto">
     <select
       value={filterMonth}
       onChange={e => setFilterMonth(e.target.value)}
-      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+      className="mt-1 rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full"
     >
       <option value="">Todos los meses</option>
       {months.map(({ value, label }) => (
@@ -103,7 +103,6 @@ export default function OrderIndex() {
     </select>
   </div>
 </div>
-
 
 {/* PEDIDOS */}
 {filteredOrders.length === 0 ? (
@@ -119,17 +118,17 @@ export default function OrderIndex() {
       >
         <button
           onClick={() => toggleOrder(order.id)}
-          className="w-full flex justify-between items-center px-6 py-4 bg-gradient-to-r from-purple-700 to-purple-900 text-white hover:brightness-125 transition duration-300 rounded-t-xl"
+          className="w-full flex justify-between items-center px-4 sm:px-6 py-4 bg-gradient-to-r from-purple-700 to-purple-900 text-white hover:brightness-125 transition duration-300 rounded-t-xl"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
-            <span className="font-semibold text-lg tracking-wide">
+            <span className="font-semibold text-base sm:text-lg tracking-wide">
               Pedido: {new Date(order.created_at).toLocaleString()}
             </span>
-            <div className="flex items-center gap-6 mt-2 sm:mt-0">
-              <span className="text-lg font-semibold text-white">
+            <div className="flex items-center gap-4 sm:gap-6 mt-2 sm:mt-0">
+              <span className="text-base sm:text-lg font-semibold text-white">
                 Total: {parseFloat(order.total).toFixed(2)} €
               </span>
-              <span className="text-2xl select-none">
+              <span className="text-xl sm:text-2xl select-none">
                 {openOrderId === order.id ? "▲" : "▼"}
               </span>
             </div>
@@ -141,10 +140,10 @@ export default function OrderIndex() {
     openOrderId === order.id
       ? "max-h-[1000px] opacity-100"
       : "max-h-0 opacity-0"
-  } bg-gray-900 px-6`}
+  } bg-gray-900 px-2 sm:px-6`}
 >
   <div className="py-6 space-y-4">
-    <div className="grid grid-cols-4 gap-4 font-semibold text-white text-sm pb-2 border-b border-purple-700">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 font-semibold text-white text-xs sm:text-sm pb-2 border-b border-purple-700">
       <div>Imagen</div>
       <div>Título</div>
       <div className="text-right">Precio</div>
@@ -154,29 +153,28 @@ export default function OrderIndex() {
     {order.lines.map((line, idx) => (
       <div
         key={idx}
-        className="grid grid-cols-4 gap-4 items-center py-4 border-b border-purple-700 last:border-b-0"
+        className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 items-center py-4 border-b border-purple-700 last:border-b-0"
       >
         <div>
           {line.path_small ? (
             <img
               src={`${line.path_small}?t=${new Date().getTime()}`}
               alt="Producto"
-              className="object-cover rounded-xl border border-purple-700 shadow-2xl"
-              style={{ width: "160px", height: "120px" }}
+              className="object-cover rounded-xl border border-purple-700 shadow-2xl w-full max-w-[160px] h-auto sm:h-[120px]"
+              style={{ maxWidth: "160px", height: "auto" }}
             />
           ) : (
             <div
-              className="bg-gray-800 rounded-xl flex items-center justify-center text-purple-300 font-bold text-3xl border border-purple-700 shadow-sm"
-              style={{ width: "160px", height: "120px" }}
+              className="bg-gray-800 rounded-xl flex items-center justify-center text-purple-300 font-bold text-2xl sm:text-3xl border border-purple-700 shadow-sm w-full max-w-[160px] h-[80px] sm:h-[120px]"
             >
               ?
             </div>
           )}
         </div>
-        <div className="text-gray-300 text-lg font-medium">
+        <div className="text-gray-300 text-base sm:text-lg font-medium break-words">
           {line.titulo ?? "Producto"}
         </div>
-        <div className="text-right text-xl font-bold text-purple-400">
+        <div className="text-right text-lg sm:text-xl font-bold text-purple-400">
           {line.precio ? `${parseFloat(line.precio).toFixed(2)} €` : "—"}
         </div>
         <div className="text-right">
@@ -184,12 +182,12 @@ export default function OrderIndex() {
             <a
               href={`/order-lines/${line.id}/download-image`}
               download
-              className="inline-block px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition"
+              className="inline-block px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition"
             >
               Descargar
             </a>
           ) : (
-            <span className="text-purple-500 text-sm">No disponible</span>
+            <span className="text-purple-500 text-xs sm:text-sm">No disponible</span>
           )}
         </div>
       </div>
