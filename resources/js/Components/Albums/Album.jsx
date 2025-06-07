@@ -104,9 +104,10 @@ const Album = ({ album }) => {
           {/* Botones editar/eliminar */}
           {canEditOrDelete && (
             <div
-              className={`absolute top-3 right-3 flex space-x-2 z-10 transition-opacity duration-300 ${
-                hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
+              className={`absolute top-3 right-3 flex space-x-2 z-10 transition-opacity duration-300
+      opacity-100 pointer-events-auto
+      sm:${hovered ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
+    `}
             >
               <button
                 onClick={handleEditClick}

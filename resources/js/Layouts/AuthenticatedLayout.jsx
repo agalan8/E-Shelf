@@ -27,6 +27,7 @@ import {
   faCartShopping,
   faBell,
 } from "@fortawesome/free-solid-svg-icons";
+import UsersSubnav from "@/Components/Subnavs/UsersSubnav";
 
 export default function AuthenticatedLayout({ header, children, subnav }) {
   const {
@@ -45,7 +46,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
   const [isNotifVisible, setIsNotifVisible] = useState(false);
   const [modalPost, setModalPost] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [isUserSubnavOpen, setIsUserSubnavOpen] = useState(false);
 
   const cartPanelRef = useRef(null);
   const notifPanelRef = useRef(null);
@@ -282,86 +283,144 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
       )}
 
 {isMobileMenuOpen && (
-  <div className="fixed inset-0 z-50 bg-black bg-opacity-60 sm:hidden">
-    <div className="w-64 bg-[#1A1D1F] h-full p-4 text-white relative overflow-y-auto">
-
+  <div className="fixed inset-0 z-50 bg-black bg-opacity-60 sm:hidden flex">
+    {/* Panel lateral */}
+    <div className="relative w-72 max-w-full bg-[#1A1D1F] h-full flex flex-col p-0">
       {/* Botón cerrar */}
       <button
-        className="absolute top-4 right-4 text-white"
+        className="absolute top-4 right-4 text-white z-10"
         onClick={() => setIsMobileMenuOpen(false)}
+        aria-label="Cerrar menú"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-
-      {/* Menú de enlaces */}
-      <div className="mt-12 flex flex-col space-y-4">
-        <NavLink href={route("posts-seguidos")} active={route().current("posts-seguidos")} className="flex items-center gap-3">
-          <HomeIcon className="w-6 h-6" />
-          <span>Home</span>
+      {/* Menú de enlaces solo iconos */}
+      <div className="mt-4 flex-1 flex flex-col space-y-2 px-4 pb-8 overflow-y-auto">
+        <NavLink
+          href={route("posts-seguidos")}
+          active={route().current("posts-seguidos")}
+          className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+        >
+          <HomeIcon className="w-7 h-7 text-white" />
         </NavLink>
-
-        <NavLink href={route("explorar")} active={route().current("explorar") || route().current("home")} className="flex items-center gap-3">
-          <GlobeAsiaAustraliaIcon className="w-6 h-6" />
-          <span>Explorar</span>
+        <NavLink
+          href={route("explorar")}
+          active={route().current("explorar") || route().current("home")}
+          className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+        >
+          <GlobeAsiaAustraliaIcon className="w-7 h-7 text-white" />
         </NavLink>
-
-        <NavLink href={route("users.show", { user: user.id })} active={route().current("users.show")} className="flex items-center gap-3">
-          <UserIcon className="w-6 h-6" />
-          <span>Perfil</span>
+        {/* Icono usuario con botón para desplegar subnav */}
+        <div>
+          <button
+            className="flex items-center justify-center w-full py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+            onClick={() => setIsUserSubnavOpen((prev) => !prev)}
+            aria-label="Abrir menú de usuario"
+            type="button"
+          >
+            <UserIcon className="w-7 h-7 text-white" />
+          </button>
+          {/* Desplegable UsersSubnav solo si está abierto */}
+          {isUserSubnavOpen && (
+            <div className="block sm:hidden mt-2">
+              <UsersSubnav currentUser={user} />
+            </div>
+          )}
+        </div>
+                  <button
+            onClick={() => {
+              if (isNotifOpen) {
+                closeNotif();
+              } else {
+                openNotif();
+              }
+              // Solo cerrar menú en móvil
+              setIsMobileMenuOpen(false);
+            }}
+            className={`mt-2 flex items-center justify-center px-2 py-2 rounded-xl relative transition-colors duration-200 ${
+              isNotifOpen ? "bg-[#7A27BC]" : "hover:bg-[#2A2D2F]"
+            }`}
+            title="Notificaciones"
+          >
+            <FontAwesomeIcon icon={faBell} className="h-7 w-7 text-white" />
+            {unreadNotificationCount > 0 && (
+              <span className="absolute top-1 right-1 bg-[#E0B0FE] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {unreadNotificationCount}
+              </span>
+            )}
+          </button>
+        <NavLink
+          href={route("regular-posts.create")}
+          active={route().current("regular-posts.create")}
+          className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+        >
+          <ArrowUpTrayIcon className="w-7 h-7 text-white" />
         </NavLink>
-
-        <NavLink href={route("regular-posts.create")} active={route().current("regular-posts.create")} className="flex items-center gap-3">
-          <ArrowUpTrayIcon className="w-6 h-6" />
-          <span>Crear Post</span>
+        <NavLink
+          href={route("shops.show", { shop: user.shop.id })}
+          active={route().current("shops.show")}
+          className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+        >
+          <FontAwesomeIcon icon={faStore} className="w-6 h-6 text-white" />
         </NavLink>
-
-        <NavLink href={route("shops.show", { shop: user.shop.id })} active={route().current("shops.show")} className="flex items-center gap-3">
-          <FontAwesomeIcon icon={faStore} className="w-5 h-5" />
-          <span>Tienda</span>
+        <NavLink
+          href={route("communities.index")}
+          active={route().current("communities.index")}
+          className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+        >
+          <FontAwesomeIcon icon={faUsers} className="w-6 h-6 text-white" />
         </NavLink>
-
-        <NavLink href={route("communities.index")} active={route().current("communities.index")} className="flex items-center gap-3">
-          <FontAwesomeIcon icon={faUsers} className="w-5 h-5" />
-          <span>Comunidades</span>
-        </NavLink>
-
         {user.is_admin && (
           <>
-            <NavLink href={route("users.index")} active={route().current("users.index")} className="flex items-center gap-3">
-              <FontAwesomeIcon icon={faUsersGear} className="w-5 h-5" />
-              <span>Usuarios</span>
+            <NavLink
+              href={route("users.index")}
+              active={route().current("users.index")}
+              className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+            >
+              <FontAwesomeIcon icon={faUsersGear} className="w-6 h-6 text-white" />
             </NavLink>
-
-            <NavLink href={route("regular-posts.index")} active={route().current("regular-posts.index")} className="flex items-center gap-3">
-              <RectangleStackIcon className="w-6 h-6" />
-              <span>Posts</span>
+            <NavLink
+              href={route("regular-posts.index")}
+              active={route().current("regular-posts.index")}
+              className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+            >
+              <RectangleStackIcon className="w-7 h-7 text-white" />
             </NavLink>
-
-            <NavLink href={route("tags.index")} active={route().current("tags.index")} className="flex items-center gap-3">
-              <SwatchIcon className="w-6 h-6" />
-              <span>Etiquetas</span>
+            <NavLink
+              href={route("tags.index")}
+              active={route().current("tags.index")}
+              className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+            >
+              <SwatchIcon className="w-7 h-7 text-white" />
             </NavLink>
-
-            <NavLink href={route("socials.index")} active={route().current("socials.index")} className="flex items-center gap-3">
-              <AtSymbolIcon className="w-6 h-6" />
-              <span>Redes</span>
+            <NavLink
+              href={route("socials.index")}
+              active={route().current("socials.index")}
+              className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+            >
+              <AtSymbolIcon className="w-7 h-7 text-white" />
             </NavLink>
           </>
         )}
-
-        <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-3 text-left w-full">
-          <Cog8ToothIcon className="w-6 h-6" />
-          <span>Configuración</span>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition text-left w-full"
+        >
+          <Cog8ToothIcon className="w-7 h-7 text-white" />
         </button>
-
-        <NavLink href={route("logout")} method="post" className="flex items-center gap-3">
-          <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
-          <span>Cerrar sesión</span>
+        <NavLink
+          href={route("logout")}
+          method="post"
+          className="flex items-center justify-center py-3 px-2 rounded-lg text-white hover:bg-[#232428] transition"
+        >
+          <ArrowLeftStartOnRectangleIcon className="w-7 h-7 text-white" />
         </NavLink>
       </div>
     </div>
+    {/* Clic fuera cierra menú */}
+    <div className="flex-1" onClick={() => setIsMobileMenuOpen(false)} />
   </div>
 )}
 

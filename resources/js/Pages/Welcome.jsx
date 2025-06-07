@@ -25,24 +25,24 @@ export default function Welcome({ openAuthModal, status, canResetPassword }) {
                 className="relative min-h-screen bg-cover bg-center text-white"
                 style={{ backgroundImage: "url('/fondo_landing.jpg')" }}
             >
-                <div className="flex flex-col justify-center min-h-screen px-16 bg-black bg-opacity-50 text-left">
+                <div className="flex flex-col justify-center min-h-screen px-4 sm:px-8 md:px-16 bg-black bg-opacity-50 text-left">
                     <h1
-                        className="text-5xl mb-8 flex items-center"
+                        className="text-3xl sm:text-4xl md:text-5xl mb-6 sm:mb-8 flex items-center"
                         style={{
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: "700",
-                            marginTop: "-50px",
+                            marginTop: "-30px",
                             color: "#F1F1F1",
                         }}
                     >
                         <img
                             src="/logo_full.png"
                             alt="E"
-                            className="w-auto h-20 object-contain mr-2"
+                            className="h-14 sm:h-16 md:h-20 w-auto object-contain mr-2"
                         />
                     </h1>
                     <h2
-                        className="text-6xl mb-6 max-w-[65vw]"
+                        className="text-3xl sm:text-4xl md:text-6xl mb-4 sm:mb-6 max-w-full sm:max-w-[65vw]"
                         style={{
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: "900",
@@ -51,19 +51,28 @@ export default function Welcome({ openAuthModal, status, canResetPassword }) {
                         }}
                     >
                         Organiza tus recuerdos,
-                        <br /> crea tu historia.
+                        <br className="hidden sm:block" /> crea tu historia.
                     </h2>
-                    <p className="text-2xl mb-12" style={{ fontFamily: "Raleway, sans-serif", fontWeight: "700", maxWidth: "65vw", color: "#F1F1F1" }}>
+                    <p
+                        className="text-lg sm:text-2xl mb-8 sm:mb-12"
+                        style={{
+                            fontFamily: "Raleway, sans-serif",
+                            fontWeight: "700",
+                            maxWidth: "100vw",
+                            color: "#F1F1F1",
+                        }}
+                    >
                         Herramientas sencillas para gestionar y compartir imágenes de alta calidad.
                     </p>
-                    <div className="flex">
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                         <button
-                            onClick={() => setRegisterOpen(true)} // Abrir el modal al hacer clic en el botón
-                            className="px-8 py-4 text-2xl bg-white text-[#240A34] rounded-lg shadow hover:bg-transparent hover:text-white hover:border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20 border-2"
+                            onClick={() => setRegisterOpen(true)}
+                            className="px-6 py-3 sm:px-8 sm:py-4 text-lg sm:text-2xl bg-white text-[#240A34] rounded-lg shadow hover:bg-transparent hover:text-white hover:border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20 border-2"
                             style={{
                                 fontFamily: "Raleway, sans-serif",
                                 fontWeight: "900",
-                                marginRight: "30px",
+                                marginRight: "0",
+                                marginBottom: "0",
                             }}
                         >
                             Únete ahora
@@ -71,7 +80,7 @@ export default function Welcome({ openAuthModal, status, canResetPassword }) {
 
                         <a
                             href={route("explorar")}
-                            className="px-8 py-4 text-xl bg-transparent text-white rounded-lg shadow border-2 border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20"
+                            className="px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-xl bg-transparent text-white rounded-lg shadow border-2 border-white transition duration-300 ease-in-out hover:backdrop-blur-sm hover:bg-[#6A3F8C] hover:bg-opacity-20 text-center sm:text-left"
                             style={{
                                 fontFamily: "Raleway, sans-serif",
                                 fontWeight: "800",

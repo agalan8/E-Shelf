@@ -70,30 +70,32 @@ const UpdateImagesProfileForm = () => {
                 </Transition>
             </div>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 flex-col sm:flex-row">
                 {/* Imagen de perfil */}
                 <div className="flex-1 min-w-[200px]">
                     <ImageInput
                         name="profile_image"
                         label="Imagen de perfil"
-                        onChange={(file) => setData('profile_image', file)} // Actualiza el estado con la imagen seleccionada
+                        onChange={(file) => setData('profile_image', file)}
                         initialImage={user.profile_image?.path_small || null}
                         previewClassName="rounded-full w-[145px] h-[145px] object-cover"
-                        onDelete={() => handleDeleteImage('profile_image')} // Llama a la función handleDeleteImage para eliminar la imagen
+                        onDelete={() => handleDeleteImage('profile_image')}
                     />
                     {errors.profile_image && <div className="text-red-500">{errors.profile_image}</div>}
                 </div>
 
                 {/* Imagen de fondo */}
-                <div className="flex-1 min-w-[200px]">
-                    <ImageInput
-                        name="background_image"
-                        label="Imagen de fondo"
-                        onChange={(file) => setData('background_image', file)} // Actualiza el estado con la imagen seleccionada
-                        initialImage={user.background_image?.path_medium || null}
-                        previewClassName="w-[325px] h-[145px] object-cover rounded-md"
-                        onDelete={() => handleDeleteImage('background_image')} // Llama a la función handleDeleteImage para eliminar la imagen
-                    />
+                <div className="flex-1 min-w-[200px] sm:mt-0 mt-4">
+                    <div className="flex sm:justify-start">
+                        <ImageInput
+                            name="background_image"
+                            label="Imagen de fondo"
+                            onChange={(file) => setData('background_image', file)}
+                            initialImage={user.background_image?.path_medium || null}
+                            previewClassName="w-[325px] sm:w-[325px] h-[145px] object-cover rounded-md"
+                            onDelete={() => handleDeleteImage('background_image')}
+                        />
+                    </div>
                     {errors.background_image && <div className="text-red-500">{errors.background_image}</div>}
                 </div>
             </div>

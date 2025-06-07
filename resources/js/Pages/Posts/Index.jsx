@@ -209,85 +209,164 @@ export default function PostIndex() {
                     </div>
                 )}
 
-                {/* Tabla */}
-                <table className="w-full border-collapse text-gray-200 shadow-lg rounded-md overflow-hidden">
-                    <thead>
-                        <tr className="bg-gray-800 border-b border-purple-600">
-                            <th
-                                className="border border-purple-700 p-3 cursor-pointer select-none"
-                                onClick={() => handleSort("user_name")}
-                            >
-                                Usuario{" "}
-                                {sortField === "user_name" &&
-                                    (sortDirection === "asc" ? "↑" : "↓")}
-                            </th>
-                            <th
-                                className="border border-purple-700 p-3 cursor-pointer select-none"
-                                onClick={() => handleSort("titulo")}
-                            >
-                                Título{" "}
-                                {sortField === "titulo" &&
-                                    (sortDirection === "asc" ? "↑" : "↓")}
-                            </th>
-                            <th className="border border-purple-700 p-3">
-                                Descripción
-                            </th>
-                            <th className="border border-purple-700 p-3">
-                                Foto
-                            </th>
-                            <th className="border border-purple-700 p-3">
-                                Etiquetas
-                            </th>
-                            <th
-                                className="border border-purple-700 p-3 cursor-pointer select-none"
-                                onClick={() => handleSort("created_at")}
-                            >
-                                Fecha creación{" "}
-                                {sortField === "created_at" &&
-                                    (sortDirection === "asc" ? "↑" : "↓")}
-                            </th>
-                            <th className="border border-purple-700 p-3">
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredPosts.map((post) => (
-                            <tr
-                                key={post.id}
-                                className="text-center hover:bg-gray-800 border-b border-purple-700 transition"
-                            >
-                                <td className="border border-purple-700 p-3">
-                                    {post.post.user.name}
-                                </td>
-                                <td className="border border-purple-700 p-3">
-                                    {post.titulo}
-                                </td>
-                                <td className="border border-purple-700 p-3 truncate max-w-xs">
-                                    {post.descripcion}
-                                </td>
-                                <td className="border border-purple-700 p-3">
-                                    {post.image && (
-                                        <Image
-                                            src={`${
-                                                post.image.path_medium
-                                            }?t=${new Date().getTime()}`}
-                                            alt="Post Photo"
-                                            className="w-32 h-32 object-contain mx-auto rounded"
-                                        />
-                                    )}
-                                </td>
-                                <td className="border border-purple-700 p-3">
-                                    {post.tags.map((tag) => (
-                                        <span
-                                            key={tag.id}
-                                            className="bg-purple-700 text-gray-300 px-2 py-1 rounded mr-1 inline-block"
+                {/* Tabla solo visible en sm+ */}
+                <div className="hidden sm:block">
+                    <table className="w-full border-collapse text-gray-200 shadow-lg rounded-md overflow-hidden">
+                        <thead>
+                            <tr className="bg-gray-800 border-b border-purple-600">
+                                <th
+                                    className="border border-purple-700 p-3 cursor-pointer select-none"
+                                    onClick={() => handleSort("user_name")}
+                                >
+                                    Usuario{" "}
+                                    {sortField === "user_name" &&
+                                        (sortDirection === "asc" ? "↑" : "↓")}
+                                </th>
+                                <th
+                                    className="border border-purple-700 p-3 cursor-pointer select-none"
+                                    onClick={() => handleSort("titulo")}
+                                >
+                                    Título{" "}
+                                    {sortField === "titulo" &&
+                                        (sortDirection === "asc" ? "↑" : "↓")}
+                                </th>
+                                <th className="border border-purple-700 p-3">
+                                    Descripción
+                                </th>
+                                <th className="border border-purple-700 p-3">
+                                    Foto
+                                </th>
+                                <th className="border border-purple-700 p-3">
+                                    Etiquetas
+                                </th>
+                                <th
+                                    className="border border-purple-700 p-3 cursor-pointer select-none"
+                                    onClick={() => handleSort("created_at")}
+                                >
+                                    Fecha creación{" "}
+                                    {sortField === "created_at" &&
+                                        (sortDirection === "asc" ? "↑" : "↓")}
+                                </th>
+                                <th className="border border-purple-700 p-3">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredPosts.map((post) => (
+                                <tr
+                                    key={post.id}
+                                    className="text-center hover:bg-gray-800 border-b border-purple-700 transition"
+                                >
+                                    <td className="border border-purple-700 p-3">
+                                        {post.post.user.name}
+                                    </td>
+                                    <td className="border border-purple-700 p-3">
+                                        {post.titulo}
+                                    </td>
+                                    <td className="border border-purple-700 p-3 truncate max-w-xs">
+                                        {post.descripcion}
+                                    </td>
+                                    <td className="border border-purple-700 p-3">
+                                        {post.image && (
+                                            <Image
+                                                src={`${
+                                                    post.image.path_medium
+                                                }?t=${new Date().getTime()}`}
+                                                alt="Post Photo"
+                                                className="w-32 h-32 object-contain mx-auto rounded"
+                                            />
+                                        )}
+                                    </td>
+                                    <td className="border border-purple-700 p-3">
+                                        {post.tags.map((tag) => (
+                                            <span
+                                                key={tag.id}
+                                                className="bg-purple-700 text-gray-300 px-2 py-1 rounded mr-1 inline-block"
+                                            >
+                                                {tag.nombre}
+                                            </span>
+                                        ))}
+                                    </td>
+                                    <td className="border border-purple-700 p-3 whitespace-nowrap">
+                                        {new Date(post.created_at).toLocaleString(
+                                            "es-ES",
+                                            {
+                                                month: "2-digit",
+                                                day: "2-digit",
+                                                year: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            }
+                                        )}
+                                    </td>
+                                    <td className="border border-purple-700 p-3 space-x-2">
+                                        <button
+                                            onClick={() => openShowModal(post)}
+                                            className="inline-flex items-center justify-center p-2 text-white bg-purple-700 hover:bg-purple-800 rounded transition text-base"
+                                            title="Ver publicación"
                                         >
-                                            {tag.nombre}
-                                        </span>
-                                    ))}
-                                </td>
-                                <td className="border border-purple-700 p-3 whitespace-nowrap">
+                                            <FontAwesomeIcon
+                                                icon={faEye}
+                                                size="lg"
+                                            />
+                                        </button>
+                                        <button
+                                            onClick={() => deletePost(post.id)}
+                                            className="inline-flex items-center justify-center p-2 text-white bg-red-700 hover:bg-red-800 rounded transition text-base"
+                                            title="Eliminar publicación"
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faTrash}
+                                                size="lg"
+                                            />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Cards solo visibles en móvil */}
+                <div className="block sm:hidden space-y-4">
+                    {filteredPosts.map((post) => (
+                        <div
+                            key={post.id}
+                            className="bg-gray-800 rounded-lg p-4 shadow border border-purple-700 flex flex-col space-y-2"
+                        >
+                            <div className="flex items-center space-x-3 mb-2">
+                                {post.image && (
+                                    <Image
+                                        src={`${post.image.path_medium}?t=${new Date().getTime()}`}
+                                        alt="Post Photo"
+                                        className="w-20 h-20 object-contain rounded"
+                                    />
+                                )}
+                                <div>
+                                    <div className="font-bold text-purple-300 text-lg">
+                                        {post.titulo}
+                                    </div>
+                                    <div className="text-gray-400 text-sm">
+                                        {post.post.user.name}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="text-gray-300 text-sm mb-1">
+                                {post.descripcion}
+                            </div>
+                            <div className="flex flex-wrap gap-2 mb-1">
+                                {post.tags.map((tag) => (
+                                    <span
+                                        key={tag.id}
+                                        className="bg-purple-700 text-gray-100 px-2 py-1 rounded text-xs"
+                                    >
+                                        {tag.nombre}
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="flex justify-between items-center text-xs text-gray-400">
+                                <span>
                                     {new Date(post.created_at).toLocaleString(
                                         "es-ES",
                                         {
@@ -298,33 +377,27 @@ export default function PostIndex() {
                                             minute: "2-digit",
                                         }
                                     )}
-                                </td>
-                                <td className="border border-purple-700 p-3 space-x-2">
+                                </span>
+                                <div className="flex space-x-2">
                                     <button
                                         onClick={() => openShowModal(post)}
-                                        className="inline-flex items-center justify-center p-2 text-white bg-purple-700 hover:bg-purple-800 rounded transition text-base"
+                                        className="p-2 text-white bg-purple-700 hover:bg-purple-800 rounded transition"
                                         title="Ver publicación"
                                     >
-                                        <FontAwesomeIcon
-                                            icon={faEye}
-                                            size="lg"
-                                        />
+                                        <FontAwesomeIcon icon={faEye} size="lg" />
                                     </button>
                                     <button
                                         onClick={() => deletePost(post.id)}
-                                        className="inline-flex items-center justify-center p-2 text-white bg-red-700 hover:bg-red-800 rounded transition text-base"
+                                        className="p-2 text-white bg-red-700 hover:bg-red-800 rounded transition"
                                         title="Eliminar publicación"
                                     >
-                                        <FontAwesomeIcon
-                                            icon={faTrash}
-                                            size="lg"
-                                        />
+                                        <FontAwesomeIcon icon={faTrash} size="lg" />
                                     </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
             {showModal && selectedPost && (
                 <Show post={selectedPost} onClose={closeShowModal} />

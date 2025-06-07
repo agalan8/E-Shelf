@@ -64,6 +64,7 @@ const loadMore = async () => {
               transition-all duration-300 ease-in-out
               ${n.isHiding ? "opacity-0 scale-95" : "opacity-100 scale-100"}
               ${n.read_at ? "bg-gray-800 border-gray-700" : "bg-gray-800 border-purple-600"}
+              mr-36 sm:mr-0
             `}
           >
             <div className="flex-grow">

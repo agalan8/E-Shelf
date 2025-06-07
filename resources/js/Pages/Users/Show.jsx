@@ -92,7 +92,7 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
         {/* Fondo de portada */}
         <div
           className={`w-full overflow-hidden flex items-center justify-center bg-white relative ${
-            user.background_image?.path_original ? "h-[500px]" : "h-[198px]"
+            user.background_image?.path_original ? "h-[300px] sm:h-[500px]" : "h-[120px] sm:h-[198px]"
           }`}
         >
           {user.background_image?.path_original ? (
@@ -106,18 +106,18 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
           )}
 
           {/* Franja inferior con imagen, datos y redes sociales */}
-          <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 backdrop-blur-sm flex items-center py-6 px-6">
-            <div className="flex items-center gap-6">
+          <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 backdrop-blur-sm flex flex-col sm:flex-row items-center py-4 sm:py-6 px-2 sm:px-6 gap-4 sm:gap-0">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
               {/* Imagen de perfil */}
               {user.profile_image?.path_small ? (
                 <Image
                   src={`${user.profile_image.path_small}?t=${new Date().getTime()}`}
                   alt={user.name}
-                  className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
+                  className="w-[90px] h-[90px] sm:w-[150px] sm:h-[150px] rounded-full border-4 border-white object-cover"
                 />
               ) : (
                 <div
-                  className="w-[150px] h-[150px] rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-gray-500 text-4xl"
+                  className="w-[90px] h-[90px] sm:w-[150px] sm:h-[150px] rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-gray-500 text-4xl"
                   title="Sin imagen"
                 >
                   ?
@@ -125,7 +125,7 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
               )}
 
               {/* Contadores */}
-              <div className="flex items-center gap-8 ml-8">
+              <div className="flex gap-6 sm:gap-8 ml-0 sm:ml-8 mt-2 sm:mt-0">
                 {/* Seguidores */}
                 <div
                   className="text-center cursor-pointer"
@@ -146,14 +146,14 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
               </div>
 
               {/* Botón seguir */}
-              <div className="flex items-center">{renderIcon()}</div>
+              <div className="flex items-center mt-2 sm:mt-0">{renderIcon()}</div>
             </div>
 
             {/* Separador flexible */}
-            <div className="flex-grow" />
+            <div className="hidden sm:flex flex-grow" />
 
             {/* Redes sociales */}
-            <div className="flex flex-col items-start gap-2 mr-24">
+            <div className="flex flex-row sm:flex-col items-center sm:items-start gap-2 sm:mr-24 mt-2 sm:mt-0">
               {user.socials?.map((social) => {
                 const iconUrl = socialIconUrls[social.nombre.toLowerCase()] || null;
                 let url = "#";
@@ -181,7 +181,7 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-white hover:underline text-lg font-semibold flex items-center gap-2"
+                    className="text-white hover:underline text-base sm:text-lg font-semibold flex items-center gap-2"
                     title={social.nombre}
                   >
                     {iconUrl && (
@@ -203,11 +203,11 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
       {/* Publicaciones */}
       <div className="mt-1">
         {posts.length === 0 ? (
-          <p className="text-white my-8 ml-5">
+          <p className="text-white my-8 ml-2 sm:ml-5 text-center sm:text-left">
             Este usuario no tiene publicaciones aún.
           </p>
         ) : (
-          <div className="flex gap-1">
+          <div className="flex flex-col sm:flex-row gap-1">
             {[0, 1, 2].map((colIndex) => (
               <div key={colIndex} className="flex flex-col gap-1 flex-1">
                 {posts

@@ -51,9 +51,8 @@ export default function Index({ communities, auth }) {
     >
         <Head title="Comunidades" />
       {auth.user && (
-        <div className="flex justify-between items-center px-4 mb-4">
-
-          <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center px-2 sm:px-4 mb-4 gap-2 sm:gap-0">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
             <select
               value={sortUsers}
               onChange={(e) => setSortUsers(e.target.value)}
@@ -76,7 +75,7 @@ export default function Index({ communities, auth }) {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-purple-600 text-white px-4 py-2 my-5 rounded hover:bg-purple-500 transition flex items-center gap-2"
+            className="bg-purple-600 text-white px-4 py-2 my-2 sm:my-5 rounded hover:bg-purple-500 transition flex items-center gap-2 w-full sm:w-auto justify-center"
           >
             <FontAwesomeIcon icon={faPlus} />
             Crear Comunidad
@@ -84,7 +83,7 @@ export default function Index({ communities, auth }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12 px-4 justify-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-2 sm:gap-x-6 gap-y-6 sm:gap-y-12 px-2 sm:px-4 justify-items-center">
         {sortedCommunities.length > 0 ? (
           sortedCommunities.map((community) => (
             <Community key={community.id} community={community} />

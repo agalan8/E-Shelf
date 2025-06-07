@@ -81,8 +81,11 @@ const Create = ({ onClose, posts }) => {
             }`}
         >
             <div
-                onClick={handleModalClick} // evita cierre si se clickea dentro
-                className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-5xl h-[70vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
+                onClick={handleModalClick}
+                className={`bg-[#292B2F] rounded-lg shadow-lg
+        w-[98vw] max-w-[98vw] h-[98vh]
+        sm:w-11/12 sm:max-w-5xl sm:h-[70vh]
+        flex flex-col overflow-hidden relative transform transition-all duration-300 ${
                     isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
                 }`}
             >
@@ -170,7 +173,7 @@ const Create = ({ onClose, posts }) => {
                             <h2 className="text-2xl font-bold mb-6">
                                 Selecciona las Publicaciones
                             </h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 max-h-[50vh] overflow-y-auto p-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 max-h-[75vh] sm:max-h-[50vh] overflow-y-auto p-4">
                                 {posts.length === 0 ? (
                                     <p>No tienes posts disponibles.</p>
                                 ) : (

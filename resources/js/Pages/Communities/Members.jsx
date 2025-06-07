@@ -167,58 +167,66 @@ const Members = ({ community, auth, authUserRole }) => {
         <Layout subnav={<CommunitySubnav currentCommunity={community} />}>
             <div className="community-profile">
                 {/* Fondo de portada */}
-                <div className="w-full h-[350px] overflow-hidden flex items-center justify-center relative">
+                <div
+                    className={`w-full overflow-hidden flex items-center justify-center relative ${
+                        community.background_image?.path_original
+                            ? "h-[200px] sm:h-[350px]"
+                            : "h-[80px] sm:h-[124px]"
+                    }`}
+                >
                     {community.background_image?.path_original ? (
                         <Image
-                            src={`${
-                                community.background_image.path_original
-                            }?t=${Date.now()}`}
+                            src={`${community.background_image.path_original}?t=${Date.now()}`}
                             alt="Fondo de comunidad"
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <div className="w-full h-full bg-[#7A27BC]" />
+                        <div className="w-full h-full bg-gray-600" />
                     )}
 
                     {/* Franja con efecto blur */}
                     <div
-                        className={`absolute bottom-0 left-0 w-full py-3 px-6 flex items-center gap-6
-            ${
-                community.background_image
-                    ? "bg-black/50 backdrop-blur-sm"
-                    : "bg-[#2d2e38]"
-            }`}
+                        className={`absolute bottom-0 left-0 w-full py-3 px-2 sm:px-6 flex flex-col sm:flex-row items-center gap-3 sm:gap-6
+                ${
+                    community.background_image
+                        ? "bg-black/50 backdrop-blur-sm"
+                        : "bg-[#2d2e38]"
+                }`}
                     >
+                        {/* Imagen de perfil */}
                         {community.profile_image?.path_small ? (
                             <Image
-                                src={`${
-                                    community.profile_image.path_small
-                                }?t=${Date.now()}`}
+                                src={`${community.profile_image.path_small}?t=${Date.now()}`}
                                 alt={community.nombre}
-                                className="w-[100px] h-[100px] rounded-full border-4 border-white object-cover"
+                                className="w-[60px] h-[60px] sm:w-[100px] sm:h-[100px] rounded-full border-4 border-white object-cover"
                             />
                         ) : (
-                            <div className="w-[100px] h-[100px] rounded-full border-4 border-white bg-gray-400 flex items-center justify-center text-white text-4xl">
+                            <div
+                                className="w-[60px] h-[60px] sm:w-[100px] sm:h-[100px] rounded-full border-4 border-white bg-gray-400 flex items-center justify-center text-white text-2xl sm:text-4xl"
+                                title="Sin imagen"
+                            >
                                 ?
                             </div>
                         )}
 
-                        <div className="flex gap-8">
+                        {/* Contadores */}
+                        <div className="flex gap-4 sm:gap-8 mt-2 sm:mt-0">
                             <div className="text-center text-white">
                                 <p className="font-semibold">
                                     {community.getTotalMembers}
                                 </p>
-                                <p className="text-base">Miembros</p>
+                                <p className="text-xs sm:text-base">Miembros</p>
                             </div>
                             <div className="text-center text-white">
                                 <p className="font-semibold">
                                     {community.getTotalPosts}
                                 </p>
-                                <p className="text-base">Publicaciones</p>
+                                <p className="text-xs sm:text-base">Publicaciones</p>
                             </div>
                         </div>
 
-                        {renderJoinButton()}
+                        {/* Botón de unirse/salir */}
+                        <div className="mt-2 sm:mt-0">{renderJoinButton()}</div>
                     </div>
                 </div>
 
@@ -231,7 +239,7 @@ const Members = ({ community, auth, authUserRole }) => {
                             placeholder="Buscar por nombre de usuario"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="border border-gray-300 rounded px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="bg-[#292B2F] text-white rounded-md px-3 py-2 border border-gray-600 w-64 focus:outline-none focus:ring-2 focus:ring-purple-600"
                         />
                     </div>
 

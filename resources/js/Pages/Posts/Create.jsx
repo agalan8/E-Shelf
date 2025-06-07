@@ -167,39 +167,39 @@ const handleSubmit = (e) => {
       <Head title="Crear publicación" />
       <div className="w-full mx-auto">
         {!imageUploaded ? (
-  <div className="flex flex-col items-center justify-center h-96 text-white mt-24">
-    <label
-      htmlFor="image-upload"
-      className="group relative cursor-pointer text-gray-400 transition-colors"
-      title="Subir imagen"
-    >
-      <FontAwesomeIcon
-        icon={faCamera}
-        className="w-96 h-96 transition-transform duration-200 group-hover:scale-105"
-      />
-      <FontAwesomeIcon
-        icon={faCirclePlus}
-        className="absolute bottom-2 -right-4 w-28 h-28 border-4 border-[#373841] rounded-full bg-[#373841] text-[#E0B0FF] text-opacity-60 transition-transform duration-200 group-hover:scale-110"
-      />
-      <input
-        id="image-upload"
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        className="hidden"
-      />
-    </label>
-    <p className="mt-4 text-2xl">
-      ¡Haz clic en el icono para subir una Publicación!
-    </p>
-  </div>
+          <div className="flex flex-col items-center justify-center h-96 text-white mt-24 sm:mt-10">
+            <label
+              htmlFor="image-upload"
+              className="group relative cursor-pointer text-gray-400 transition-colors flex flex-col lg:block items-center"
+              title="Subir imagen"
+            >
+              <FontAwesomeIcon
+                icon={faCamera}
+                className="w-40 h-40 sm:w-32 sm:h-32 lg:w-96 lg:h-96 transition-transform duration-200 group-hover:scale-105 mx-auto"
+              />
+              <FontAwesomeIcon
+                icon={faCirclePlus}
+                className="absolute bottom-2 right-1 sm:bottom-2 sm:right-1 lg:bottom-2 lg:-right-4 w-10 h-10 sm:w-8 sm:h-8 lg:w-28 lg:h-28 border-4 border-[#373841] rounded-full bg-[#373841] text-[#E0B0FF] text-opacity-60 transition-transform duration-200 group-hover:scale-110"
+              />
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
+            <p className="mt-4 text-base sm:text-base lg:text-2xl text-center">
+              ¡Haz clic en el icono para subir una Publicación!
+            </p>
+          </div>
         ) : (
-          <div className="flex items-center gap-6 mt-4 h-[90vh]">
-            <div className="w-[65%] relative ml-6">
+          <div className="flex flex-col lg:flex-row items-center gap-6 mt-4 h-auto lg:h-[90vh]">
+            <div className="w-full lg:w-[65%] relative ml-0 lg:ml-6 mb-4 lg:mb-0">
               <img
                 src={URL.createObjectURL(imageFile)}
                 alt="Imagen subida"
-                className="h-auto max-h-[80vh] w-full object-contain shadow-black shadow-2xl"
+                className="h-auto max-h-[40vh] lg:max-h-[80vh] w-full object-contain shadow-black shadow-2xl"
               />
               <button
                 onClick={handleRemoveImage}
@@ -210,10 +210,10 @@ const handleSubmit = (e) => {
               </button>
             </div>
 
-            <div className="w-[35%] bg-[#303136] p-1 shadow h-[90vh] flex flex-col">
+            <div className="w-full lg:w-[35%] bg-[#303136] p-1 shadow h-auto lg:h-[90vh] flex flex-col">
               <form
                 onSubmit={handleSubmit}
-                className="space-y-4 flex flex-col flex-grow overflow-y-auto p-6"
+                className="space-y-4 flex flex-col flex-grow overflow-y-auto p-3 lg:p-6"
               >
                 {/* Título */}
                 <div>
@@ -312,13 +312,13 @@ const handleSubmit = (e) => {
                       Seleccionar etiqueta...
                     </button>
                     {isDropdownOpen && (
-                      <div className="absolute w-full mt-1 border rounded bg-white shadow-md z-10 max-h-40 overflow-y-auto">
+                      <div className="absolute w-full mt-1 border rounded bg-[#272729] shadow-md z-10 max-h-40 overflow-y-auto">
                         <input
                           type="text"
                           placeholder="Buscar..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full p-2 border-b rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                          className="w-full p-2 border-b rounded-md bg-[#272729] text-white placeholder-gray-400 focus:ring-white"
                         />
                         {tags
                           .filter((tag) =>
@@ -330,7 +330,7 @@ const handleSubmit = (e) => {
                             <div
                               key={tag.id}
                               onClick={() => handleTagSelect(tag)}
-                              className="p-2 cursor-pointer hover:bg-gray-200"
+                              className="p-2 cursor-pointer hover:bg-[#373841] text-white"
                             >
                               {tag.nombre}
                             </div>
@@ -372,7 +372,7 @@ const handleSubmit = (e) => {
                       Seleccionar comunidad...
                     </button>
                     {isCommunityDropdownOpen && (
-                      <div className="absolute w-full mt-1 border rounded bg-white shadow-md z-10 max-h-40 overflow-y-auto">
+                      <div className="absolute w-full mt-1 border rounded bg-[#272729] shadow-md z-10 max-h-40 overflow-y-auto">
                         <input
                           type="text"
                           placeholder="Buscar..."
@@ -380,7 +380,7 @@ const handleSubmit = (e) => {
                           onChange={(e) =>
                             setCommunitySearchTerm(e.target.value)
                           }
-                          className="w-full p-2 border-b rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                          className="w-full p-2 border-b rounded-md bg-[#272729] text-white placeholder-gray-400 focus:ring-white"
                         />
                         {communities
                           .filter((community) =>
@@ -392,7 +392,7 @@ const handleSubmit = (e) => {
                             <div
                               key={community.id}
                               onClick={() => handleCommunitySelect(community)}
-                              className="p-2 cursor-pointer hover:bg-gray-200"
+                              className="p-2 cursor-pointer hover:bg-[#373841] text-white"
                             >
                               {community.nombre}
                             </div>

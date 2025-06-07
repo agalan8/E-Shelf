@@ -31,7 +31,10 @@ const FollowingModal = ({ isOpen, onClose, following }) => {
         onClick={(e) => e.stopPropagation()} // Previene cierre al hacer clic dentro del modal
         className={`bg-[#36393F] rounded-lg shadow-lg w-full max-w-lg p-6 relative transform transition-all duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
-        }`}
+        }
+        sm:max-w-lg sm:p-6
+        max-w-full w-[95vw] p-2
+        `}
         style={{ height: '70vh', display: 'flex', flexDirection: 'column' }}
       >
         <button

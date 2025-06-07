@@ -96,16 +96,29 @@ const Show = ({ community, auth, posts, tags }) => {
 
     return (
         <Layout subnav={<CommunitySubnav currentCommunity={community} />}>
+            {/* Botón miembros solo en móvil, en el header */}
+            {/* <div className="sm:hidden flex justify-end px-4 pt-4">
+                <a
+                    href={route("communities.members", community.id)}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded bg-[#9C7FB3] text-white font-bold text-sm shadow"
+                    title="Ver miembros"
+                >
+                    <FontAwesomeIcon icon={faUserGroup} className="w-4 h-4" />
+                    Miembros
+                </a>
+            </div> */}
             <div className="community-profile">
                 {/* Fondo de portada */}
-                <div   className={`w-full overflow-hidden flex items-center justify-center relative ${
-    community.background_image?.path_original ? "h-[350px]" : "h-[124px]"
-  }`}>
+                <div
+                    className={`w-full overflow-hidden flex items-center justify-center relative ${
+                        community.background_image?.path_original
+                            ? "h-[200px] sm:h-[350px]"
+                            : "h-[80px] sm:h-[124px]"
+                    }`}
+                >
                     {community.background_image?.path_original ? (
                         <Image
-                            src={`${
-                                community.background_image.path_original
-                            }?t=${Date.now()}`}
+                            src={`${community.background_image.path_original}?t=${Date.now()}`}
                             alt="Fondo de comunidad"
                             className="w-full h-full object-cover"
                         />
@@ -115,25 +128,23 @@ const Show = ({ community, auth, posts, tags }) => {
 
                     {/* Franja con efecto blur */}
                     <div
-                        className={`absolute bottom-0 left-0 w-full py-3 px-6 flex items-center gap-6
-            ${
-                community.background_image
-                    ? "bg-black/50 backdrop-blur-sm"
-                    : "bg-[#2d2e38]"
-            }`}
+                        className={`absolute bottom-0 left-0 w-full py-3 px-2 sm:px-6 flex flex-col sm:flex-row items-center gap-3 sm:gap-6
+                            ${
+                                community.background_image
+                                    ? "bg-black/50 backdrop-blur-sm"
+                                    : "bg-[#2d2e38]"
+                            }`}
                     >
                         {/* Imagen de perfil */}
                         {community.profile_image?.path_small ? (
                             <Image
-                                src={`${
-                                    community.profile_image.path_small
-                                }?t=${Date.now()}`}
+                                src={`${community.profile_image.path_small}?t=${Date.now()}`}
                                 alt={community.nombre}
-                                className="w-[100px] h-[100px] rounded-full border-4 border-white object-cover"
+                                className="w-[60px] h-[60px] sm:w-[100px] sm:h-[100px] rounded-full border-4 border-white object-cover"
                             />
                         ) : (
                             <div
-                                className="w-[100px] h-[100px] rounded-full border-4 border-white bg-gray-400 flex items-center justify-center text-white text-4xl"
+                                className="w-[60px] h-[60px] sm:w-[100px] sm:h-[100px] rounded-full border-4 border-white bg-gray-400 flex items-center justify-center text-white text-2xl sm:text-4xl"
                                 title="Sin imagen"
                             >
                                 ?
@@ -141,23 +152,34 @@ const Show = ({ community, auth, posts, tags }) => {
                         )}
 
                         {/* Contadores */}
-                        <div className="flex gap-8">
-                            <div className="text-center text-white">
+                        <div className="flex gap-4 sm:gap-8 mt-2 sm:mt-0">
+                            {/* Miembros: En móvil es enlace, en escritorio texto */}
+                            <a
+                                href={route("communities.members", community.id)}
+                                className="sm:hidden text-center text-white"
+                                title="Ver miembros"
+                            >
                                 <p className="font-semibold">
                                     {community.getTotalMembers}
                                 </p>
-                                <p className="text-base">Miembros</p>
+                                <p className="text-xs sm:text-base">Miembros</p>
+                            </a>
+                            <div className="hidden sm:block text-center text-white">
+                                <p className="font-semibold">
+                                    {community.getTotalMembers}
+                                </p>
+                                <p className="text-xs sm:text-base">Miembros</p>
                             </div>
                             <div className="text-center text-white">
                                 <p className="font-semibold">
                                     {community.getTotalPosts}
                                 </p>
-                                <p className="text-base">Publicaciones</p>
+                                <p className="text-xs sm:text-base">Publicaciones</p>
                             </div>
                         </div>
 
                         {/* Botón de unirse/salir */}
-                        {renderJoinButton()}
+                        <div className="mt-2 sm:mt-0">{renderJoinButton()}</div>
                     </div>
                 </div>
             </div>
@@ -165,11 +187,11 @@ const Show = ({ community, auth, posts, tags }) => {
             {/* Publicaciones de la comunidad */}
             <div className="mt-1">
                 {posts.length === 0 ? (
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 text-center mt-8">
                         Esta comunidad no tiene publicaciones aún.
                     </p>
                 ) : (
-                    <div className="flex gap-1">
+                    <div className="flex flex-col sm:flex-row gap-1">
                         {[0, 1, 2].map((colIndex) => (
                             <div
                                 key={colIndex}
