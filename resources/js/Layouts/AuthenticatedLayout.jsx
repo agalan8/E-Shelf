@@ -44,6 +44,8 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isNotifVisible, setIsNotifVisible] = useState(false);
   const [modalPost, setModalPost] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
 
   const cartPanelRef = useRef(null);
   const notifPanelRef = useRef(null);
@@ -195,7 +197,17 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
 
       <div className="flex-1 flex flex-col h-full">
         <div className="bg-[#373841] shadow px-4 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b-2 border-[#2b2c31]">
+            {/* Botón menú móvil */}
+  <button
+    className="sm:hidden text-white"
+    onClick={() => setIsMobileMenuOpen(true)}
+  >
+    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
           {header && (
+
             <div className="text-base font-semibold text-white">{header}</div>
           )}
           <div className="w-full sm:w-auto sm:ml-auto flex items-center gap-4">
@@ -268,6 +280,93 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
           notification={true}
         />
       )}
+
+{isMobileMenuOpen && (
+  <div className="fixed inset-0 z-50 bg-black bg-opacity-60 sm:hidden">
+    <div className="w-64 bg-[#1A1D1F] h-full p-4 text-white relative overflow-y-auto">
+
+      {/* Botón cerrar */}
+      <button
+        className="absolute top-4 right-4 text-white"
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      {/* Menú de enlaces */}
+      <div className="mt-12 flex flex-col space-y-4">
+        <NavLink href={route("posts-seguidos")} active={route().current("posts-seguidos")} className="flex items-center gap-3">
+          <HomeIcon className="w-6 h-6" />
+          <span>Home</span>
+        </NavLink>
+
+        <NavLink href={route("explorar")} active={route().current("explorar") || route().current("home")} className="flex items-center gap-3">
+          <GlobeAsiaAustraliaIcon className="w-6 h-6" />
+          <span>Explorar</span>
+        </NavLink>
+
+        <NavLink href={route("users.show", { user: user.id })} active={route().current("users.show")} className="flex items-center gap-3">
+          <UserIcon className="w-6 h-6" />
+          <span>Perfil</span>
+        </NavLink>
+
+        <NavLink href={route("regular-posts.create")} active={route().current("regular-posts.create")} className="flex items-center gap-3">
+          <ArrowUpTrayIcon className="w-6 h-6" />
+          <span>Crear Post</span>
+        </NavLink>
+
+        <NavLink href={route("shops.show", { shop: user.shop.id })} active={route().current("shops.show")} className="flex items-center gap-3">
+          <FontAwesomeIcon icon={faStore} className="w-5 h-5" />
+          <span>Tienda</span>
+        </NavLink>
+
+        <NavLink href={route("communities.index")} active={route().current("communities.index")} className="flex items-center gap-3">
+          <FontAwesomeIcon icon={faUsers} className="w-5 h-5" />
+          <span>Comunidades</span>
+        </NavLink>
+
+        {user.is_admin && (
+          <>
+            <NavLink href={route("users.index")} active={route().current("users.index")} className="flex items-center gap-3">
+              <FontAwesomeIcon icon={faUsersGear} className="w-5 h-5" />
+              <span>Usuarios</span>
+            </NavLink>
+
+            <NavLink href={route("regular-posts.index")} active={route().current("regular-posts.index")} className="flex items-center gap-3">
+              <RectangleStackIcon className="w-6 h-6" />
+              <span>Posts</span>
+            </NavLink>
+
+            <NavLink href={route("tags.index")} active={route().current("tags.index")} className="flex items-center gap-3">
+              <SwatchIcon className="w-6 h-6" />
+              <span>Etiquetas</span>
+            </NavLink>
+
+            <NavLink href={route("socials.index")} active={route().current("socials.index")} className="flex items-center gap-3">
+              <AtSymbolIcon className="w-6 h-6" />
+              <span>Redes</span>
+            </NavLink>
+          </>
+        )}
+
+        <button onClick={() => setIsModalOpen(true)} className="flex items-center gap-3 text-left w-full">
+          <Cog8ToothIcon className="w-6 h-6" />
+          <span>Configuración</span>
+        </button>
+
+        <NavLink href={route("logout")} method="post" className="flex items-center gap-3">
+          <ArrowLeftStartOnRectangleIcon className="w-6 h-6" />
+          <span>Cerrar sesión</span>
+        </NavLink>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
     </div>
   );
 }
