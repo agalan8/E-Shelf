@@ -107,7 +107,7 @@ export default function Community({ community }) {
         {/* Fondo */}
         <div
           className={`w-full h-full bg-cover bg-center ${
-            !community.background_image && 'bg-[#7A27BC]'
+            !community.background_image && 'bg-gray-200'
           }`}
           style={{
             backgroundImage: community.background_image

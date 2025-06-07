@@ -123,7 +123,7 @@ const ShopPost = ({ post }) => {
                 ) : (
                   <button
                     onClick={handleAddToCart}
-                    className="bg-green-600 hover:bg-green-700 text-white p-2 rounded flex items-center justify-center"
+                    className="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded flex items-center justify-center"
                     title="Añadir al carrito"
                   >
                     <FontAwesomeIcon icon={faCartPlus} />

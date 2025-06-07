@@ -153,7 +153,7 @@ class AlbumController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'string|max:255',
-            'portada' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'portada' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
         ]);
 
         $album->update([

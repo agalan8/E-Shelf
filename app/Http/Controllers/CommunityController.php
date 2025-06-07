@@ -58,8 +58,8 @@ class CommunityController extends Controller
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string|max:255',
             'visibilidad' => 'required|string|in:publico,privado',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
         ]);
 
         $community = Community::create([
@@ -186,8 +186,8 @@ class CommunityController extends Controller
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string|max:255',
             'visibilidad' => 'required|string|in:publico,privado',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
         ]);
 
         $community->update([

@@ -258,8 +258,10 @@ export default function UserIndex() {
                   defaultValue=""
                   className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                 >
-                  <option value="">No</option>
-                  <option value="1">Sí</option>
+                <option value="">Seleccione una opción...</option>
+
+                  <option value="false">No</option>
+                  <option value="true">Sí</option>
                 </select>
               </div>
               <div className="flex justify-end space-x-3 mt-6">

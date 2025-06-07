@@ -86,7 +86,7 @@ export default function CommunityJoinRequestNotification({
       <div className="flex space-x-3 mt-2 px-2">
         <button
           onClick={handleAccept}
-          className="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-3 py-1 rounded transition"
+          className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-3 py-1 rounded transition"
         >
           Aceptar
         </button>

@@ -4,10 +4,6 @@ import Post from '@/Components/Posts/Post';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import HomeSubnav from '@/Components/Subnavs/HomeSubnav';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart as faHeartSolid, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
-
 const PostsSeguidos = ({ posts, tags }) => {
   const [comments, setComments] = useState({});
   const textareaRefs = useRef({});
@@ -15,7 +11,6 @@ const PostsSeguidos = ({ posts, tags }) => {
   const [likes, setLikes] = useState({});
   const [hoveredLike, setHoveredLike] = useState({});
 
-  // Sincroniza estado local de likes con los posts cuando cambian
   useEffect(() => {
     setLikes(Object.fromEntries(posts.map((post) => [post.id, post.isLikedByUser])));
   }, [posts]);
@@ -51,52 +46,93 @@ const PostsSeguidos = ({ posts, tags }) => {
     );
   };
 
-  const toggleLike = (postId) => {
-    router.post(
-      route('like'),
-      { post_id: postId },
-      {
-        preserveScroll: true,
-        onSuccess: () => {
-          setLikes((prev) => ({ ...prev, [postId]: !prev[postId] }));
-        },
+  const handleKeyDown = (postId, e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleCommentSubmit(postId);
+    }
+  };
+
+  const timeAgo = (dateString) => {
+    const now = new Date();
+    const postDate = new Date(dateString);
+    const seconds = Math.floor((now - postDate) / 1000);
+
+    const intervals = [
+      { label: 'año', seconds: 31536000 },
+      { label: 'mes', seconds: 2592000 },
+      { label: 'día', seconds: 86400 },
+      { label: 'hora', seconds: 3600 },
+      { label: 'minuto', seconds: 60 },
+    ];
+
+    for (const interval of intervals) {
+      const count = Math.floor(seconds / interval.seconds);
+      if (count > 0) {
+        return `hace ${count} ${interval.label}${count > 1 ? 's' : ''}`;
       }
-    );
+    }
+    return 'justo ahora';
   };
 
   return (
     <AuthenticatedLayout
-      header={<h2 className=" font-semibold leading-tight">Seguidos</h2>}
+      header={<h2 className="font-semibold leading-tight">Seguidos</h2>}
       subnav={<HomeSubnav />}
     >
       <Head title="Mis publicaciones" />
       <div className="container mx-auto p-4">
-        <h2 className="text-xl font-semibold mb-4 text-white">Seguidos</h2>
 
         {posts.length === 0 ? (
           <p className="text-white">No sigues a nadie aún.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {posts.map((post) => (
-              <div key={`${post.post_type}-${post.id}`} className="space-y-2">
-                <Post post={post} tags={tags} isLikedByUser={post.isLikedByUser} getTotalLikes={post.getTotalLikes} isSharedByUser={post.isSharedByUser} getTotalShares={post.getTotalShares} postType={post.post_type} />
+          <div className="flex flex-col max-w-xl mx-auto">
+            {posts.map((post, index) => (
+              <div
+                key={`${post.post_type}-${post.id}`}
+                className={`space-y-2 w-full py-8 ${index !== posts.length - 1 ? 'border-b border-purple-600' : ''}`}
+              >
+                {/* Usuario y perfil */}
+                <div className="flex items-center space-x-3 px-4 mb-4">
+                  {post.post.user.profile_image ? (
+                    <img
+                      src={post.post.user.profile_image}
+                      alt={`${post.post.user.name} perfil`}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-lg">
+                      ?
+                    </div>
+                  )}
+                  <span className="text-white font-semibold">{post.post.user.name}</span>
+                  <span className="text-purple-400 text-sm ml-auto">{timeAgo(post.post.created_at)}</span>
+                </div>
+
+                <div className="flex justify-center w-auto">
+                  <Post
+                    post={post}
+                    tags={tags}
+                    isLikedByUser={post.isLikedByUser}
+                    getTotalLikes={post.getTotalLikes}
+                    isSharedByUser={post.isSharedByUser}
+                    getTotalShares={post.getTotalShares}
+                    postType={post.post_type}
+                    className="shadow-2xl shadow-black"
+                  />
+                </div>
 
                 {/* Campo para comentarios */}
-                <div className="px-4">
+                <div className="px-4 shadow-lg shadow-black">
                   <textarea
                     ref={(el) => (textareaRefs.current[post.id] = el)}
                     rows={1}
-                    className="w-full border rounded-md p-2 text-sm resize-none overflow-hidden"
+                    className="w-full h-10 border-none rounded-md p-2 mt-2 text-base resize-none overflow-hidden bg-[#373841] text-white"
                     placeholder="Escribe un comentario..."
                     value={comments[post.id] || ''}
                     onChange={(e) => handleCommentChange(post.id, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(post.id, e)}
                   />
-                  <button
-                    onClick={() => handleCommentSubmit(post.id)}
-                    className="mt-2 bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-1 rounded"
-                  >
-                    Comentar
-                  </button>
                 </div>
               </div>
             ))}

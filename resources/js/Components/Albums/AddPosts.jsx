@@ -7,6 +7,11 @@ const AddPosts = ({ album, userPosts, onClose }) => {
     const [selectedPosts, setSelectedPosts] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
 
+    // Filtrar posts que NO están en el álbum
+    const postsNotInAlbum = userPosts.filter(
+        (userPost) => !album.posts.some(albumPost => albumPost.id === userPost.id)
+    );
+
     useEffect(() => {
         setTimeout(() => setIsVisible(true), 10);
         document.body.style.overflow = "hidden";
@@ -46,14 +51,21 @@ const AddPosts = ({ album, userPosts, onClose }) => {
         setTimeout(() => onClose(), 300);
     };
 
+    // Evitar que al clicar dentro del modal se cierre el modal
+    const handleModalClick = (e) => {
+        e.stopPropagation();
+    };
+
     return (
         <div
+            onClick={handleClose}  // Cerrar al hacer clic fuera
             className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ${
                 isVisible ? "opacity-100" : "opacity-0"
             }`}
         >
             <div
-                className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-5xl h-[80vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
+                onClick={handleModalClick} // Prevenir cierre si se hace clic dentro del modal
+                className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-6xl h-[85vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
                     isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
                 }`}
             >
@@ -67,19 +79,19 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                 <form onSubmit={handleSubmit} className="flex flex-col flex-grow">
                     <div className="p-6 text-white overflow-y-auto">
                         <h2 className="text-2xl font-bold mb-6">
-                            Agregar Publicaciones al Álbum
+                            Añadir Publicaciones al Álbum
                         </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto p-4">
-                            {userPosts.length === 0 ? (
-                                <p>No tienes posts disponibles.</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto p-4">
+                            {postsNotInAlbum.length === 0 ? (
+                                <p>No tienes posts disponibles para agregar.</p>
                             ) : (
-                                userPosts.map((post) => (
+                                postsNotInAlbum.map((post) => (
                                     <div
                                         key={post.id}
                                         onClick={() => togglePostSelection(post.id)}
                                         className={`relative rounded cursor-pointer transition-all ${
                                             selectedPosts.includes(post.id)
-                                                ? "border-4 border-blue-500 bg-blue-100 bg-opacity-10"
+                                                ? "border-4 border-purple-500 bg-purple-100 bg-opacity-10"
                                                 : "border border-gray-600"
                                         }`}
                                     >
@@ -101,9 +113,9 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                     <div className="absolute bottom-6 right-6">
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-500"
+                            className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-500"
                         >
-                            Agregar Posts
+                            Agregar Publicaciones
                         </button>
                     </div>
                 </form>

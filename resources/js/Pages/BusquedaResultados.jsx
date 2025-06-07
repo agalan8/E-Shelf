@@ -21,7 +21,7 @@ export default function BusquedaResultados({ results, filter, auth, tags = [] })
     >
       {results.length > 0 ? (
         filter === "Usuarios" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 p-4 ml-8">
             {results.map(user => <User key={user.id} user={user} />)}
           </div>
         ) : filter === "Publicaciones" ? (
@@ -50,18 +50,18 @@ export default function BusquedaResultados({ results, filter, auth, tags = [] })
             </div>
           </div>
         ) : filter === "Comunidades" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 mt-5">
             {results.map((community) => (
               <Community key={community.id} community={community} />
             ))}
           </div>
         ) : (
-          <div className="col-span-full text-center text-gray-600">
+          <div className="col-span-full text-center text-white mt-5">
             No se encontraron resultados para {filter}.
           </div>
         )
       ) : (
-        <div className="col-span-full text-center text-gray-600">
+        <div className="col-span-full text-center text-white mt-5">
           No se encontraron resultados.
         </div>
       )}

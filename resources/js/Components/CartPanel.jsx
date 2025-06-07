@@ -30,13 +30,15 @@ export default function CartPanel() {
   };
 
   return (
-    <div className="w-[400px] relative" style={{ paddingBottom: '100px', overflow: 'hidden' }}>
+    <div className="p-4 w-[400px] relative" style={{ paddingBottom: '100px', overflow: 'hidden' }}>
+              <h1 className="text-3xl font-semibold mb-8">Carrito</h1>
+
       {lineasCarrito.length === 0 ? (
-        <div className="text-gray-400 text-center py-16">Tu carrito está vacío</div>
+        <div className="text-white text-center py-16">Tu carrito está vacío</div>
       ) : (
         <>
           <div
-            className="overflow-y-auto p-6"
+            className="overflow-y-auto"
             style={{ maxHeight: 'calc(100vh - 135px)' }}
           >
             {lineasCarrito.map((linea) => {
@@ -105,7 +107,7 @@ export default function CartPanel() {
             <button
               onClick={handleCheckout}
               disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded disabled:opacity-50"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded disabled:opacity-50"
             >
               {loading ? 'Procesando...' : 'Pagar con Stripe'}
             </button>
