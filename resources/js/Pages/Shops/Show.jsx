@@ -43,6 +43,8 @@ const Show = ({ posts, shop, user, userPosts }) => {
         </h2>
       }
     >
+                <Head title={`Tienda de ${shop.user.name}`} />
+
       {/* Contenedor general con justify-between */}
       <div className="w-full mx-auto px-4 mb-4 flex justify-between items-center gap-4 flex-wrap">
         {/* Siempre visibles: selectores de orden */}

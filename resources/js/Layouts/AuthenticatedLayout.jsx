@@ -124,10 +124,10 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
           <NavLink title="Home" href={route("posts-seguidos")} active={!isNotifOpen && route().current("posts-seguidos")} className="flex justify-center">
             <HomeIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("explorar")} active={!isNotifOpen && route().current("explorar") || route().current("home")} className="flex justify-center">
+          <NavLink href={route("explorar")} active={!isNotifOpen && route().current("explorar") || !isNotifOpen && route().current("home")} className="flex justify-center">
             <GlobeAsiaAustraliaIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("users.show", { user: user.id })} active={!isNotifOpen && route().current("users.show") || route().current("mis-albums") || route().current("mis-comunidades") || route().current("orders.index")} className="flex justify-center">
+          <NavLink href={route("users.show", { user: user.id })} active={!isNotifOpen && route().current("users.show") || !isNotifOpen && route().current("mis-albums") || !isNotifOpen && route().current("mis-comunidades") || !isNotifOpen && route().current("orders.index")} className="flex justify-center">
             <UserIcon className="h-9 w-9" />
           </NavLink>
 

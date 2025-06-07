@@ -86,7 +86,8 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
   return (
     <Layout subnav={<UsersSubnav currentUser={user}/>} header={<h2 className=" font-semibold leading-tight text-white">Publicaciones</h2>}
 >
-      <Head title={user.name} />
+      <Head title="Publicaciones" />
+
       <div className="user-profile">
         {/* Fondo de portada */}
         <div

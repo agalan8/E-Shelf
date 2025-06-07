@@ -80,7 +80,7 @@ const PostsSeguidos = ({ posts, tags }) => {
       header={<h2 className="font-semibold leading-tight">Seguidos</h2>}
       subnav={<HomeSubnav />}
     >
-      <Head title="Mis publicaciones" />
+      <Head title="Seguidos" />
       <div className="container mx-auto p-4">
 
         {posts.length === 0 ? (

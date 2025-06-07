@@ -3,6 +3,7 @@ import Community from '@/Components/Communities/Community';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Create from '@/Components/Communities/Create';
 import UsersSubnav from '@/Components/Subnavs/UsersSubnav';
+import { Head } from '@inertiajs/react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -48,6 +49,7 @@ export default function MisComunidades({ communities, user }) {
       }
       subnav={<UsersSubnav currentUser={user} />}
     >
+        <Head title="Mis Comunidades" />
       {/* Controles de filtrado y botón crear comunidad */}
       <div className="flex justify-between items-center px-4 mb-4 my-5">
         <div className="flex space-x-4">

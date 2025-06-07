@@ -431,17 +431,23 @@ const Show = ({
                             </p>
                             <div className="mt-4">
                                 <h3 className="text-lg font-medium text-white">
-                                    Categorías
+                                    Etiquetas
                                 </h3>
                                 {post.tags.length > 0 ? (
-                                    <ul className="list-disc ml-4 text-white">
-                                        {post.tags.map((tag) => (
-                                            <li key={tag.id}>{tag.nombre}</li>
-                                        ))}
-                                    </ul>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+    {post.tags.map((tag) => (
+        <span
+            key={tag.id}
+            className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm"
+        >
+            {tag.nombre}
+        </span>
+    ))}
+</div>
+
                                 ) : (
                                     <p className="text-sm text-white">
-                                        No hay categorías disponibles.
+                                        No hay etiquetas disponibles.
                                     </p>
                                 )}
                             </div>
