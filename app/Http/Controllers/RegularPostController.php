@@ -253,6 +253,39 @@ if ($request->hasFile('imagen')) {
         if ($request->hasFile('imagen')) {
 
             $imagen = $request->file('imagen');
+
+                // Ruta temporal (necesaria para exif_read_data)
+            $path = $imagen->getRealPath();
+
+            // Obtener EXIF (solo funciona con JPEG y TIFF)
+            $exif = @exif_read_data($path);
+
+            // Función para convertir valores tipo "850/10" a float
+            $evalFraction = fn($val) => is_string($val) && strpos($val, '/') !== false
+                ? (float)eval('return ' . $val . ';')
+                : (float)$val;
+
+            $fechaHora = $exif['DateTimeOriginal'] ?? null;
+            $marca = $exif['Make'] ?? null;
+            $modelo = $exif['Model'] ?? null;
+            $exposicion = $exif['ExposureTime'] ?? null;
+            $diafragma = isset($exif['FNumber']) ? $evalFraction($exif['FNumber']) : null;
+            $iso = isset($exif['ISOSpeedRatings']) ? (int)$exif['ISOSpeedRatings'] : null;
+
+            // Flash: bit 0 indica si flash fue disparado (1 = sí, 0 = no)
+            $flash = isset($exif['Flash']) ? (($exif['Flash'] & 1) === 1) : null;
+
+            $longitudFocal = isset($exif['FocalLength']) ? $evalFraction($exif['FocalLength']) . ' mm' : null;
+
+            $RegularPost->image->fecha_hora = $fechaHora;
+            $RegularPost->image->marca = $marca;
+            $RegularPost->image->modelo = $modelo;
+            $RegularPost->image->exposicion = $exposicion;
+            $RegularPost->image->diafragma = $diafragma;
+            $RegularPost->image->iso = $iso;
+            $RegularPost->image->flash = $flash;
+            $RegularPost->image->longitud_focal = $longitudFocal;
+
             $extension = $imagen->getClientOriginalExtension();
             $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
             $path_original = "public/posts/{$RegularPost->id}/original/{$RegularPost->id}.{$extension}";
