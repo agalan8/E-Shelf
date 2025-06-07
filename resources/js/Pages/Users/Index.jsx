@@ -211,7 +211,7 @@ export default function UserIndex() {
           }`}
         >
           <div className="bg-gray-900 rounded-lg shadow-lg w-96 p-6 ring-2 ring-purple-600">
-            <h2 className="text-2xl font-bold mb-5 text-purple-400 text-center tracking-wide">
+            <h2 className="text-2xl font-bold mb-5 text-white text-center tracking-wide">
               Crear Usuario
             </h2>
             <form

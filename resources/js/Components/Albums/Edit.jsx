@@ -14,7 +14,6 @@ const Edit = ({ album, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Activar animación de aparición
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
@@ -59,12 +58,14 @@ const Edit = ({ album, onClose }) => {
 
   return (
     <div
+      onClick={handleClose}
       className={`fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 transition-opacity duration-300 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       <div
-        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-md p-6 relative transform transition-all duration-300 ${
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-4xl p-10 relative transform transition-all duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
         }`}
       >
@@ -77,60 +78,59 @@ const Edit = ({ album, onClose }) => {
           <XMarkIcon className="w-6 h-6" />
         </button>
 
-        <h2 className="text-white text-xl font-bold mb-6">Editar Álbum</h2>
+        <h2 className="text-white text-2xl font-bold mb-8">Editar Álbum</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div>
-            <label htmlFor="nombre" className="block text-white font-semibold mb-1">
+            <label htmlFor="nombre" className="block text-white font-semibold mb-2">
               Nombre del Álbum
             </label>
             <input
               id="nombre"
               type="text"
               value={data.nombre}
-              onChange={e => setData('nombre', e.target.value)}
-              className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
+              onChange={(e) => setData('nombre', e.target.value)}
+              className="w-full rounded px-4 py-3 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
-            {errors.nombre && <p className="text-red-500 mt-1">{errors.nombre}</p>}
+            {errors.nombre && <p className="text-red-500 mt-2">{errors.nombre}</p>}
           </div>
 
           <div>
-            <label htmlFor="descripcion" className="block text-white font-semibold mb-1">
+            <label htmlFor="descripcion" className="block text-white font-semibold mb-2">
               Descripción
             </label>
             <textarea
               id="descripcion"
               value={data.descripcion}
-              onChange={e => setData('descripcion', e.target.value)}
-              rows={4}
-              className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
+              onChange={(e) => setData('descripcion', e.target.value)}
+              rows={5}
+              className="w-full resize-none rounded px-4 py-3 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
-            {errors.descripcion && <p className="text-red-500 mt-1">{errors.descripcion}</p>}
+            {errors.descripcion && <p className="text-red-500 mt-2">{errors.descripcion}</p>}
           </div>
 
-          {/* Centrar el input de imagen */}
           <div className="flex justify-center">
             <ImageInput
               name="portada"
               label="Imagen de Portada"
-              onChange={file => {
+              onChange={(file) => {
                 setData('portada', file);
                 if (file) setData('eliminar_portada', false);
               }}
               initialImage={album.cover_image?.path_medium || null}
               onDelete={eliminarPortada}
-              previewClassName="w-full max-w-[320px] h-[160px] object-cover rounded-md"
+              previewClassName="w-[500px] h-[223px] object-cover rounded-md"
             />
           </div>
-          {errors.portada && <p className="text-red-500 mt-1 text-center">{errors.portada}</p>}
+          {errors.portada && <p className="text-red-500 mt-2 text-center">{errors.portada}</p>}
 
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={processing}
-              className="px-6 py-2 bg-[#a32bff] hover:bg-[#9326E6] focus:bg-[#9326E6] text-white rounded transition"
+              className="px-8 py-3 bg-[#a32bff] hover:bg-[#9326E6] focus:bg-[#9326E6] text-white rounded transition"
             >
               {processing ? 'Guardando...' : 'Guardar Cambios'}
             </button>

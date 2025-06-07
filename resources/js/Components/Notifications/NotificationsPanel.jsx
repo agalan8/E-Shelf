@@ -53,7 +53,7 @@ const loadMore = async () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 bg-[#18191C] min-h-screen text-white overflow-y-auto">
+    <div className="max-w-5xl mx-auto p-4 bg-[#18191C] min-h-screen text-white overflow-y-auto shadow-2xl shadow-purple-950">
       <h1 className="text-3xl font-semibold mb-8">Notificaciones</h1>
       <ul>
         {notifications.map((n) => (

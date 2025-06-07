@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
@@ -6,12 +6,23 @@ import Image from "../Image";
 const AddPosts = ({ shop, userPosts, onClose }) => {
   const [selectedPosts, setSelectedPosts] = useState({});
   const [isVisible, setIsVisible] = useState(false);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 10);
     document.body.style.overflow = "hidden";
+
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.body.style.overflow = "auto";
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -77,7 +88,8 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
       }`}
     >
       <div
-        className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-5xl h-[80vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
+        ref={modalRef}
+        className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-7xl h-[90vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
           isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
         }`}
       >
@@ -90,8 +102,8 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-grow relative">
           <div className="p-6 text-white overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-6">Agregar publicaciones a la tienda</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto p-4">
+            <h2 className="text-2xl font-bold mb-6">Añadir Publicaciones a la Tienda</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto p-4">
               {userPosts.length === 0 ? (
                 <p>No tienes posts disponibles.</p>
               ) : (
@@ -105,7 +117,7 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
                       onClick={() => togglePostSelection(postId)}
                       className={`relative rounded cursor-pointer transition-all p-2 flex flex-col ${
                         isSelected
-                          ? "border-4 border-blue-500 bg-blue-100 bg-opacity-10"
+                          ? "border-4 border-purple-500 bg-purple-100 bg-opacity-10"
                           : "border border-gray-600"
                       }`}
                     >
@@ -130,7 +142,7 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
                           onClick={(e) => e.stopPropagation()}
                           onFocus={(e) => e.stopPropagation()}
                           placeholder="Precio (€)"
-                          className="mt-2 px-3 py-2 rounded bg-[#1f1f22] text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="mt-2 px-3 py-2 rounded bg-[#1f1f22] text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         />
                       )}
                     </div>
@@ -143,9 +155,9 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
           <div className="absolute bottom-6 right-6">
             <button
               type="submit"
-              className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-500"
+              className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-500"
             >
-              Agregar Posts
+              Añadir Publicaciones
             </button>
           </div>
         </form>
