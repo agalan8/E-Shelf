@@ -21,6 +21,14 @@ public function up(): void
         $table->string('localizacion')->nullable();
         $table->decimal('latitud', 10, 7)->nullable();
         $table->decimal('longitud', 10, 7)->nullable();
+        $table->string('fecha_hora')->nullable();
+        $table->string('marca')->nullable();
+        $table->string('modelo')->nullable();
+        $table->string('exposicion')->nullable();
+        $table->string('diafragma')->nullable();
+        $table->integer('iso')->nullable();
+        $table->boolean('flash')->nullable();
+        $table->string('longitud_focal')->nullable();
         $table->timestamps();
     });
 }

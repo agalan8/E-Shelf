@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, router, usePage } from "@inertiajs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -8,6 +8,11 @@ import {
     faHeart as faHeartSolid,
     faHeartCrack,
     faMapLocationDot,
+    faCircleInfo,
+    faClockRotateLeft,
+    faCamera,
+    faBoltLightning,
+    faStopwatch,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { XMarkIcon, ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
@@ -36,8 +41,15 @@ const Show = ({
     const [commentBody, setCommentBody] = useState("");
     const [comments, setComments] = useState(post.comments || []);
     const [hoveredLike, setHoveredLike] = useState(false);
-
     const [showMap, setShowMap] = useState(false);
+    const [showExif, setShowExif] = useState(false);
+
+    // Chequeo si latitud y longitud están disponibles y válidas
+    const hasValidLocation =
+        post?.image?.latitud !== null &&
+        post?.image?.longitud !== null &&
+        post?.image?.latitud !== undefined &&
+        post?.image?.longitud !== undefined;
 
     useEffect(() => {
         const timer = setTimeout(() => setIsVisible(true), 10);
@@ -75,8 +87,7 @@ const Show = ({
     }, [showMap]);
 
     const initMap = () => {
-        if (!window.google || !post?.image?.latitud || !post?.image?.longitud)
-            return;
+        if (!window.google || !hasValidLocation) return;
         const lat = parseFloat(post.image.latitud);
         const lng = parseFloat(post.image.longitud);
         const map = new window.google.maps.Map(
@@ -245,43 +256,87 @@ const Show = ({
                             </Link>
                             {renderFollowIcon()}
                         </div>
-                        <div className="flex justify-between items-center py-4 px-8 bg-[#202225]">
-    {!notification && (
-        <div className="flex items-center space-x-2">
-            <button
-                onClick={() => toggleLike(post.id)}
-                onMouseEnter={() => setHoveredLike(true)}
-                onMouseLeave={() => setHoveredLike(false)}
-                className="text-xl focus:outline-none"
-                disabled={!user}
-                title={isLiked ? "Quitar like" : "Dar like"}
-            >
-                <FontAwesomeIcon
-                    icon={
-                        isLiked
-                            ? hoveredLike
-                                ? faHeartCrack
-                                : faHeartSolid
-                            : faHeartRegular
-                    }
-                    className={`w-7 h-7 transition duration-200 ${
-                        isLiked ? "text-red-600" : "text-white"
-                    }`}
-                />
-            </button>
-            <span className="text-lg text-white">{totalLikes}</span>
-        </div>
-    )}
-    {/* Botón del mapa visible siempre */}
-    <button
-        onClick={() => setShowMap((prev) => !prev)}
-        className="text-xl focus:outline-none text-white hover:text-purple-400 transition-colors"
-        title={showMap ? "Ocultar mapa" : "Mostrar mapa"}
-    >
-        <FontAwesomeIcon icon={faMapLocationDot} className="w-7 h-7" />
-    </button>
-</div>
+                        <div className="flex justify-between items-center py-4 px-8 bg-[#202225] space-x-2">
+                            {!notification && (
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        onClick={() => toggleLike(post.id)}
+                                        onMouseEnter={() =>
+                                            setHoveredLike(true)
+                                        }
+                                        onMouseLeave={() =>
+                                            setHoveredLike(false)
+                                        }
+                                        className="text-xl focus:outline-none"
+                                        disabled={!user}
+                                        title={
+                                            isLiked ? "Quitar like" : "Dar like"
+                                        }
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={
+                                                isLiked
+                                                    ? hoveredLike
+                                                        ? faHeartCrack
+                                                        : faHeartSolid
+                                                    : faHeartRegular
+                                            }
+                                            className={`w-7 h-7 transition duration-200 ${
+                                                isLiked
+                                                    ? "text-red-600"
+                                                    : "text-white"
+                                            }`}
+                                        />
+                                    </button>
+                                    <span className="text-lg text-white">
+                                        {totalLikes}
+                                    </span>
+                                </div>
+                            )}
 
+                            {/* Mostrar botón del mapa sólo si hay localización válida */}
+                            {hasValidLocation && (
+                                <button
+                                    onClick={() => {
+                                        setShowMap((prev) => !prev);
+                                        if (showExif) setShowExif(false);
+                                    }}
+                                    className="text-xl focus:outline-none text-white hover:text-purple-400 transition-colors"
+                                    title={
+                                        showMap
+                                            ? "Ocultar mapa"
+                                            : "Mostrar mapa"
+                                    }
+                                >
+                                    <FontAwesomeIcon
+                                        icon={faMapLocationDot}
+                                        className="w-7 h-7"
+                                    />
+                                </button>
+                            )}
+
+                            {/* Botón info EXIF */}
+                            <button
+                                onClick={() => {
+                                    setShowExif((prev) => !prev);
+                                    if (showMap) setShowMap(false);
+                                }}
+                                className="flex items-center space-x-2 text-xl focus:outline-none text-white hover:text-purple-400 transition-colors"
+                                title={
+                                    showExif
+                                        ? "Ocultar información EXIF"
+                                        : "Mostrar información EXIF"
+                                }
+                            >
+                                <FontAwesomeIcon
+                                    icon={faCircleInfo}
+                                    className="w-7 h-7"
+                                />
+                                <span>EXIF</span>
+                            </button>
+                        </div>
+
+                        {/* Contenedor mapa */}
                         <div
                             className={`transition-[max-height,opacity] duration-500 ease-in-out px-8 bg-[#202225] rounded ${
                                 showMap
@@ -298,6 +353,69 @@ const Show = ({
                                 }}
                             />
                         </div>
+
+{/* Contenedor EXIF */}
+<div
+  className={`transition-[max-height,opacity] duration-500 ease-in-out px-8 bg-[#202225] rounded overflow-hidden ${
+    showExif ? "max-h-[400px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
+  }`}
+>
+  {/* Encabezado: Fecha y Marca/Modelo */}
+  <div className="flex justify-between items-center text-white text-base mb-6">
+    <div className="flex items-center gap-2">
+      <FontAwesomeIcon icon={faClockRotateLeft} className="w-5 h-5" />
+      {post.image.fecha_hora
+        ? (() => {
+            const [date, time] = post.image.fecha_hora.split(" ");
+            const [year, month, day] = date.split(":");
+            return `${day}/${month}/${year} ${time}`;
+          })()
+        : "No disponible"}
+    </div>
+    <div className="flex items-center gap-2">
+      <FontAwesomeIcon icon={faCamera} className="w-5 h-5" />
+      {post.image.marca || "No disponible"} | {post.image.modelo || "No disponible"}
+    </div>
+  </div>
+
+  {/* Tres listas debajo */}
+  <div className="flex gap-12 text-white text-base justify-center items-start">
+    {/* Lista 1: Diafragma, ISO */}
+    <ul className="space-y-4 flex-1">
+      <li className="flex items-center gap-2">
+        <img src="/exposure_icon.png" alt="Apertura" className="w-5 h-5" />
+        f/{post.image.diafragma || "No disponible"}
+      </li>
+      <li className="flex items-center gap-2">
+        <img src="/iso_icon.png" alt="ISO" className="w-5 h-5" />
+        {post.image.iso !== null ? post.image.iso : "No disponible"}
+      </li>
+    </ul>
+
+    {/* Lista 2: Exposición, Longitud focal */}
+    <ul className="space-y-4 flex-1">
+      <li className="flex items-center gap-2">
+        <FontAwesomeIcon icon={faStopwatch} className="w-5 h-5" />
+        {post.image.exposicion || "No disponible"} s
+      </li>
+      <li className="flex items-center gap-2">
+        <img src="/focal_icon.png" alt="Focal" className="w-5 h-5" />
+        {post.image.longitud_focal || "No disponible"}
+      </li>
+    </ul>
+
+    {/* Lista 3: Flash */}
+    <ul className="space-y-4 flex-1">
+      <li className="flex items-center gap-2">
+        <FontAwesomeIcon icon={faBoltLightning} className="w-5 h-5" />
+        {post.image.flash !== null ? (post.image.flash ? "Sí" : "No") : "No disponible"}
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+
                         <div className="px-8 py-4 bg-[#292B2F] flex-shrink-0">
                             <h2 className="text-2xl font-semibold text-white">
                                 {post.titulo}
@@ -306,7 +424,10 @@ const Show = ({
                                 {post.descripcion}
                             </p>
                             <p className="text-sm text-white mt-2">
-                                Localización: {post.image.localizacion}
+                                Localización:{" "}
+                                {hasValidLocation
+                                    ? post.image.localizacion
+                                    : "No disponible"}
                             </p>
                             <div className="mt-4">
                                 <h3 className="text-lg font-medium text-white">

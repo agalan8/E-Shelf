@@ -64,14 +64,18 @@ class RegularPostController extends Controller
      */
     public function store(StoreRegularPostRequest $request)
     {
-        $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'localizacion' => 'nullable|string|max:255',
-            'latitud' => 'nullable|numeric|between:-90,90',
-            'longitud' => 'nullable|numeric|between:-180,180',
-        ]);
+
+
+            $request->validate([
+                'titulo' => 'required|string|max:255',
+                'descripcion' => 'required|string',
+                'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:20480',
+                'localizacion' => 'nullable|string|max:255',
+                'latitud' => 'nullable|numeric|between:-90,90',
+                'longitud' => 'nullable|numeric|between:-180,180',
+            ]);
+
+
 
 
         DB::beginTransaction();
@@ -88,37 +92,69 @@ class RegularPostController extends Controller
         $post->posteable()->associate($RegularPost);
         $post->save();
 
-        if ($request->hasFile('imagen')) {
+if ($request->hasFile('imagen')) {
 
-            $imagen = $request->file('imagen');
-            $extension = $imagen->getClientOriginalExtension();
-            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
-            $path_original = "public/posts/{$RegularPost->id}/original/{$RegularPost->id}.{$extension}";
-            $path_medium = "public/posts/{$RegularPost->id}/medium/{$RegularPost->id}.{$extension}";
-            $path_small = "public/posts/{$RegularPost->id}/small/{$RegularPost->id}.{$extension}";
+    $imagen = $request->file('imagen');
 
-            $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
-            $small_Image = ImageIntervention::read($imagen)->scale(height: 450)->encode();
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+    // Ruta temporal (necesaria para exif_read_data)
+    $path = $imagen->getRealPath();
 
+    // Obtener EXIF (solo funciona con JPEG y TIFF)
+    $exif = @exif_read_data($path);
 
-            Storage::disk('s3')->put($path_original, $imagen, 'public');
-            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
-            Storage::disk('s3')->put($path_small, $small_Image, 'public');
+    // Función para convertir valores tipo "850/10" a float
+    $evalFraction = fn($val) => is_string($val) && strpos($val, '/') !== false
+        ? (float)eval('return ' . $val . ';')
+        : (float)$val;
 
-            $image = new Image([
-                'path_original' => $path_aws . $path_original,
-                'path_medium' => $path_aws . $path_medium,
-                'path_small' => $path_aws . $path_small,
-                'type' => 'RegularPost',
-                'localizacion' => $request->localizacion,
-                'latitud' => $request->latitud,
-                'longitud' => $request->longitud,
+    $fechaHora = $exif['DateTimeOriginal'] ?? null;
+    $marca = $exif['Make'] ?? null;
+    $modelo = $exif['Model'] ?? null;
+    $exposicion = $exif['ExposureTime'] ?? null;
+    $diafragma = isset($exif['FNumber']) ? $evalFraction($exif['FNumber']) : null;
+    $iso = isset($exif['ISOSpeedRatings']) ? (int)$exif['ISOSpeedRatings'] : null;
 
-            ]);
+    // Flash: bit 0 indica si flash fue disparado (1 = sí, 0 = no)
+    $flash = isset($exif['Flash']) ? (($exif['Flash'] & 1) === 1) : null;
 
-            $image->imageable()->associate($RegularPost)->save();
-        }
+    $longitudFocal = isset($exif['FocalLength']) ? $evalFraction($exif['FocalLength']) . ' mm' : null;
+
+    $extension = $imagen->getClientOriginalExtension();
+    $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+    $path_original = "public/posts/{$RegularPost->id}/original/{$RegularPost->id}.{$extension}";
+    $path_medium = "public/posts/{$RegularPost->id}/medium/{$RegularPost->id}.{$extension}";
+    $path_small = "public/posts/{$RegularPost->id}/small/{$RegularPost->id}.{$extension}";
+
+    $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
+    $small_Image = ImageIntervention::read($imagen)->scale(height: 450)->encode();
+    $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+
+    Storage::disk('s3')->put($path_original, $imagen, 'public');
+    Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+    Storage::disk('s3')->put($path_small, $small_Image, 'public');
+
+    $image = new Image([
+        'path_original' => $path_aws . $path_original,
+        'path_medium' => $path_aws . $path_medium,
+        'path_small' => $path_aws . $path_small,
+        'type' => 'RegularPost',
+        'localizacion' => $request->localizacion,
+        'latitud' => $request->latitud,
+        'longitud' => $request->longitud,
+        // Aquí los metadatos
+        'fecha_hora' => $fechaHora,
+        'marca' => $marca,
+        'modelo' => $modelo,
+        'exposicion' => $exposicion,
+        'diafragma' => $diafragma,
+        'iso' => $iso,
+        'flash' => $flash,
+        'longitud_focal' => $longitudFocal,
+    ]);
+
+    $image->imageable()->associate($RegularPost)->save();
+}
+
 
         $tags = $request->input('tags');
 
@@ -194,11 +230,10 @@ class RegularPostController extends Controller
      */
     public function update(UpdateRegularPostRequest $request, $id)
     {
-        dd($request->all());
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'localizacion' => 'nullable|string|max:255',
             'latitud' => 'nullable|numeric|between:-90,90',
             'longitud' => 'nullable|numeric|between:-180,180',
