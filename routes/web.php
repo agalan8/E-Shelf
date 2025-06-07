@@ -80,7 +80,7 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
         'openAuthModal' => $openAuthModal
     ]);
-});
+})->name('home');
 
 Route::get('/explorar', function () {
 
@@ -347,8 +347,8 @@ Route::post('/images/update', function (Request $request) {
     $request->validate([
         'user' => 'required|array',
         'user.id' => 'required|exists:users,id',
-        'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+        'background_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
     ]);
 
     $user = User::findOrFail($request->input('user.id'));
@@ -504,14 +504,15 @@ Route::get('/buscar', function (Request $request) {
     $query = $request->query('q');
     $filter = $request->query('filter');
 
-
     if ($filter === 'Usuarios') {
-        $results = User::where('name', 'ilike', "%{$query}%")
-            ->with('profileImage', 'backgroundImage')
-            ->get();
+        $queryBuilder = User::with('profileImage', 'backgroundImage');
+        if (!empty($query)) {
+            $queryBuilder->where('name', 'ilike', "%{$query}%");
+        }
+        $results = $queryBuilder->get();
+
     } elseif ($filter === 'Publicaciones') {
-        $posts = RegularPost::where('titulo', 'ilike', "%{$query}%")
-            ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
+        $queryBuilder = RegularPost::doesntHave('shopPost')
             ->with([
                 'post.user.profileImage',
                 'tags',
@@ -521,11 +522,14 @@ Route::get('/buscar', function (Request $request) {
                 'comments.user',
                 'comments.replies',
                 'comments.replies.user'
-            ])
-            ->get();
+            ]);
 
+        if (!empty($query)) {
+            $queryBuilder->where('titulo', 'ilike', "%{$query}%");
+        }
 
-        // Añadir propiedades calculadas a cada post
+        $posts = $queryBuilder->get();
+
         $results = $posts->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = $post->isLikedByUser();
@@ -534,17 +538,20 @@ Route::get('/buscar', function (Request $request) {
             $post->post_type = 'regular';
             return $post;
         });
-    } elseif ($filter === 'Comunidades') {
 
-        $comunidades = Community::where('nombre', 'ilike', "%{$query}%")
-            ->with('profileImage', 'backgroundImage', 'members')
-            ->get();
+    } elseif ($filter === 'Comunidades') {
+        $queryBuilder = Community::with('profileImage', 'backgroundImage', 'memberships');
+        if (!empty($query)) {
+            $queryBuilder->where('nombre', 'ilike', "%{$query}%");
+        }
+        $comunidades = $queryBuilder->get();
 
         $results = $comunidades->map(function ($community) {
             $community->getTotalMembers = $community->getTotalMembers();
             $community->getTotalPosts = $community->getTotalPosts();
             return $community;
         });
+
     } else {
         $results = collect();
     }

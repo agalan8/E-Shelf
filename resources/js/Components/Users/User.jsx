@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { router, usePage, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
-import Image from '../Image'; // Asumiendo que Image es un componente personalizado
+import Image from '../Image';
 
 export default function User({ user }) {
-  const { auth } = usePage().props; // Obtener el usuario autenticado desde Inertia
-  const [following, setFollowing] = useState(auth.user?.following?.some(f => f.id === user.id)); // Verifica si el usuario está siguiendo al autor
-  const [hovering, setHovering] = useState(false); // Para manejar el estado de hover del icono
+  const { auth } = usePage().props;
+  const [following, setFollowing] = useState(auth.user?.following?.some(f => f.id === user.id));
+  const [hovering, setHovering] = useState(false);
 
-  // Función para manejar el cambio de seguir/dejar de seguir
-  const handleFollowToggle = () => {
-    if (!auth.user) return; // Si no hay un usuario autenticado, no hacer nada.
+  const handleFollowToggle = (e) => {
+    e.stopPropagation(); // Evita que el click en el botón active el enlace padre
+
+    if (!auth.user) return;
 
     if (following) {
       router.delete(`/unfollow/${user.id}`, {
@@ -26,17 +27,16 @@ export default function User({ user }) {
     }
   };
 
-  // Función para renderizar el icono de seguir o dejar de seguir
   const renderFollowIcon = () => {
-    if (!auth.user || auth.user.id === user.id) return null; // Si el usuario autenticado es el mismo que el autor de la publicación no renderiza el ícono
+    if (!auth.user || auth.user.id === user.id) return null;
 
     let icon = faUserPlus;
-    let color = 'text-blue-500';
+    let color = 'text-white';
     let title = 'Seguir';
 
     if (following) {
       icon = hovering ? faUserMinus : faUserCheck;
-      color = hovering ? 'text-red-500' : 'text-green-500';
+      color = hovering ? 'text-red-500' : 'text-purple-500';
       title = hovering ? 'Dejar de seguir' : 'Siguiendo';
     }
 
@@ -45,8 +45,9 @@ export default function User({ user }) {
         onClick={handleFollowToggle}
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
-        className={`text-2xl cursor-pointer transition-colors duration-200 ${color}`}
+        className={`text-3xl cursor-pointer transition-colors duration-200 ${color}`}
         title={title}
+        type="button"
       >
         <FontAwesomeIcon icon={icon} />
       </button>
@@ -54,9 +55,11 @@ export default function User({ user }) {
   };
 
   return (
-    <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white cursor-pointer">
+    <Link
+      href={route('users.show', { user: user.id })}
+      className="max-w-sm rounded overflow-hidden shadow-2xl shadow-black bg-[#1A1D1F] cursor-pointer block"
+    >
       <div className="relative">
-        {/* Fondo de portada con imagen predeterminada si background_image es null */}
         {user.background_image && user.background_image.path_original ? (
           <Image
             className="w-full h-32 object-cover"
@@ -64,10 +67,9 @@ export default function User({ user }) {
             alt="Background"
           />
         ) : (
-          <div className="w-full h-32 bg-gray-200" /> // Fondo gris si no hay imagen
+          <div className="w-full h-32 bg-gray-200" />
         )}
 
-        {/* Imagen de perfil con imagen predeterminada si profile_image es null */}
         <div className="absolute top-16 left-4">
           {user.profile_image && user.profile_image.path_small ? (
             <Image
@@ -83,16 +85,13 @@ export default function User({ user }) {
         </div>
       </div>
 
-      <div className="pt-10 pl-5 pb-5 flex items-center">
-        <Link href={route('users.show', { user: user.id })}>
-          <h2 className="text-xl font-semibold text-gray-800">{user.name}</h2>
-        </Link>
+      <div className="pt-10 pl-5 pb-5 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-white">{user.name}</h2>
 
-        {/* Coloca el icono de seguir al lado de la imagen de perfil */}
-        <div className="ml-8">
+        <div className="ml-4 flex-shrink-0 mr-10 mb-1">
           {renderFollowIcon()}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

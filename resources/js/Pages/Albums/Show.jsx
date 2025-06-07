@@ -5,7 +5,7 @@ import Post from "@/Components/Posts/Post";
 import Edit from "@/Components/Albums/Edit";
 import AddPosts from "@/Components/Albums/AddPosts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const Show = ({ album, userPosts, tags }) => {
     const [posts, setPosts] = useState([]);
@@ -56,42 +56,30 @@ const Show = ({ album, userPosts, tags }) => {
                 <div className="mb-4">
                     <Link
                         href={route("mis-albums")}
-                        className="text-blue-500 hover:text-blue-700 font-semibold"
+                        className="text-purple-500 hover:text-purple-700 font-semibold"
                     >
                         &larr; Volver a Mis Álbumes
                     </Link>
                 </div>
 
-                {/* Botón de Editar */}
-                <div className="flex justify-end mb-4">
+                {/* Título y botón en una sola línea */}
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-white text-3xl font-semibold">
+                        {album.nombre}
+                    </h1>
                     <button
-                        onClick={handleOpenEditModal}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                        onClick={handleOpenAddPostsModal}
+                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md"
                     >
-                        Editar
+                        <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+                        Añadir Publicaciones al Álbum
                     </button>
                 </div>
 
-                {/* Título y detalles */}
-                <h1 className="text-white text-3xl font-semibold mb-2">
-                    {album.nombre}
-                </h1>
-                <div className="text-lg text-white mb-4">
-                    <strong>Creado por:</strong> {album.user.name}
-                </div>
+                {/* Descripción */}
                 <div className="text-md text-white mb-4">
                     <strong>Descripción:</strong>
                     <p>{album.descripcion}</p>
-                </div>
-
-                {/* Botón añadir publicación */}
-                <div className="mb-4">
-                    <button
-                        onClick={handleOpenAddPostsModal}
-                        className="px-4 py-2 bg-green-500 text-white rounded-md"
-                    >
-                        Añadir Publicación
-                    </button>
                 </div>
 
                 {/* Mostrar publicaciones */}
@@ -100,8 +88,8 @@ const Show = ({ album, userPosts, tags }) => {
                         No hay publicaciones en este álbum.
                     </p>
                 ) : (
-                    <div className="py-2">
-                        <div className="mx-auto max-w-8xl p-1">
+                    <div className="w-full py-2">
+                        <div className="w-full p-1">
                             <div className="flex gap-2">
                                 {[0, 1, 2].map((colIndex) => (
                                     <div key={colIndex} className="">
@@ -147,25 +135,6 @@ const Show = ({ album, userPosts, tags }) => {
                                     </div>
                                 ))}
                             </div>
-
-                            {/* Paginación */}
-                            {posts.links && posts.links.length > 0 && (
-                                <div className="mt-6 flex justify-center">
-                                    {posts.links.map((link, index) => (
-                                        <a
-                                            key={index}
-                                            href={link.url}
-                                            className={`px-4 py-2 mx-1 text-sm ${
-                                                link.active
-                                                    ? "bg-blue-500 text-white"
-                                                    : "bg-gray-200 text-gray-700"
-                                            } rounded`}
-                                        >
-                                            {link.label}
-                                        </a>
-                                    ))}
-                                </div>
-                            )}
                         </div>
                     </div>
                 )}

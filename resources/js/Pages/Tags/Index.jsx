@@ -52,7 +52,7 @@ export default function TagIndex() {
   };
 
   const deleteTag = (id) => {
-    if (confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
+    if (confirm("¿Estás seguro de que deseas eliminar esta etiqueta?")) {
       router.delete(route('tags.destroy', id));
     }
   };

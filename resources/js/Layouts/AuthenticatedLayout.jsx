@@ -124,10 +124,10 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
           <NavLink title="Home" href={route("posts-seguidos")} active={!isNotifOpen && route().current("posts-seguidos")} className="flex justify-center">
             <HomeIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("explorar")} active={!isNotifOpen && route().current("explorar")} className="flex justify-center">
+          <NavLink href={route("explorar")} active={!isNotifOpen && route().current("explorar") || !isNotifOpen && route().current("home")} className="flex justify-center">
             <GlobeAsiaAustraliaIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("users.show", { user: user.id })} active={!isNotifOpen && route().current("users.show")} className="flex justify-center">
+          <NavLink href={route("users.show", { user: user.id })} active={!isNotifOpen && route().current("users.show") || !isNotifOpen && route().current("mis-albums") || !isNotifOpen && route().current("mis-comunidades") || !isNotifOpen && route().current("orders.index")} className="flex justify-center">
             <UserIcon className="h-9 w-9" />
           </NavLink>
 
@@ -223,7 +223,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
       {isCartOpen && (
         <div
           ref={cartPanelRef}
-          className={`fixed top-0 right-0 w-[400px] h-full bg-[#2F3136] text-white border-l border-[#232428] z-40 transform transition-transform duration-300 ease-in-out ${
+          className={`fixed top-0 right-0 w-[400px] h-full bg-[#18191C] text-white border-l border-[#232428] z-40 transform transition-transform duration-300 ease-in-out ${
             isCartVisible ? "translate-x-0" : "translate-x-full"
           }`}
         >
@@ -234,7 +234,7 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
       {isNotifOpen && (
         <div
           ref={notifPanelRef}
-          className={`fixed overflow-y-auto top-0 left-20 w-[450px] h-full bg-[#2F3136] text-white border-r border-[#232428] z-40 transform transition-transform duration-300 ease-in-out shadow-2xl shadow-purple-800 ${
+          className={`fixed overflow-y-auto top-0 left-20 w-[450px] h-full text-white border-r border-[#232428] z-40 transform transition-transform duration-300 ease-in-out ${
             isNotifVisible ? "translate-x-0" : "-translate-x-full"
           }`}
         >

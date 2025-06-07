@@ -5,6 +5,7 @@ import Community from '@/Components/Communities/Community';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Create from '@/Components/Communities/Create';
+import { Head } from '@inertiajs/react';
 
 export default function Index({ communities, auth }) {
   const [showModal, setShowModal] = useState(false);
@@ -48,6 +49,7 @@ export default function Index({ communities, auth }) {
         </h2>
       }
     >
+        <Head title="Comunidades" />
       {auth.user && (
         <div className="flex justify-between items-center px-4 mb-4">
 

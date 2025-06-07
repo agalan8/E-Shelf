@@ -20,6 +20,15 @@ class Image extends Model
         'localizacion',
         'latitud',
         'longitud',
+        'fecha_hora',
+        'marca',
+        'modelo',
+        'exposicion',
+        'diafragma',
+        'iso',
+        'flash',
+        'longitud_focal',
+
     ];
 
     public function imageable()

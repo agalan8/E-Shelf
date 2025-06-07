@@ -84,7 +84,7 @@ export default function Create({ onClose }) {
               <textarea
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white"
+                className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white resize-none"
               />
             </div>
 

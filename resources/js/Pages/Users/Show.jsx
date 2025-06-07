@@ -50,12 +50,12 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
     if (!auth.user || auth.user.id === user.id) return null;
 
     let icon = faUserPlus;
-    let color = "text-blue-500";
+    let color = "text-white";
     let title = "Seguir";
 
     if (followingState) {
       icon = hovering ? faUserMinus : faUserCheck;
-      color = hovering ? "text-red-500" : "text-green-500";
+      color = hovering ? "text-red-500" : "text-purple-500";
       title = hovering ? "Dejar de seguir" : "Siguiendo";
     }
 
@@ -65,7 +65,7 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
         onClick={handleFollowToggle}
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
-        className={`text-4xl cursor-pointer transition-colors duration-200 ${color}`}
+        className={`text-5xl ml-8 cursor-pointer transition-colors duration-200 ${color}`}
         title={title}
       />
     );
@@ -84,8 +84,10 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
   };
 
   return (
-    <Layout subnav={<UsersSubnav currentUser={user} />}>
-      <Head title={user.name} />
+    <Layout subnav={<UsersSubnav currentUser={user}/>} header={<h2 className=" font-semibold leading-tight text-white">Publicaciones</h2>}
+>
+      <Head title="Publicaciones" />
+
       <div className="user-profile">
         {/* Fondo de portada */}
         <div
@@ -100,7 +102,7 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-white" />
+            <div className="w-full h-full bg-gray-600" />
           )}
 
           {/* Franja inferior con imagen, datos y redes sociales */}

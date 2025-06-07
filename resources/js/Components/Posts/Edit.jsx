@@ -23,8 +23,7 @@ const Edit = ({ post, onClose, tags }) => {
     const [titulo, setTitulo] = useState(post?.titulo || "");
     const [descripcion, setDescripcion] = useState(post?.descripcion || "");
     const [localizacion, setLocalizacion] = useState(post?.image?.localizacion || "");
-      const [ultimaLocalizacion, setUltimaLocalizacion] = useState(post?.image?.localizacion || "");
-
+    const [ultimaLocalizacion, setUltimaLocalizacion] = useState(post?.image?.localizacion || "");
 
     const [locationCoords, setLocationCoords] = useState(
         post?.image?.latitud && post?.image?.longitud
@@ -42,11 +41,11 @@ const Edit = ({ post, onClose, tags }) => {
         post?.communities || []
     );
     const [imageFile, setImageFile] = useState(null);
+    const [previewImage, setPreviewImage] = useState(post?.image?.path_medium || null);
     const [searchTerm, setSearchTerm] = useState("");
     const [communitySearch, setCommunitySearch] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] =
-        useState(false);
+    const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
     const tagDropdownRef = useRef();
@@ -79,7 +78,6 @@ const Edit = ({ post, onClose, tags }) => {
         setLocationCoords({ lat, lng });
         setLocalizacion(formatted || `${lat},${lng}`);
         setUltimaLocalizacion(formatted || `${lat},${lng}`);
-
     };
 
     const onMapClick = (e) => {
@@ -105,12 +103,9 @@ const Edit = ({ post, onClose, tags }) => {
                         }
                     });
 
-                    const formatted = `${city}${
-                        city && country ? ", " : ""
-                    }${country}`;
+                    const formatted = `${city}${city && country ? ", " : ""}${country}`;
                     setLocalizacion(formatted || `${lat},${lng}`);
                     setUltimaLocalizacion(formatted || `${lat},${lng}`);
-
                 }
             }
         );
@@ -140,7 +135,13 @@ const Edit = ({ post, onClose, tags }) => {
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleImageUpload = (e) => setImageFile(e.target.files[0]);
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            setPreviewImage(URL.createObjectURL(file));
+        }
+    };
 
     const handleTagSelect = (tag) => {
         if (!selectedTags.find((t) => t.id === tag.id)) {
@@ -165,16 +166,16 @@ const Edit = ({ post, onClose, tags }) => {
         const formData = new FormData();
         formData.append("titulo", titulo);
         formData.append("descripcion", descripcion);
-          const trimmedLoc = localizacion.trim();
-  const trimmedUltimaLoc = ultimaLocalizacion.trim();
+        const trimmedLoc = localizacion.trim();
+        const trimmedUltimaLoc = ultimaLocalizacion.trim();
 
-  if (!trimmedLoc || trimmedLoc !== trimmedUltimaLoc) {
-    // Input vacío o modificado: enviar última localización válida
-    formData.append("localizacion", trimmedUltimaLoc);
-  } else {
-    // No ha sido modificado: enviar tal cual
-    formData.append("localizacion", trimmedLoc);
-  }
+        if (!trimmedLoc || trimmedLoc !== trimmedUltimaLoc) {
+            // Input vacío o modificado: enviar última localización válida
+            formData.append("localizacion", trimmedUltimaLoc);
+        } else {
+            // No ha sido modificado: enviar tal cual
+            formData.append("localizacion", trimmedLoc);
+        }
         formData.append("latitud", locationCoords.lat);
         formData.append("longitud", locationCoords.lng);
         if (imageFile) formData.append("imagen", imageFile);
@@ -213,9 +214,7 @@ const Edit = ({ post, onClose, tags }) => {
                 <div className="w-2/3 flex items-center justify-center bg-[#292B2F] p-6">
                     <div className="flex flex-col items-center justify-center w-full h-full">
                         <Image
-                            src={`${
-                                post?.image?.path_medium
-                            }?t=${new Date().getTime()}`}
+                            src={previewImage}
                             alt="Imagen actual"
                             className="max-h-full max-w-full object-contain rounded shadow-2xl shadow-black"
                         />
@@ -234,9 +233,7 @@ const Edit = ({ post, onClose, tags }) => {
 
                 {/* Formulario */}
                 <div className="w-1/3 p-6 bg-[#272729] overflow-y-auto text-white">
-                    <h2 className="text-xl font-bold mb-6">
-                        Editar Publicación
-                    </h2>
+                    <h2 className="text-xl font-bold mb-6">Editar Publicación</h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <input
                             type="text"
@@ -261,9 +258,7 @@ const Edit = ({ post, onClose, tags }) => {
                                 libraries={libraries}
                             >
                                 <StandaloneSearchBox
-                                    onLoad={(ref) =>
-                                        (searchBoxRef.current = ref)
-                                    }
+                                    onLoad={(ref) => (searchBoxRef.current = ref)}
                                     onPlacesChanged={onPlacesChanged}
                                 >
                                     <input
@@ -271,9 +266,7 @@ const Edit = ({ post, onClose, tags }) => {
                                         placeholder="Escribe una ubicación"
                                         className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] text-white"
                                         value={localizacion}
-                                        onChange={(e) =>
-                                            setLocalizacion(e.target.value)
-                                        }
+                                        onChange={(e) => setLocalizacion(e.target.value)}
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter") {
                                                 e.preventDefault();
@@ -294,11 +287,8 @@ const Edit = ({ post, onClose, tags }) => {
                         </div>
 
                         {/* Tags */}
-
                         <div className="mt-6">
-                            <label className="block font-semibold mb-4">
-                                Etiquetas
-                            </label>
+                            <label className="block font-semibold mb-4">Etiquetas</label>
 
                             <div className="flex flex-wrap gap-3 mb-4">
                                 {selectedTags.map((tag) => (
@@ -307,12 +297,9 @@ const Edit = ({ post, onClose, tags }) => {
                                         className="bg-gray-700 text-white px-3 py-1 rounded-full text-sm flex items-center"
                                     >
                                         {tag.nombre}
-
                                         <button
                                             type="button"
-                                            onClick={() =>
-                                                handleTagRemove(tag.id)
-                                            }
+                                            onClick={() => handleTagRemove(tag.id)}
                                             className="ml-2 text-red-400"
                                         >
                                             ×
@@ -326,9 +313,7 @@ const Edit = ({ post, onClose, tags }) => {
                                     type="text"
                                     placeholder="Buscar etiquetas..."
                                     value={searchTerm}
-                                    onChange={(e) =>
-                                        setSearchTerm(e.target.value)
-                                    }
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                     onFocus={() => setIsDropdownOpen(true)}
                                     className="w-full p-3 rounded bg-[#1c1c1e] min-h-[44px]"
                                 />
@@ -336,21 +321,13 @@ const Edit = ({ post, onClose, tags }) => {
                                 {isDropdownOpen && (
                                     <div className="absolute w-full bg-[#2f2f2f] rounded mt-2 max-h-56 overflow-y-auto z-10 border border-gray-600">
                                         {tags
-
                                             .filter((tag) =>
-                                                tag.nombre
-                                                    .toLowerCase()
-                                                    .includes(
-                                                        searchTerm.toLowerCase()
-                                                    )
+                                                tag.nombre.toLowerCase().includes(searchTerm.toLowerCase())
                                             )
-
                                             .map((tag) => (
                                                 <div
                                                     key={tag.id}
-                                                    onClick={() =>
-                                                        handleTagSelect(tag)
-                                                    }
+                                                    onClick={() => handleTagSelect(tag)}
                                                     className="p-3 hover:bg-gray-600 cursor-pointer text-sm"
                                                 >
                                                     {tag.nombre}
@@ -362,11 +339,8 @@ const Edit = ({ post, onClose, tags }) => {
                         </div>
 
                         {/* Comunidades */}
-
                         <div className="mt-6">
-                            <label className="block font-semibold mb-4">
-                                Comunidades
-                            </label>
+                            <label className="block font-semibold mb-4">Comunidades</label>
 
                             <div className="flex flex-wrap gap-3 mb-4">
                                 {selectedCommunities.map((c) => (
@@ -375,12 +349,9 @@ const Edit = ({ post, onClose, tags }) => {
                                         className="bg-gray-700 text-white px-3 py-1 rounded-full text-sm flex items-center"
                                     >
                                         {c.nombre}
-
                                         <button
                                             type="button"
-                                            onClick={() =>
-                                                handleCommunityRemove(c.id)
-                                            }
+                                            onClick={() => handleCommunityRemove(c.id)}
                                             className="ml-2 text-red-400"
                                         >
                                             ×
@@ -389,41 +360,26 @@ const Edit = ({ post, onClose, tags }) => {
                                 ))}
                             </div>
 
-                            <div
-                                className="relative"
-                                ref={communityDropdownRef}
-                            >
+                            <div className="relative" ref={communityDropdownRef}>
                                 <input
                                     type="text"
                                     placeholder="Buscar comunidades..."
                                     value={communitySearch}
-                                    onChange={(e) =>
-                                        setCommunitySearch(e.target.value)
-                                    }
-                                    onFocus={() =>
-                                        setIsCommunityDropdownOpen(true)
-                                    }
+                                    onChange={(e) => setCommunitySearch(e.target.value)}
+                                    onFocus={() => setIsCommunityDropdownOpen(true)}
                                     className="w-full p-3 rounded bg-[#1c1c1e] min-h-[44px]"
                                 />
 
                                 {isCommunityDropdownOpen && (
                                     <div className="absolute w-full bg-[#2f2f2f] rounded mt-2 max-h-56 overflow-y-auto z-10 border border-gray-600">
                                         {userCommunities
-
                                             .filter((c) =>
-                                                c.nombre
-                                                    .toLowerCase()
-                                                    .includes(
-                                                        communitySearch.toLowerCase()
-                                                    )
+                                                c.nombre.toLowerCase().includes(communitySearch.toLowerCase())
                                             )
-
                                             .map((c) => (
                                                 <div
                                                     key={c.id}
-                                                    onClick={() =>
-                                                        handleCommunitySelect(c)
-                                                    }
+                                                    onClick={() => handleCommunitySelect(c)}
                                                     className="p-3 hover:bg-gray-600 cursor-pointer text-sm"
                                                 >
                                                     {c.nombre}
