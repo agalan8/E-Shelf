@@ -454,23 +454,23 @@ Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $image
     // Verificar el tipo de imagen a eliminar (profile_image o background_image)
     if ($imageType === 'profile_image' && $user->profileImage) {
 
-        $path = parse_url($user->profileImage->path_small, PHP_URL_PATH); // /public/profile_images/123.jpg
-        $path = ltrim($path, '/'); // public/profile_images/123.jpg
+        // $path = parse_url($user->profileImage->path_small, PHP_URL_PATH); // /public/profile_images/123.jpg
+        // $path = ltrim($path, '/'); // public/profile_images/123.jpg
 
-        // Eliminar del bucket S3
-        Storage::disk('s3')->delete($path);
+        // // Eliminar del bucket S3
+        // Storage::disk('s3')->delete($path);
         $user->profileImage->delete();
     }
 
     if ($imageType === 'background_image' && $user->backgroundImage) {
 
-        $paths = [
-            ltrim(parse_url($user->backgroundImage->path_original, PHP_URL_PATH), '/'),
-            ltrim(parse_url($user->backgroundImage->path_medium, PHP_URL_PATH), '/'),
-        ];
+        // $paths = [
+        //     ltrim(parse_url($user->backgroundImage->path_original, PHP_URL_PATH), '/'),
+        //     ltrim(parse_url($user->backgroundImage->path_medium, PHP_URL_PATH), '/'),
+        // ];
 
-        // Eliminar del bucket S3
-        Storage::disk('s3')->delete($paths);
+        // // Eliminar del bucket S3
+        // Storage::disk('s3')->delete($paths);
 
         $user->backgroundImage()->delete();
     }
@@ -574,6 +574,10 @@ Route::middleware(['auth'])->group(function () {
     Route::match(['get', 'post'], 'payment/create-checkout-session', [PaymentController::class, 'createCheckoutSession'])->name('payment.createCheckoutSession');
     Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
     Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+});
+
+Route::fallback(function () {
+    return redirect()->route('explorar');
 });
 
 require __DIR__ . '/auth.php';

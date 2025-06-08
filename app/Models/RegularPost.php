@@ -124,12 +124,12 @@ class RegularPost extends Model
                 // Eliminar imagen asociada al RegularPost
                 if ($RegularPost->image) {
                     $image = $RegularPost->image;
-                    $paths = [
-                        ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                        ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-                        ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
-                    ];
-                    Storage::disk('s3')->delete($paths);
+                    // $paths = [
+                    //     ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                    //     ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                    //     ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
+                    // ];
+                    // Storage::disk('s3')->delete($paths);
                     $image->delete();
                 }
 
