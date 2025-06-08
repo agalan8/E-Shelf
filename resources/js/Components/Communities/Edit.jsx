@@ -12,6 +12,41 @@ export default function EditCommunity({ community, onClose }) {
     background_image: null,
   });
 
+  // Estado local para errores en caliente
+  const [liveErrors, setLiveErrors] = useState({});
+
+  // Validaciones en caliente
+  const validateField = (field, value) => {
+    let error = '';
+    if (field === 'nombre') {
+      if (!value.trim()) error = 'El nombre es obligatorio.';
+      else if (value.length > 255) error = 'Máximo 255 caracteres.';
+    }
+    if (field === 'descripcion') {
+      if (value && value.length > 255) error = 'Máximo 255 caracteres.';
+    }
+    if (field === 'visibilidad') {
+      if (!['publico', 'privado'].includes(value)) error = 'Valor inválido.';
+    }
+    setLiveErrors(prev => ({ ...prev, [field]: error }));
+  };
+
+  // Handlers para cada campo
+  const handleNombreChange = e => {
+    setData('nombre', e.target.value);
+    validateField('nombre', e.target.value);
+  };
+
+  const handleDescripcionChange = e => {
+    setData('descripcion', e.target.value);
+    validateField('descripcion', e.target.value);
+  };
+
+  const handleVisibilidadChange = e => {
+    setData('visibilidad', e.target.value);
+    validateField('visibilidad', e.target.value);
+  };
+
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -110,11 +145,13 @@ export default function EditCommunity({ community, onClose }) {
               id="nombre"
               type="text"
               value={data.nombre}
-              onChange={e => setData('nombre', e.target.value)}
+              onChange={handleNombreChange}
               className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
-            {errors.nombre && <p className="text-red-500 mt-1">{errors.nombre}</p>}
+            {(liveErrors.nombre || errors.nombre) && (
+              <p className="text-red-500 mt-1">{liveErrors.nombre || errors.nombre}</p>
+            )}
           </div>
 
           <div>
@@ -124,12 +161,14 @@ export default function EditCommunity({ community, onClose }) {
             <textarea
               id="descripcion"
               value={data.descripcion}
-              onChange={e => setData('descripcion', e.target.value)}
+              onChange={handleDescripcionChange}
               rows={4}
               className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff] resize-none"
               required
             />
-            {errors.descripcion && <p className="text-red-500 mt-1">{errors.descripcion}</p>}
+            {(liveErrors.descripcion || errors.descripcion) && (
+              <p className="text-red-500 mt-1">{liveErrors.descripcion || errors.descripcion}</p>
+            )}
           </div>
 
           <div>
@@ -141,7 +180,7 @@ export default function EditCommunity({ community, onClose }) {
                   name="visibilidad"
                   value="publico"
                   checked={data.visibilidad === 'publico'}
-                  onChange={e => setData('visibilidad', e.target.value)}
+                  onChange={handleVisibilidadChange}
                   className="text-purple-600 focus:ring-purple-500"
                 />
                 <span className="text-white">Público</span>
@@ -153,13 +192,15 @@ export default function EditCommunity({ community, onClose }) {
                   name="visibilidad"
                   value="privado"
                   checked={data.visibilidad === 'privado'}
-                  onChange={e => setData('visibilidad', e.target.value)}
+                  onChange={handleVisibilidadChange}
                   className="text-purple-600 focus:ring-purple-500"
                 />
                 <span className="text-white">Privado</span>
               </label>
             </div>
-            {errors.visibilidad && <p className="text-red-500 mt-1">{errors.visibilidad}</p>}
+            {(liveErrors.visibilidad || errors.visibilidad) && (
+              <p className="text-red-500 mt-1">{liveErrors.visibilidad || errors.visibilidad}</p>
+            )}
           </div>
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-4">

@@ -47,6 +47,7 @@ const Edit = ({ post, onClose, tags }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const tagDropdownRef = useRef();
     const communityDropdownRef = useRef();
@@ -135,8 +136,54 @@ const Edit = ({ post, onClose, tags }) => {
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const validateField = (name, value) => {
+        let error = "";
+        switch (name) {
+            case "titulo":
+                if (!value) error = "El título es obligatorio.";
+                else if (value.length > 255) error = "Máximo 255 caracteres.";
+                break;
+            case "descripcion":
+                if (!value) error = "La descripción es obligatoria.";
+                else if (value.length > 255) error = "Máximo 255 caracteres.";
+                break;
+            case "localizacion":
+                if (value && value.length > 255) error = "Máximo 255 caracteres.";
+                break;
+            case "latitud":
+                if (value && (isNaN(value) || value < -90 || value > 90)) error = "Latitud inválida.";
+                break;
+            case "longitud":
+                if (value && (isNaN(value) || value < -180 || value > 180)) error = "Longitud inválida.";
+                break;
+            case "imagen":
+                if (value && value.size > 20480 * 1024) error = "La imagen debe pesar menos de 20MB.";
+                if (value && !["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(value.type)) error = "Formato de imagen no permitido.";
+                break;
+            default:
+                break;
+        }
+        setErrors((prev) => ({ ...prev, [name]: error }));
+    };
+
+    const handleTituloChange = (e) => {
+        setTitulo(e.target.value);
+        validateField("titulo", e.target.value);
+    };
+
+    const handleDescripcionChange = (e) => {
+        setDescripcion(e.target.value);
+        validateField("descripcion", e.target.value);
+    };
+
+    const handleLocalizacionChange = (e) => {
+        setLocalizacion(e.target.value);
+        validateField("localizacion", e.target.value);
+    };
+
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
+        validateField("imagen", file);
         if (file) {
             setImageFile(file);
             setPreviewImage(URL.createObjectURL(file));
@@ -238,16 +285,19 @@ const Edit = ({ post, onClose, tags }) => {
                         <input
                             type="text"
                             value={titulo}
-                            onChange={(e) => setTitulo(e.target.value)}
+                            onChange={handleTituloChange}
                             className="w-full p-3 rounded bg-[#1c1c1e]"
                             placeholder="Título"
                         />
+                        {errors.titulo && <p className="text-red-400 text-sm">{errors.titulo}</p>}
+
                         <textarea
                             value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
+                            onChange={handleDescripcionChange}
                             className="w-full p-3 rounded bg-[#1c1c1e]"
                             placeholder="Descripción"
                         />
+                        {errors.descripcion && <p className="text-red-400 text-sm">{errors.descripcion}</p>}
 
                         <div>
                             <label className="block text-lg font-semibold text-white">
@@ -266,7 +316,7 @@ const Edit = ({ post, onClose, tags }) => {
                                         placeholder="Escribe una ubicación"
                                         className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] text-white"
                                         value={localizacion}
-                                        onChange={(e) => setLocalizacion(e.target.value)}
+                                        onChange={handleLocalizacionChange}
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter") {
                                                 e.preventDefault();
@@ -285,6 +335,8 @@ const Edit = ({ post, onClose, tags }) => {
                                 </GoogleMap>
                             </LoadScript>
                         </div>
+
+                        {errors.localizacion && <p className="text-red-400 text-sm">{errors.localizacion}</p>}
 
                         {/* Tags */}
                         <div className="mt-6">

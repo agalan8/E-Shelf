@@ -12,6 +12,7 @@ const Edit = ({ album, onClose }) => {
   });
 
   const [isVisible, setIsVisible] = useState(false);
+  const [liveErrors, setLiveErrors] = useState({});
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
@@ -33,6 +34,31 @@ const Edit = ({ album, onClose }) => {
         },
       });
     }
+  };
+
+  const validateField = (name, value) => {
+    let error = '';
+    if (name === 'nombre') {
+      if (!value.trim()) error = 'El nombre es obligatorio.';
+      else if (value.length > 255) error = 'El nombre no puede superar 255 caracteres.';
+    }
+    if (name === 'descripcion') {
+      if (value.length > 255) error = 'La descripción no puede superar 255 caracteres.';
+    }
+    setLiveErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
+  const validatePortada = (file) => {
+    let error = '';
+    if (file) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        error = 'Formato de imagen no permitido.';
+      } else if (file.size > 20480 * 1024) {
+        error = 'La imagen no puede superar 20MB.';
+      }
+    }
+    setLiveErrors((prev) => ({ ...prev, portada: error }));
   };
 
   const handleSubmit = (e) => {
@@ -90,11 +116,18 @@ const Edit = ({ album, onClose }) => {
               id="nombre"
               type="text"
               value={data.nombre}
-              onChange={(e) => setData('nombre', e.target.value)}
+              onChange={(e) => {
+                setData('nombre', e.target.value);
+                validateField('nombre', e.target.value);
+              }}
               className="w-full rounded px-4 py-3 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
-            {errors.nombre && <p className="text-red-500 mt-2">{errors.nombre}</p>}
+            <div className="min-h-[24px]">
+              {(liveErrors.nombre || errors.nombre) && (
+                <p className="text-red-500 mt-2">{liveErrors.nombre || errors.nombre}</p>
+              )}
+            </div>
           </div>
 
           <div>
@@ -104,28 +137,40 @@ const Edit = ({ album, onClose }) => {
             <textarea
               id="descripcion"
               value={data.descripcion}
-              onChange={(e) => setData('descripcion', e.target.value)}
+              onChange={(e) => {
+                setData('descripcion', e.target.value);
+                validateField('descripcion', e.target.value);
+              }}
               rows={5}
               className="w-full resize-none rounded px-4 py-3 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
-            {errors.descripcion && <p className="text-red-500 mt-2">{errors.descripcion}</p>}
+            <div className="min-h-[24px]">
+              {(liveErrors.descripcion || errors.descripcion) && (
+                <p className="text-red-500 mt-2">{liveErrors.descripcion || errors.descripcion}</p>
+              )}
+            </div>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center flex-col items-center">
             <ImageInput
               name="portada"
               label="Imagen de Portada"
               onChange={(file) => {
                 setData('portada', file);
                 if (file) setData('eliminar_portada', false);
+                validatePortada(file);
               }}
               initialImage={album.cover_image?.path_medium || null}
               onDelete={eliminarPortada}
               previewClassName="w-[300px] h-[134px] sm:w-[500px] sm:h-[223px] object-cover rounded-md"
             />
+            <div className="min-h-[24px]">
+              {(liveErrors.portada || errors.portada) && (
+                <p className="text-red-500 mt-2 text-center">{liveErrors.portada || errors.portada}</p>
+              )}
+            </div>
           </div>
-          {errors.portada && <p className="text-red-500 mt-2 text-center">{errors.portada}</p>}
 
           <div className="flex justify-end">
             <button

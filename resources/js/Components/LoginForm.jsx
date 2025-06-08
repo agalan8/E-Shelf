@@ -5,6 +5,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Link } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function LoginForm({
     onClose,
@@ -13,18 +14,58 @@ export default function LoginForm({
     status,
     canResetPassword
 }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors: serverErrors, reset } = useForm({
         email: '',
         password: '',
         remember: false,
     });
 
+    const [errors, setErrors] = useState({});
+
+    // Validación simple en caliente
+    const validate = (field, value) => {
+        let newErrors = { ...errors };
+
+        if (field === 'email') {
+            if (!value) {
+                newErrors.email = 'El email es obligatorio.';
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                newErrors.email = 'Introduce un email válido.';
+            } else {
+                delete newErrors.email;
+            }
+        }
+
+        if (field === 'password') {
+            if (!value) {
+                newErrors.password = 'La contraseña es obligatoria.';
+            } else if (value.length < 8) {
+                newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+            } else {
+                delete newErrors.password;
+            }
+        }
+
+        setErrors(newErrors);
+    };
+
+    const handleChange = (field, value) => {
+        setData(field, value);
+        validate(field, value);
+    };
+
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+        // Validar todo antes de enviar
+        validate('email', data.email);
+        validate('password', data.password);
+
+        if (Object.keys(errors).length === 0) {
+            post(route('login'), {
+                onFinish: () => reset('password'),
+            });
+        }
     };
 
     return (
@@ -46,13 +87,13 @@ export default function LoginForm({
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e) => handleChange('email', e.target.value)}
                     />
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email || serverErrors.email} className="mt-2" />
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="Contraseña" />
                     <TextInput
                         id="password"
                         type="password"
@@ -60,9 +101,9 @@ export default function LoginForm({
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e) => handleChange('password', e.target.value)}
                     />
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password || serverErrors.password} className="mt-2" />
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -72,7 +113,7 @@ export default function LoginForm({
                             checked={data.remember}
                             onChange={(e) => setData('remember', e.target.checked)}
                         />
-                        <span className="ml-2 text-sm text-[#eceeef]">Remember me</span>
+                        <span className="ml-2 text-sm text-[#eceeef]">Recuérdame</span>
                     </label>
 
                     {canResetPassword && (
@@ -84,7 +125,7 @@ export default function LoginForm({
                             }}
                             className="text-sm text-[#a42bfd] underline hover:text-[#8222cc] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
                         >
-                            Forgot your password?
+                            ¿Has olvidado la contraseña?
                         </Link>
                     )}
                 </div>

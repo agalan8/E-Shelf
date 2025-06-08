@@ -8,11 +8,30 @@ const Edit = ({ post, onClose }) => {
   });
 
   const [isVisible, setIsVisible] = useState(false);
+  const [precioError, setPrecioError] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
+
+  // Validación en caliente para el campo precio
+  const validatePrecio = (value) => {
+    const regex = /^\d{1,10}(\.\d{1,2})?$/;
+    if (!value) {
+      return 'El precio es obligatorio';
+    }
+    if (!regex.test(value)) {
+      return 'Formato de precio inválido';
+    }
+    return '';
+  };
+
+  const handlePrecioChange = (e) => {
+    const value = e.target.value;
+    setData('precio', value);
+    setPrecioError(validatePrecio(value));
+  };
 
   const handleClose = () => {
     setIsVisible(false);
@@ -21,6 +40,9 @@ const Edit = ({ post, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const error = validatePrecio(data.precio);
+    setPrecioError(error);
+    if (error) return;
 
     router.put(route('shop-posts.update', post.id), data, {
       preserveScroll: true,
@@ -61,11 +83,13 @@ const Edit = ({ post, onClose }) => {
               step="0.01"
               min="0"
               value={data.precio}
-              onChange={e => setData('precio', e.target.value)}
+              onChange={handlePrecioChange}
               className="w-full rounded px-3 py-2 border border-gray-600 bg-[#272729] text-white focus:outline-none focus:ring-2 focus:ring-[#a32bff]"
               required
             />
-            {errors.precio && <p className="text-red-500 mt-1">{errors.precio}</p>}
+            {(precioError || errors.precio) && (
+              <p className="text-red-500 mt-1">{precioError || errors.precio}</p>
+            )}
           </div>
 
           <div className="flex justify-end">

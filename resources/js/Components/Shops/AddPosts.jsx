@@ -6,6 +6,7 @@ import Image from "../Image";
 const AddPosts = ({ shop, userPosts, onClose }) => {
   const [selectedPosts, setSelectedPosts] = useState({});
   const [isVisible, setIsVisible] = useState(false);
+  const [errors, setErrors] = useState({});
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -26,16 +27,10 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
     };
   }, []);
 
-  const togglePostSelection = (postId) => {
-    setSelectedPosts((prevSelected) => {
-      if (prevSelected.hasOwnProperty(postId)) {
-        const newSelected = { ...prevSelected };
-        delete newSelected[postId];
-        return newSelected;
-      } else {
-        return { ...prevSelected, [postId]: "" };
-      }
-    });
+  const priceRegex = /^\d{1,10}(\.\d{1,2})?$/;
+
+  const validatePrice = (price) => {
+    return priceRegex.test(price) && Number(price) > 0;
   };
 
   const handlePriceChange = (postId, price) => {
@@ -43,23 +38,53 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
       ...prevSelected,
       [postId]: price,
     }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [postId]: !validatePrice(price) ? "Precio inválido" : undefined,
+    }));
+  };
+
+  const togglePostSelection = (postId) => {
+    setSelectedPosts((prevSelected) => {
+      if (prevSelected.hasOwnProperty(postId)) {
+        const newSelected = { ...prevSelected };
+        delete newSelected[postId];
+        setErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          delete newErrors[postId];
+          return newErrors;
+        });
+        return newSelected;
+      } else {
+        // No agregues error aquí, solo selecciona el post
+        return { ...prevSelected, [postId]: "" };
+      }
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const selectedIds = Object.keys(selectedPosts);
+    let hasError = false;
+    const newErrors = {};
+
     if (selectedIds.length === 0) {
       alert("Selecciona al menos un post para agregar.");
       return;
     }
 
     for (const id of selectedIds) {
-      if (!selectedPosts[id] || Number(selectedPosts[id]) <= 0) {
-        alert("Introduce un precio válido para todos los posts seleccionados.");
-        return;
+      if (!validatePrice(selectedPosts[id])) {
+        newErrors[id] = "Introduce un precio válido para todos los posts seleccionados.";
+        hasError = true;
       }
     }
+
+    setErrors(newErrors);
+
+    if (hasError) return;
 
     const postsData = selectedIds.map((id) => ({
       id,
@@ -133,17 +158,24 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
                       </div>
 
                       {isSelected && (
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={selectedPosts[postId]}
-                          onChange={(e) => handlePriceChange(postId, e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
-                          onFocus={(e) => e.stopPropagation()}
-                          placeholder="Precio (€)"
-                          className="mt-2 px-3 py-2 rounded bg-[#1f1f22] text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
+                        <>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={selectedPosts[postId]}
+                            onChange={(e) => handlePriceChange(postId, e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onFocus={(e) => e.stopPropagation()}
+                            placeholder="Precio (€)"
+                            className={`mt-2 px-3 py-2 rounded bg-[#1f1f22] text-white border ${
+                              errors[postId] ? "border-red-500" : "border-gray-600"
+                            } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+                          />
+                          {errors[postId] && (
+                            <span className="text-red-400 text-xs">{errors[postId]}</span>
+                          )}
+                        </>
                       )}
                     </div>
                   );

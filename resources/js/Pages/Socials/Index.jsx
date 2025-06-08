@@ -10,6 +10,7 @@ export default function SocialIndex() {
   const [isVisible, setIsVisible] = useState(false);
   const [editingSocial, setEditingSocial] = useState(null);
   const [nombre, setNombre] = useState('');
+  const [nombreError, setNombreError] = useState('');
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState('nombre');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -35,8 +36,28 @@ export default function SocialIndex() {
     }, 300);
   };
 
+  // Validación en caliente para el campo nombre
+  const validateNombre = (value) => {
+    if (!value.trim()) {
+      setNombreError('El nombre es obligatorio.');
+      return false;
+    }
+    if (value.length > 255) {
+      setNombreError('El nombre no puede tener más de 255 caracteres.');
+      return false;
+    }
+    setNombreError('');
+    return true;
+  };
+
+  const handleNombreChange = (e) => {
+    setNombre(e.target.value);
+    validateNombre(e.target.value);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateNombre(nombre)) return;
     const formData = { nombre };
 
     if (editingSocial) {
@@ -154,10 +175,15 @@ export default function SocialIndex() {
                 <input
                   type="text"
                   value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
+                  onChange={handleNombreChange}
                   required
-                  className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                  className={`w-full rounded-md bg-gray-800 border px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 transition ${
+                    nombreError ? 'border-red-500 focus:ring-red-500' : 'border-purple-600 focus:ring-purple-500'
+                  }`}
                 />
+                {nombreError && (
+                  <p className="text-red-400 text-xs mt-1">{nombreError}</p>
+                )}
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button

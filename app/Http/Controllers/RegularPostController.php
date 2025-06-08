@@ -68,7 +68,7 @@ class RegularPostController extends Controller
 
             $request->validate([
                 'titulo' => 'required|string|max:255',
-                'descripcion' => 'required|string',
+                'descripcion' => 'required|string|max:255',
                 'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:20480',
                 'localizacion' => 'nullable|string|max:255',
                 'latitud' => 'nullable|numeric|between:-90,90',
@@ -232,7 +232,7 @@ if ($request->hasFile('imagen')) {
     {
         $request->validate([
             'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+            'descripcion' => 'required|string|max:255',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'localizacion' => 'nullable|string|max:255',
             'latitud' => 'nullable|numeric|between:-90,90',
