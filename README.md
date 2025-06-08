@@ -72,6 +72,6 @@
 
 ## Licencia
 
-Este proyecto está bajo la licencia [MIT](LICENSE).
+Este proyecto está bajo la licencia [MIT License](https://opensource.org/license/MIT).
 
 ---
