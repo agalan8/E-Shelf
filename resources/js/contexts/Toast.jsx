@@ -7,7 +7,7 @@ export default function Toast({ message, type = "success", duration = 3000, onCl
     setShow(true);
     const timer = setTimeout(() => {
       setShow(false);
-      setTimeout(onClose, 300); // Espera la transición antes de desmontar
+      setTimeout(onClose, 300);
     }, duration);
     return () => clearTimeout(timer);
   }, [duration, onClose]);

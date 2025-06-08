@@ -3,15 +3,13 @@ import { Head } from "@inertiajs/react";
 import AuthModal from "@/Components/AuthModal";
 
 export default function Welcome({ openAuthModal, status, canResetPassword }) {
-    // Estado para controlar la apertura del modal
     const [isRegisterOpen, setRegisterOpen] = useState(false);
 
-    // Abrir el modal si openAuthModal es true (cuando se redirige desde el servidor)
     useEffect(() => {
         if (openAuthModal) {
-            setRegisterOpen(true); // Abrir el modal si openAuthModal es true
+            setRegisterOpen(true);
         }
-    }, [openAuthModal]); // Esto se ejecuta cuando `openAuthModal` cambia
+    }, [openAuthModal]);
 
     return (
         <>
@@ -97,7 +95,7 @@ export default function Welcome({ openAuthModal, status, canResetPassword }) {
                 isOpen={isRegisterOpen}
                 status={status}
                 canResetPassword={canResetPassword}
-                onClose={() => setRegisterOpen(false)} // Cerrar el modal
+                onClose={() => setRegisterOpen(false)}
             />
         </>
     );

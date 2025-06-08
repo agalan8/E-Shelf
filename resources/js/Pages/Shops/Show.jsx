@@ -9,8 +9,8 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Show = ({ posts, shop, user, userPosts }) => {
   const [showModal, setShowModal] = useState(false);
-  const [sortPriceOrder, setSortPriceOrder] = useState('asc'); // orden precio
-  const [sortDateOrder, setSortDateOrder] = useState('desc'); // orden fecha
+  const [sortPriceOrder, setSortPriceOrder] = useState('asc');
+  const [sortDateOrder, setSortDateOrder] = useState('desc');
   const isOwner = shop.user.id === user.id;
 
   // Ordenamos los posts primero por fecha, luego por precio

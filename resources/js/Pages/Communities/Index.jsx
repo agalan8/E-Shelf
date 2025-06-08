@@ -10,15 +10,11 @@ import { Head } from '@inertiajs/react';
 export default function Index({ communities, auth }) {
   const [showModal, setShowModal] = useState(false);
 
-  // Estados para ordenar
-  const [sortPrice, setSortPrice] = useState('none'); // no aplica aquí, pero puedes adaptar si quieres
-  const [sortDate, setSortDate] = useState('none');   // idem
   const [sortUsers, setSortUsers] = useState('none'); // 'asc' | 'desc' | 'none'
   const [sortPosts, setSortPosts] = useState('none'); // 'asc' | 'desc' | 'none'
 
   const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
-  // Ordenar comunidades según los select
   const sortedCommunities = useMemo(() => {
     let sorted = [...communities];
 

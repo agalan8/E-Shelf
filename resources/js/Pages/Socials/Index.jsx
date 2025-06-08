@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 export default function SocialIndex() {
   const { socials } = usePage().props;
@@ -16,7 +16,7 @@ export default function SocialIndex() {
   const [sortField, setSortField] = useState('nombre');
   const [sortDirection, setSortDirection] = useState('asc');
 
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (showModal) {
@@ -39,7 +39,6 @@ export default function SocialIndex() {
     }, 300);
   };
 
-  // Validación en caliente para el campo nombre
   const validateNombre = (value) => {
     if (!value.trim()) {
       setNombreError('El nombre es obligatorio.');

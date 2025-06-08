@@ -71,7 +71,6 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
     );
   };
 
-  // URLs de iconos para redes sociales (puedes cambiar por otros enlaces si quieres)
   const socialIconUrls = {
     instagram:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/1024px-Instagram_logo_2016.svg.png",
@@ -172,7 +171,7 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
                     url = `https://linkedin.com/in/${social.pivot.perfil}`;
                     break;
                   default:
-                    url = social.pivot.perfil; // fallback
+                    url = social.pivot.perfil;
                 }
 
                 return (

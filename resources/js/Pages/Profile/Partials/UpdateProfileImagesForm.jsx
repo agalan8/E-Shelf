@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm, usePage, router } from '@inertiajs/react';
 import ImageInput from '@/Components/ImageInput';
 import { Transition } from '@headlessui/react';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 const UpdateImagesProfileForm = () => {
     const { flash, auth } = usePage().props;
@@ -15,22 +15,18 @@ const UpdateImagesProfileForm = () => {
         background_image: null,
     });
 
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
-    // Función para manejar el envío del formulario
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const formData = new FormData();
         formData.append('user', JSON.stringify(data.user));
 
-        // Si hay una imagen de perfil, añádela al FormData
         if (data.profile_image) formData.append('profile_image', data.profile_image);
 
-        // Si hay una imagen de fondo, añádela al FormData
         if (data.background_image) formData.append('background_image', data.background_image);
 
-        // Enviar la solicitud POST a la ruta de actualización de imágenes
         post(route('images.update'), {
             preserveScroll: true,
             onSuccess: () => {
@@ -39,15 +35,12 @@ const UpdateImagesProfileForm = () => {
         });
     };
 
-    // Función para eliminar la imagen
     const handleDeleteImage = (imageType) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
 
-            // Usamos Inertia para hacer la solicitud DELETE
             router.delete(route('images.destroy',{ user: user.id, imageType}), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    // Si la eliminación es exitosa, actualizamos el estado para reflejarlo
                     if (imageType === 'profile_image') {
                         setData('profile_image', null);
                     } else if (imageType === 'background_image') {

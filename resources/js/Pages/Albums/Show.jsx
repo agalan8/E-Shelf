@@ -6,13 +6,13 @@ import Edit from "@/Components/Albums/Edit";
 import AddPosts from "@/Components/Albums/AddPosts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 const Show = ({ album, userPosts, tags }) => {
     const [posts, setPosts] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddPostsModalOpen, setIsAddPostsModalOpen] = useState(false);
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (album && album.posts) {
@@ -65,7 +65,6 @@ const Show = ({ album, userPosts, tags }) => {
                     </Link>
                 </div>
 
-                {/* Título y botón en una sola línea */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-4 gap-2">
                     <h1 className="text-white text-2xl sm:text-3xl font-semibold">
                         {album.nombre}
@@ -79,7 +78,6 @@ const Show = ({ album, userPosts, tags }) => {
                     </button>
                 </div>
 
-                {/* Descripción */}
                 <div className="text-md text-white mb-2 sm:mb-4">
                     <strong>Descripción:</strong>
                     <p>{album.descripcion}</p>
@@ -115,7 +113,6 @@ const Show = ({ album, userPosts, tags }) => {
                                                         />
                                                     </button>
 
-                                                    {/* Publicación */}
                                                     <Post
                                                         getTotalLikes={
                                                             post.getTotalLikes
@@ -136,7 +133,6 @@ const Show = ({ album, userPosts, tags }) => {
                 )}
             </div>
 
-            {/* Modales */}
             {isEditModalOpen && (
                 <Edit album={album} onClose={handleCloseEditModal} />
             )}

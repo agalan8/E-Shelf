@@ -1,14 +1,13 @@
 import React from 'react';
 import User from '@/Components/Users/User';
 import Post from '@/Components/Posts/Post';
-import Community from '@/Components/Communities/Community'; // Asegúrate de que esta ruta sea correcta
+import Community from '@/Components/Communities/Community';
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 export default function BusquedaResultados({ results, filter, auth, tags = [] }) {
   const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
-  // Para distribuir en 3 columnas
   const columns = [0, 1, 2];
 
   return (

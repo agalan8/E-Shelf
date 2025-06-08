@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
-import UpdateProfileImagesForm from './Partials/UpdateProfileImagesForm';  // Importamos el formulario
+import UpdateProfileImagesForm from './Partials/UpdateProfileImagesForm';
 
 export default function Edit({ mustVerifyEmail, status, user, socials }) {
 

@@ -336,7 +336,6 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
               } else {
                 openNotif();
               }
-              // Solo cerrar menú en móvil
               setIsMobileMenuOpen(false);
             }}
             className={`mt-2 flex items-center justify-center px-2 py-2 rounded-xl relative transition-colors duration-200 ${

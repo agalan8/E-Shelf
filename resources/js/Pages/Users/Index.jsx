@@ -4,12 +4,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Image from '@/Components/Image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 export default function UserIndex() {
   const { users, auth } = usePage().props;
   const [showModal, setShowModal] = useState(false);
-  const [isVisible, setIsVisible] = useState(false); // controla opacidad para animación
+  const [isVisible, setIsVisible] = useState(false);
 
   const [search, setSearch] = useState('');
   const [searchField, setSearchField] = useState('name');
@@ -24,7 +24,7 @@ export default function UserIndex() {
   });
   const [errors, setErrors] = useState({});
 
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (showModal) {
@@ -34,7 +34,7 @@ export default function UserIndex() {
 
   const closeModal = () => {
     setIsVisible(false);
-    setTimeout(() => setShowModal(false), 300); // duración igual a la transición CSS
+    setTimeout(() => setShowModal(false), 300);
   };
 
   const deleteUser = (id) => {
@@ -82,18 +82,15 @@ export default function UserIndex() {
       return 0;
     });
 
-  // Validaciones en caliente
   const validate = (field, value) => {
     let newErrors = { ...errors };
 
-    // Validar campo obligatorio
     if (value === '' || value === null || value === undefined) {
       newErrors[field] = 'Este campo es obligatorio';
     } else {
       delete newErrors[field];
     }
 
-    // Validar email
     if (field === 'email') {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
@@ -104,7 +101,6 @@ export default function UserIndex() {
       }
     }
 
-    // Validar contraseña
     if (field === 'password') {
       if (value.length < 8) {
         newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
@@ -114,7 +110,6 @@ export default function UserIndex() {
       }
     }
 
-    // Validar selección de admin
     if (field === 'is_admin') {
       if (value === '') {
         newErrors.is_admin = 'Debe seleccionar una opción';
@@ -352,7 +347,6 @@ export default function UserIndex() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                // Validación final antes de enviar
                 validate('name', form.name);
                 validate('email', form.email);
                 validate('password', form.password);

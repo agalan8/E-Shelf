@@ -5,7 +5,7 @@ import TextInput from '@/Components/TextInput';
 import TextAreaInput from '@/Components/TextAreaInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -15,7 +15,6 @@ export default function UpdateProfileInformation({
     const { userEdit } = usePage().props;
     const { socials } = usePage().props;
 
-    // Mapea las redes sociales del usuario y obtiene los perfiles actuales
     const userSocials = userEdit.socials.reduce((acc, social) => {
         acc[social.nombre.toLowerCase()] = social.pivot.perfil;
         return acc;
@@ -26,10 +25,10 @@ export default function UpdateProfileInformation({
             name: userEdit.name,
             email: userEdit.email,
             biografia: userEdit.biografia,
-            ...userSocials, // Carga las redes existentes
+            ...userSocials,
         });
 
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
     const submit = (e) => {
         e.preventDefault();
