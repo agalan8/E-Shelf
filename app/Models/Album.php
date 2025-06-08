@@ -38,7 +38,6 @@ class Album extends Model
             $album->posts()->detach();
         }
 
-        // Verifica si el álbum tiene una imagen asociada
         if ($album->coverImage) {
             $image = $album->coverImage;
 

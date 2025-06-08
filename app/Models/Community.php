@@ -74,7 +74,6 @@ class Community extends Model
 {
     static::deleting(function ($community) {
         if (! $community->isForceDeleting()) {
-            // Solo eliminar registros de imágenes (sin borrar archivos físicos)
             if ($community->profileImage) {
                 $community->profileImage->delete();
             }
@@ -82,10 +81,8 @@ class Community extends Model
                 $community->backgroundImage->delete();
             }
 
-            // Desvincular posts relacionados
             $community->posts()->detach();
 
-            // Desvincular miembros relacionados
             $community->memberships()->delete();
         }
     });

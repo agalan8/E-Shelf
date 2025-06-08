@@ -49,10 +49,7 @@ protected static function booted()
         $shopPost->lineasCarrito()->delete();
 
         if (! $shopPost->isForceDeleting()) {
-            // Eliminar la relación con el modelo Post
             $shopPost->post()?->delete();
-
-            // Eliminar las líneas de carrito relacionadas
         }
     });
 }

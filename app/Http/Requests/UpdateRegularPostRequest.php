@@ -16,7 +16,6 @@ class UpdateRegularPostRequest extends FormRequest
 
          $RegularPost = RegularPost::findOrFail($RegularPost);
 
-         // Verificar si el usuario autenticado es el autor del post o un administrador
          return $this->user()->id === $RegularPost->post->user->id || $this->user()->is_admin;
     }
 
