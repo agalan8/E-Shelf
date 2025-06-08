@@ -65,7 +65,7 @@ Route::get('/', function () {
                 'comments.replies.user.profileImage',
                 'comments.replies.user.backgroundImage'
             )
-                ->doesntHave('shopPost') // Aquí se filtran los que NO tienen shopPost relacionado
+                ->doesntHave('shopPost')
                 ->orderBy('created_at', 'desc')
                 ->get(),
         ]);
@@ -88,7 +88,7 @@ Route::get('/explorar', function () {
     return Inertia::render('Explorar', [
         'posts' => RegularPost::with('image', 'tags', 'communities', 'post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->doesntHave('shopPost')->orderBy('created_at', 'desc')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
-            $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false; // Verificar si el usuario ha dado like
+            $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false;
             return $post;
         }),
         'tags' => Tag::all(),
@@ -111,10 +111,6 @@ Route::delete('albums/posts', function (Request $request) {
     $album = Album::findOrFail($request->album_id);
     $regularPost = RegularPost::findOrFail($request->regular_post_id);
 
-
-    // Eliminar el post (esto ejecuta el "booted" y elimina lo relacionado)
-
-    // Eliminar la relación entre album y post (por si queda)
     $album->posts()->detach($regularPost->id);
 
     return back();
@@ -182,11 +178,6 @@ Route::middleware(['auth'])->group(function () {
 Route::resource('community-memberships', CommunityMembershipController::class)->middleware('auth');
 
 
-
-
-
-
-
 // Route::get('/mis-posts', function () {
 
 //     $userId = Auth::user()->id;
@@ -209,14 +200,12 @@ Route::get('/posts-seguidos', function () {
 
     $user = User::findOrFail(Auth::id());
 
-    // IDs de usuarios seguidos + el propio
     $userIds = $user->following()->pluck('followed_user_id')->push($user->id);
 
-    // RegularPosts de usuarios seguidos o propios
     $regularPosts = RegularPost::whereHas('post', function ($query) use ($userIds) {
         $query->whereIn('user_id', $userIds);
     })
-        ->doesntHave('shopPost') // Excluir los que tienen relación con ShopPost
+        ->doesntHave('shopPost')
         ->with([
             'image',
             'post.user.profileImage',
@@ -235,8 +224,8 @@ Route::get('/posts-seguidos', function () {
     $sharedPosts = SharedPost::whereHas('post', function ($query) use ($userIds) {
         $query->whereIn('user_id', $userIds);
     })
-        ->whereHas('regularPost') // Asegurarse de que tiene un RegularPost
-        ->whereDoesntHave('regularPost.shopPost') // Excluir si su RegularPost tiene ShopPost
+        ->whereHas('regularPost')
+        ->whereDoesntHave('regularPost.shopPost')
         ->with([
             'regularPost.image',
             'regularPost.post.user.profileImage',
@@ -248,12 +237,10 @@ Route::get('/posts-seguidos', function () {
             'regularPost.comments.replies.user.profileImage',
             'regularPost.comments.replies.user.backgroundImage',
             'regularPost.likedBy',
-            'post.user.profileImage', // quien hizo el share
+            'post.user.profileImage',
         ])
         ->get();
 
-
-    // Mapear ambos tipos al mismo formato base
     $allPosts = collect();
 
     foreach ($regularPosts as $post) {
@@ -262,7 +249,7 @@ Route::get('/posts-seguidos', function () {
         $post->isSharedByUser = $post->isSharedByUser();
         $post->getTotalShares = $post->getTotalShares();
         $post->post_type = 'regular';
-        $post->shared_by = null; // No aplica
+        $post->shared_by = null;
         $allPosts->push($post);
     }
 
@@ -273,12 +260,11 @@ Route::get('/posts-seguidos', function () {
         $original->isSharedByUser = $original->isSharedByUser();
         $original->getTotalShares = $original->getTotalShares();
         $original->post_type = 'shared';
-        $original->shared_by = $sharedPost->post->user; // quien lo compartió
+        $original->shared_by = $sharedPost->post->user;
         $original->shared_at = $sharedPost->post->created_at;
         $allPosts->push($original);
     }
 
-    // Ordenar todos los posts por fecha de creación (propia o compartida)
     $sortedPosts = $allPosts->sortByDesc(function ($post) {
         return $post->shared_at ?? $post->post->created_at;
     })->values();
@@ -324,24 +310,16 @@ Route::get('mis-comunidades', function () {
 
 Route::post('albums/{album}/posts', function (Request $request, Album $album) {
 
-    // Obtener los IDs de los posts seleccionados
     $postIds = $request->input('posts', []);
 
-    // Verificar que el álbum existe
     $album = Album::findOrFail($album->id);
 
-    // Añadir la relación entre el álbum y los posts seleccionados, sin duplicar
     foreach ($postIds as $postId) {
-        // Verificar si el post ya está relacionado con el álbum
         $album->posts()->syncWithoutDetaching([$postId]);
     }
 
-    // Devolver una respuesta con un mensaje de éxito
     return redirect()->route('albums.show', $album->id);
 })->name('albums.posts.store')->middleware('auth');
-
-
-
 
 Route::post('/images/update', function (Request $request) {
     $request->validate([
@@ -353,7 +331,6 @@ Route::post('/images/update', function (Request $request) {
 
     $user = User::findOrFail($request->input('user.id'));
 
-    // Subir imagen de perfil
     if ($request->hasFile('profile_image')) {
 
         $imagen = $request->file('profile_image');
@@ -379,7 +356,6 @@ Route::post('/images/update', function (Request $request) {
         Storage::disk('s3')->put($path_small, $smallImage, 'public');
 
         if ($user->profileImage) {
-            // Actualizamos la foto asociada al post
             $user->profileImage()->update([
                 'path_small' => $path_aws . $path_small,
             ]);
@@ -423,7 +399,6 @@ Route::post('/images/update', function (Request $request) {
         Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
         if ($user->backgroundImage) {
-            // Actualizamos la foto asociada al post
             $user->backgroundImage()->update([
                 'path_original' => $path_aws . $path_original,
                 'path_medium' => $path_aws . $path_medium,
@@ -451,7 +426,6 @@ Route::post('/images/update', function (Request $request) {
 Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $imageType) {
 
 
-    // Verificar el tipo de imagen a eliminar (profile_image o background_image)
     if ($imageType === 'profile_image' && $user->profileImage) {
 
         // $path = parse_url($user->profileImage->path_small, PHP_URL_PATH); // /public/profile_images/123.jpg
@@ -475,10 +449,8 @@ Route::delete('/images/destroy/{user}/{imageType}', function (User $user, $image
         $user->backgroundImage()->delete();
     }
 
-    // Guardar los cambios en el usuario (vaciar la ruta de la imagen)
     $user->save();
 
-    // Redirigir con un mensaje de éxito
     return redirect()->back()->with('message', 'La imagen ha sido eliminada correctamente');
 })->name('images.destroy');
 
@@ -493,7 +465,6 @@ Route::post('/like', function (Request $request) {
         $post->likedBy()->detach($user->id);
     } else {
         $post->likedBy()->attach($user->id);
-        // Notificar al usuario que ha dado like, enviando el post ya cargado con relaciones
         $post->post->user->notify(new PostLiked($post, $user));
     }
 
