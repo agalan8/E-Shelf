@@ -12,12 +12,10 @@ class UpdatePostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-         // Obtener el post que se está editando desde la ruta
          $post = $this->route('post');
 
          $post = Post::findOrFail($post);
 
-         // Verificar si el usuario autenticado es el autor del post o un administrador
          return $this->user()->id === $post->user->id || $this->user()->is_admin;
     }
 

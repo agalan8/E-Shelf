@@ -14,7 +14,7 @@ import { PencilIcon as PencilSolid } from "@heroicons/react/24/solid";
 import { TrashIcon as TrashOutline } from "@heroicons/react/24/outline";
 import { TrashIcon as TrashSolid } from "@heroicons/react/24/solid";
 import Image from "@/Components/Image";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 const Post = ({
     post,
@@ -37,7 +37,7 @@ const Post = ({
     const [isShared, setIsShared] = useState(isSharedByUser);
     const [totalShares, setTotalShares] = useState(getTotalShares || 0);
 
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
     console.log("Post:", post);
     console.log("Post Type:", postType);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 const Edit = ({ post, onClose }) => {
   const { data, setData, processing, errors } = useForm({
@@ -10,14 +10,13 @@ const Edit = ({ post, onClose }) => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [precioError, setPrecioError] = useState('');
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
 
-  // Validación en caliente para el campo precio
   const validatePrecio = (value) => {
     const regex = /^\d{1,10}(\.\d{1,2})?$/;
     if (!value) {

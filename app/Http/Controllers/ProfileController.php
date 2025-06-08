@@ -45,7 +45,6 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Recorrer todas las redes sociales disponibles
         foreach (Social::all() as $social) {
 
             $perfil = $request->input(strtolower($social->nombre));
@@ -53,18 +52,15 @@ class ProfileController extends Controller
             $existingSocial = $user->socials()->where('social_id', $social->id)->first();
 
             if ($perfil === null || trim($perfil) === '') {
-                // Si el campo está vacío y existe una relación, eliminarla
                 if ($existingSocial) {
                     $user->socials()->detach($social->id);
                 }
             } else {
-                // Si hay una relación existente, actualizar si el perfil es diferente
                 if ($existingSocial) {
                     if ($existingSocial->pivot->perfil !== $perfil) {
                         $user->socials()->updateExistingPivot($social->id, ['perfil' => $perfil]);
                     }
                 } else {
-                    // Si no existe relación, crear una nueva
                     $user->socials()->attach($social->id, ['perfil' => $perfil]);
                 }
             }

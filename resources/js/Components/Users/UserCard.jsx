@@ -17,12 +17,10 @@ const UserCard = ({ user }) => {
         backgroundPosition: 'center',
       }}
     >
-      {/* Overlay oscuro para legibilidad */}
       {hasBackgroundImage && (
         <div className="absolute inset-0 bg-black bg-opacity-60 pointer-events-none rounded-lg" />
       )}
 
-      {/* Contenido encima */}
       <div className="relative flex items-center gap-4 z-10">
         {hasProfileImage ? (
           <Image

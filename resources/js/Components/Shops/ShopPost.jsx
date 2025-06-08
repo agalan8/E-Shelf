@@ -9,7 +9,7 @@ import {
   faCartArrowDown
 } from "@fortawesome/free-solid-svg-icons";
 import Edit from "@/Components/ShopPosts/Edit";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 const ShopPost = ({ post }) => {
   const { auth } = usePage().props;
@@ -18,15 +18,13 @@ const ShopPost = ({ post }) => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
 
-  // Carrito del usuario autenticado
   const lineasCarrito = auth?.user?.lineas_carrito || [];
 
-  // Verifica si el producto ya está en el carrito
   const estaEnCarrito = lineasCarrito.some(
     (linea) => linea.shop_post_id === post.id
   );
 
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   const handleRemoveFromShop = () => {
     if (confirm("¿Eliminar esta publicación de la tienda?")) {

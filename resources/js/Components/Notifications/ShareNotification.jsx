@@ -5,7 +5,6 @@ import { faRetweet } from '@fortawesome/free-solid-svg-icons';
 export default function ShareNotification({ sharer, post, openPostModal }) {
   return (
     <>
-      {/* Contenedor del usuario que compartió */}
       <Link
         href={route('users.show', { user: sharer.id })}
         className="flex items-start justify-between hover:bg-gray-700 p-2 rounded transition-colors"
@@ -32,7 +31,6 @@ export default function ShareNotification({ sharer, post, openPostModal }) {
         <FontAwesomeIcon icon={faRetweet} className="text-purple-300 w-7 h-7 flex-shrink-0 ml-2 mt-1" />
       </Link>
 
-      {/* Contenedor del post compartido */}
       <div
         className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-700"
         onClick={() => openPostModal(post)}

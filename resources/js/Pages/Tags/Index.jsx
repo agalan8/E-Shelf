@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 export default function TagIndex() {
   const { tags } = usePage().props;
   const [showModal, setShowModal] = useState(false);
-  const [isVisible, setIsVisible] = useState(false); // animación de opacidad
+  const [isVisible, setIsVisible] = useState(false);
   const [editingTag, setEditingTag] = useState(null);
   const [nombre, setNombre] = useState('');
   const [nombreError, setNombreError] = useState('');
@@ -17,7 +17,7 @@ export default function TagIndex() {
   const [sortField, setSortField] = useState('nombre');
   const [sortDirection, setSortDirection] = useState('asc');
 
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (showModal) {
@@ -37,7 +37,7 @@ export default function TagIndex() {
       setShowModal(false);
       setEditingTag(null);
       setNombre('');
-    }, 300); // igual a la transición
+    }, 300);
   };
 
   const validateNombre = (value) => {

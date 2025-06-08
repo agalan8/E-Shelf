@@ -10,7 +10,7 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 const containerStyle = { width: "100%", height: "300px" };
 const centerDefault = { lat: 40.4168, lng: -3.7038 };
@@ -44,7 +44,7 @@ const PostCreate = () => {
     localizacion: false,
   });
 
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     const handleClickOutside = (e) => {

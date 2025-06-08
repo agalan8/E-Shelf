@@ -22,13 +22,13 @@ const FollowingModal = ({ isOpen, onClose, following }) => {
 
   return (
     <div
-      onClick={handleClose} // Cierra modal si se clickea fuera
+      onClick={handleClose}
       className={`fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 transition-opacity duration-300 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       <div
-        onClick={(e) => e.stopPropagation()} // Previene cierre al hacer clic dentro del modal
+        onClick={(e) => e.stopPropagation()}
         className={`bg-[#36393F] rounded-lg shadow-lg w-full max-w-lg p-6 relative transform transition-all duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
         }

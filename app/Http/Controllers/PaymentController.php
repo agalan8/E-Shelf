@@ -39,13 +39,12 @@ class PaymentController extends Controller
         foreach ($lineasCarrito as $linea) {
             $precioCentimos = (int) round($linea->shopPost->precio * 100);
 
-            // Aquí usaremos un objeto con price_data para enviar precio dinámico
             $line_items[] = [
                 'price_data' => [
                     'currency' => 'eur',
                     'product_data' => [
                         'name' => $linea->shopPost->regularPost->titulo ?? 'Producto',
-                        'images' => [$linea->shopPost->regularPost->image->path_small ?? ''], // URL imagen si tienes
+                        'images' => [$linea->shopPost->regularPost->image->path_small ?? ''],
                     ],
                     'unit_amount' => $precioCentimos,
                 ],
@@ -69,15 +68,12 @@ class PaymentController extends Controller
         }
     }
 
-    // Opcional: rutas para éxito y cancelación
     public function success(Request $request)
     {
 
         $user = User::findOrFail(Auth::user()->id);
-        // ✅ Recuperar las líneas desde la sesión del servidor
         $ids = session('lineas_carrito_pagadas', []);
 
-        // Obtener solo las líneas que realmente están en el carrito y son del usuario
         $lineas = $user->lineasCarrito()->whereIn('id', $ids)->get();
 
         if (count($lineas) !== count($ids)) {
@@ -107,7 +103,6 @@ class PaymentController extends Controller
             ]);
         }
 
-        // Eliminar solo las líneas válidas que se pagaron
         $lineas->each->delete();
 
         Mail::to($order->user->email)->queue(new OrderDigitalDownload($order));
@@ -117,7 +112,7 @@ class PaymentController extends Controller
         session()->forget('lineas_carrito_pagadas');
 
 
-        return redirect()->route('orders.index'); // O vista simple con mensaje
+        return redirect()->route('orders.index');
     }
 
     public function cancel()
@@ -125,6 +120,6 @@ class PaymentController extends Controller
         $user = User::findOrFail(Auth::user()->id);
 
         session()->forget('lineas_carrito_pagadas');
-        return redirect()->route('shops.show', $user->shop->id); // O vista simple con mensaje
+        return redirect()->route('shops.show', $user->shop->id);
     }
 }

@@ -16,19 +16,18 @@ export default function Edit({ isOpen, onClose, mustVerifyEmail, status, socials
 
     if (isOpen) {
       setShouldRender(true);
-      timer = setTimeout(() => setVisible(true), 10); // animar apertura
+      timer = setTimeout(() => setVisible(true), 10);
     } else if (shouldRender) {
-      setVisible(false); // animar cierre
+      setVisible(false);
       timer = setTimeout(() => {
-        setShouldRender(false); // desmontar modal
+        setShouldRender(false);
         if (onClose) onClose();
-      }, 300); // duración de la animación
+      }, 300);
     }
 
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  // Cuando el usuario pulsa fuera o en la X, animamos la salida y avisamos al padre después
   const handleClose = () => {
     setVisible(false);
     setTimeout(() => {
@@ -59,7 +58,7 @@ export default function Edit({ isOpen, onClose, mustVerifyEmail, status, socials
           sm:rounded-2xl sm:h-[90vh] sm:max-w-5xl
           h-screen max-w-full
         `}
-        style={{ maxHeight: '100dvh' }} // Para soportar altura real en móviles modernos
+        style={{ maxHeight: '100dvh' }}
       >
         {/* Barra superior */}
         <div className="w-full bg-[#292B2F] text-white flex items-center justify-between p-4 sm:p-4 p-2">

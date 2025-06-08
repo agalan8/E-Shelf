@@ -36,7 +36,7 @@ class ShopPostController extends Controller
     public function store(StoreShopPostRequest $request)
     {
         $user = User::findOrFail(Auth::user()->id);
-        $shop = $user->shop; // Asumiendo que el usuario autenticado tiene una tienda asociada
+        $shop = $user->shop;
 
         $request->validate([
             'posts' => ['required', 'array', 'min:1'],

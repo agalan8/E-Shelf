@@ -5,7 +5,7 @@ import Show from "@/Components/Posts/Show";
 import Image from "@/Components/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 export default function PostIndex() {
     const { posts, tags } = usePage().props;
@@ -20,7 +20,7 @@ export default function PostIndex() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const dropdownRef = useRef();
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
     useEffect(() => {
         const handleClickOutside = (event) => {

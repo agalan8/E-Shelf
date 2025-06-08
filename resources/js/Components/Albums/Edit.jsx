@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import ImageInput from '@/Components/ImageInput';
-import { useToast } from '@/contexts/ToastProvider'; // Asegúrate de que la ruta sea correcta
+import { useToast } from '@/contexts/ToastProvider';
 
 const Edit = ({ album, onClose }) => {
   const { data, setData, post, processing, errors } = useForm({
@@ -14,7 +14,7 @@ const Edit = ({ album, onClose }) => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [liveErrors, setLiveErrors] = useState({});
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);

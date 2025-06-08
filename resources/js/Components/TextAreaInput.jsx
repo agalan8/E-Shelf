@@ -10,7 +10,7 @@ const TextAreaInput = ({ value, onChange, placeholder = '', rows = 4, cols = 50,
         rows={rows}
         cols={cols}
         name={name}
-        {...props} // Permite pasar cualquier otra propiedad extra (ej. className, id, etc.)
+        {...props}
       />
     </div>
   );

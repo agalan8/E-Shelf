@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
-import { ChatBubbleOvalLeftIcon } from '@heroicons/react/24/solid'; // ✅ Importado
+import { ChatBubbleOvalLeftIcon } from '@heroicons/react/24/solid';
 
 const Comment = ({ comment, onReplySubmitted }) => {
   const { auth, users } = usePage().props;
@@ -139,8 +139,8 @@ const Comment = ({ comment, onReplySubmitted }) => {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();  // Evita que se añada una nueva línea
-      handleReplySubmit();  // Envía la respuesta al presionar Enter
+      e.preventDefault();
+      handleReplySubmit();
     }
   };
 
@@ -214,7 +214,7 @@ const Comment = ({ comment, onReplySubmitted }) => {
                 e.target.style.height = 'auto';
                 e.target.style.height = `${e.target.scrollHeight}px`;
               }}
-              onKeyDown={handleKeyDown} // Detecta el presionar Enter
+              onKeyDown={handleKeyDown}
             />
           </div>
           {suggestions.length > 0 && (

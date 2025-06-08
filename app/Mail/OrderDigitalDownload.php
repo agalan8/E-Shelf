@@ -75,13 +75,11 @@ class OrderDigitalDownload extends Mailable implements ShouldQueue
         foreach ($this->order->lines as $line) {
             $filePath = $line->path_image;
 
-            // Elimina la parte del dominio para obtener la ruta dentro del bucket
             $storagePath = parse_url($filePath, PHP_URL_PATH);
-            $storagePath = ltrim($storagePath, '/'); // elimina la barra inicial
+            $storagePath = ltrim($storagePath, '/');
 
 
 
-            // Obtener el contenido del archivo desde S3
             if (Storage::disk('s3')->exists($storagePath)) {
                 $content = Storage::disk('s3')->get($storagePath);
                 $filename = basename($storagePath);

@@ -13,7 +13,6 @@ const MisAlbums = ({ albums, posts, user }) => {
   const [filterYear, setFilterYear] = useState('');
   const [filterMonth, setFilterMonth] = useState('');
 
-  // Extraer años únicos desde albums
   const albumYears = useMemo(() => {
     const yearSet = new Set();
     albums.forEach(album => {

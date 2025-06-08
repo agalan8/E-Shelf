@@ -23,7 +23,6 @@ class LineaCarritoController extends Controller
     {
         $user = Auth::user();
 
-        // Añade sólo si no existe
         $exists = LineaCarrito::where('user_id', $user->id)
             ->where('shop_post_id', $request->shop_post_id)
             ->exists();

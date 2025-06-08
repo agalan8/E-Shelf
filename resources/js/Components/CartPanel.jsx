@@ -3,13 +3,13 @@ import { usePage, router } from '@inertiajs/react';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBillWave, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 export default function CartPanel({ onClose }) {
   const { auth } = usePage().props;
   const lineasCarrito = auth.user?.lineas_carrito || [];
   const [loading, setLoading] = useState(false);
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   const handleRemove = (shopPostId) => {
     router.post(

@@ -11,7 +11,7 @@ class UpdateCommunityRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $community = $this->route('community'); // Esto ya es un modelo si usas model binding
+        $community = $this->route('community');
 
         return $community && $this->user() && $community->user_id === $this->user()->id;
     }

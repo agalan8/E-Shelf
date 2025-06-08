@@ -5,11 +5,11 @@ import { faEye, faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Edit from '@/Components/Albums/Edit';
 import FlipBook from '@/Components/Albums/FlipBook';
 import Image from '../Image';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 const Album = ({ album }) => {
   const { auth } = usePage().props;
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isFlipBookOpen, setIsFlipBookOpen] = useState(false);

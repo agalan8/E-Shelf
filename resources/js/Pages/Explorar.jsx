@@ -1,10 +1,9 @@
 import GuestPageLayout from '@/Layouts/GuestPageLayout';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import Post from '@/Components/Posts/Post'; // Asegúrate de importar el componente Post
+import Post from '@/Components/Posts/Post';
 
 export default function Explorar({ auth, posts, tags }) {
-    // Condición para verificar si el usuario está autenticado
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
     console.log(posts);

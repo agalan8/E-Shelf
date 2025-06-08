@@ -11,11 +11,9 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 export default function MisComunidades({ communities, user }) {
   const [showModal, setShowModal] = useState(false);
 
-  // Estados para ordenar
-  const [sortUsers, setSortUsers] = useState('none'); // 'asc' | 'desc' | 'none'
-  const [sortPosts, setSortPosts] = useState('none'); // 'asc' | 'desc' | 'none'
+  const [sortUsers, setSortUsers] = useState('none');
+  const [sortPosts, setSortPosts] = useState('none');
 
-  // Comunidades ordenadas según select
   const sortedCommunities = useMemo(() => {
     let sorted = [...communities];
 
@@ -36,7 +34,6 @@ export default function MisComunidades({ communities, user }) {
     return sorted;
   }, [communities, sortUsers, sortPosts]);
 
-  // Separar comunidades en dos grupos después de ordenar
   const administradas = sortedCommunities.filter(c => c.user.id === user.id);
   const miembro = sortedCommunities.filter(c => c.user.id !== user.id);
 

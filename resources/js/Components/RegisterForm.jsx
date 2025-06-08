@@ -45,7 +45,6 @@ export default function RegisterForm({ onClose, onSwitchToLogin }) {
             } else {
                 delete newErrors.password;
             }
-            // Validar confirmación también si ya hay valor
             if (data.password_confirmation && value !== data.password_confirmation) {
                 newErrors.password_confirmation = 'Las contraseñas no coinciden.';
             } else if (data.password_confirmation) {
@@ -74,7 +73,6 @@ export default function RegisterForm({ onClose, onSwitchToLogin }) {
     const submit = (e) => {
         e.preventDefault();
 
-        // Validar todos los campos antes de enviar
         validate('name', data.name);
         validate('email', data.email);
         validate('password', data.password);

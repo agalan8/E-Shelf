@@ -29,10 +29,10 @@ class HandleInertiaRequests extends Middleware
 
             $communities = $user->communityMemberships()
                 ->where('community_role_id', '!=', 4)
-                ->with('community') // carga la relación community
+                ->with('community')
                 ->get()
-                ->pluck('community') // extrae las comunidades
-                ->filter(); // elimina posibles null (por seguridad)
+                ->pluck('community')
+                ->filter();
         }
 
         $newCommentId = session('newCommentId');
@@ -49,11 +49,9 @@ class HandleInertiaRequests extends Middleware
                         'id' => $notification->id,
                         'type' => $notification->data['type'] ?? 'other',
                         'created_at' => $notification->created_at->diffForHumans(),
-                        // Para follower, verificamos que 'follower_id' exista antes de buscar
                         'follower' => isset($notification->data['follower_id'])
                             ? User::with('profileImage')->find($notification->data['follower_id'])
                             : null,
-                        // Para sharer, igual, verificamos que 'sharer_id' exista antes de buscar
                         'sharer' => isset($notification->data['sharer_id'])
                             ? User::with('profileImage')->find($notification->data['sharer_id'])
                             : null,
@@ -103,7 +101,7 @@ class HandleInertiaRequests extends Middleware
             'socials' => Social::all(),
             'users' => User::all(),
             'newCommentId' => $newCommentId,
-            'notifications' => $notifications,  // Aquí pasamos las notificaciones a Inertia
+            'notifications' => $notifications,
             'unreadNotificationCount' => $unreadNotificationCount,
         ];
     }

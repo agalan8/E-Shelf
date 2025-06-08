@@ -22,21 +22,21 @@ const FollowersModal = ({ isOpen, onClose, followers }) => {
 
   return (
     <div
-      onClick={handleClose} // cerrar al clic en el backdrop
+      onClick={handleClose}
       className={`fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 transition-opacity duration-300 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       <div
-        onClick={(e) => e.stopPropagation()} // evitar cierre si clic dentro del modal
+        onClick={(e) => e.stopPropagation()}
         className={`bg-[#36393F] rounded-lg shadow-lg w-full max-w-lg p-6 relative transform transition-all duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-5'
         }
         sm:max-w-lg sm:p-6
-        max-w-full w-[95vw] p-2`} // Añadido para móvil
+        max-w-full w-[95vw] p-2`}
         style={{
           height: '70vh',
-          maxHeight: '90vh', // Mejor manejo en móvil
+          maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column'
         }}

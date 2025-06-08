@@ -14,7 +14,6 @@ export default function FlipBook({ isOpen, onClose, album }) {
   // Estado para guardar si cada imagen es vertical
   const [isPortrait, setIsPortrait] = useState({});
 
-  // Cuando se abre el modal, activar la animación
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => setIsVisible(true), 10);
@@ -24,7 +23,6 @@ export default function FlipBook({ isOpen, onClose, album }) {
     }
   }, [isOpen]);
 
-  // Actualizar páginas si cambia el álbum
   useEffect(() => {
     setCurrentAlbum(album);
     const updatedPages = [...album.posts];
@@ -32,7 +30,7 @@ export default function FlipBook({ isOpen, onClose, album }) {
       updatedPages.push(null);
     }
     setPages(updatedPages);
-    setIsPortrait({}); // resetear estado cuando cambia álbum
+    setIsPortrait({});
   }, [album]);
 
   if (!isOpen) return null;
@@ -70,13 +68,13 @@ export default function FlipBook({ isOpen, onClose, album }) {
     }, 300);
   };
 
-  // Función para detectar si imagen es vertical y guardar resultado
+  // Función para detectar si imagen es vertical
   const handleImageLoad = (index) => (e) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
     const isVertical = naturalHeight > naturalWidth;
 
     setIsPortrait((prev) => {
-      if (prev[index] === isVertical) return prev; // evita actualizar si no cambia
+      if (prev[index] === isVertical) return prev;
       return {
         ...prev,
         [index]: isVertical,
@@ -172,7 +170,6 @@ export default function FlipBook({ isOpen, onClose, album }) {
                     overflow-hidden
                   "
                 >
-                  {/* Reflejo blanco sutil */}
                   <div
                     className="absolute top-0 left-0 w-full h-full pointer-events-none"
                     style={{

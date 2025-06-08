@@ -10,7 +10,7 @@ export default function User({ user }) {
   const [hovering, setHovering] = useState(false);
 
   const handleFollowToggle = (e) => {
-    e.stopPropagation(); // Evita que el click en el botón active el enlace padre
+    e.stopPropagation();
 
     if (!auth.user) return;
 
