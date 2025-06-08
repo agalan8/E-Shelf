@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Image from '@/Components/Image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function UserIndex() {
   const { users, auth } = usePage().props;
@@ -14,6 +15,16 @@ export default function UserIndex() {
   const [searchField, setSearchField] = useState('name');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    is_admin: '',
+  });
+  const [errors, setErrors] = useState({});
+
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     if (showModal) {
@@ -28,7 +39,11 @@ export default function UserIndex() {
 
   const deleteUser = (id) => {
     if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
-      router.delete(route('users.destroy', id));
+      router.delete(route('users.destroy', id), {
+        onSuccess: () => {
+          showToast("Usuario eliminado correctamente.", "success");
+        },
+      });
     }
   };
 
@@ -66,6 +81,54 @@ export default function UserIndex() {
       }
       return 0;
     });
+
+  // Validaciones en caliente
+  const validate = (field, value) => {
+    let newErrors = { ...errors };
+
+    // Validar campo obligatorio
+    if (value === '' || value === null || value === undefined) {
+      newErrors[field] = 'Este campo es obligatorio';
+    } else {
+      delete newErrors[field];
+    }
+
+    // Validar email
+    if (field === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        newErrors.email = 'Formato de email inválido';
+      }
+      if (value === '') {
+        newErrors.email = 'El email es obligatorio';
+      }
+    }
+
+    // Validar contraseña
+    if (field === 'password') {
+      if (value.length < 8) {
+        newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
+      }
+      if (value === '') {
+        newErrors.password = 'La contraseña es obligatoria';
+      }
+    }
+
+    // Validar selección de admin
+    if (field === 'is_admin') {
+      if (value === '') {
+        newErrors.is_admin = 'Debe seleccionar una opción';
+      }
+    }
+
+    setErrors(newErrors);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    validate(name, value);
+  };
 
   return (
     <AuthenticatedLayout
@@ -289,10 +352,27 @@ export default function UserIndex() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                const formData = new FormData(e.target);
-                router.post(route('users.store'), formData, {
-                  onSuccess: () => closeModal(),
-                });
+                // Validación final antes de enviar
+                validate('name', form.name);
+                validate('email', form.email);
+                validate('password', form.password);
+                validate('is_admin', form.is_admin);
+                if (
+                  Object.keys(errors).length === 0 &&
+                  form.name &&
+                  form.email &&
+                  form.password &&
+                  form.is_admin
+                ) {
+                  const formData = new FormData();
+                  Object.entries(form).forEach(([key, value]) => formData.append(key, value));
+                  router.post(route('users.store'), formData, {
+                    onSuccess: () => {
+                      showToast("¡Usuario creado con éxito!", "success");
+                      closeModal();
+                    },
+                  });
+                }
               }}
               className="space-y-4"
             >
@@ -301,6 +381,8 @@ export default function UserIndex() {
                 <input
                   type="text"
                   name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   required
                   className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                 />
@@ -310,31 +392,39 @@ export default function UserIndex() {
                 <input
                   type="email"
                   name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   required
-                  className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                  className={`w-full rounded-md bg-gray-800 border px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.email ? 'border-red-500' : 'border-purple-600'}`}
                 />
+                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-purple-300 mb-1">Contraseña</label>
                 <input
                   type="password"
                   name="password"
+                  value={form.password}
+                  onChange={handleChange}
                   required
-                  className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                  className={`w-full rounded-md bg-gray-800 border px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.password ? 'border-red-500' : 'border-purple-600'}`}
                 />
+                {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-purple-300 mb-1">Admin</label>
                 <select
                   name="is_admin"
-                  defaultValue=""
-                  className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                  value={form.is_admin}
+                  onChange={handleChange}
+                  className={`w-full rounded-md bg-gray-800 border px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition ${errors.is_admin ? 'border-red-500' : 'border-purple-600'}`}
+                  required
                 >
-                <option value="">Seleccione una opción...</option>
-
+                  <option value="">Seleccione una opción...</option>
                   <option value="false">No</option>
                   <option value="true">Sí</option>
                 </select>
+                {errors.is_admin && <p className="text-red-400 text-xs mt-1">{errors.is_admin}</p>}
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button
@@ -347,6 +437,7 @@ export default function UserIndex() {
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-md bg-purple-700 hover:bg-purple-800 text-white font-semibold shadow-md transition"
+                  disabled={Object.keys(errors).length > 0 || !form.name || !form.email || !form.password || !form.is_admin}
                 >
                   Crear
                 </button>

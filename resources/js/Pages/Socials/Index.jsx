@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function SocialIndex() {
   const { socials } = usePage().props;
@@ -10,9 +11,12 @@ export default function SocialIndex() {
   const [isVisible, setIsVisible] = useState(false);
   const [editingSocial, setEditingSocial] = useState(null);
   const [nombre, setNombre] = useState('');
+  const [nombreError, setNombreError] = useState('');
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState('nombre');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     if (showModal) {
@@ -35,24 +39,54 @@ export default function SocialIndex() {
     }, 300);
   };
 
+  // Validación en caliente para el campo nombre
+  const validateNombre = (value) => {
+    if (!value.trim()) {
+      setNombreError('El nombre es obligatorio.');
+      return false;
+    }
+    if (value.length > 255) {
+      setNombreError('El nombre no puede tener más de 255 caracteres.');
+      return false;
+    }
+    setNombreError('');
+    return true;
+  };
+
+  const handleNombreChange = (e) => {
+    setNombre(e.target.value);
+    validateNombre(e.target.value);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateNombre(nombre)) return;
     const formData = { nombre };
 
     if (editingSocial) {
       router.put(route('socials.update', editingSocial.id), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Red social actualizada correctamente.", "success");
+          closeModal();
+        },
       });
     } else {
       router.post(route('socials.store'), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Red social creada correctamente.", "success");
+          closeModal();
+        },
       });
     }
   };
 
   const deleteSocial = (id) => {
     if (confirm("¿Estás seguro de que deseas eliminar esta red social?")) {
-      router.delete(route('socials.destroy', id));
+      router.delete(route('socials.destroy', id), {
+        onSuccess: () => {
+          showToast("Red social eliminada correctamente.", "success");
+        },
+      });
     }
   };
 
@@ -154,10 +188,15 @@ export default function SocialIndex() {
                 <input
                   type="text"
                   value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
+                  onChange={handleNombreChange}
                   required
-                  className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                  className={`w-full rounded-md bg-gray-800 border px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 transition ${
+                    nombreError ? 'border-red-500 focus:ring-red-500' : 'border-purple-600 focus:ring-purple-500'
+                  }`}
                 />
+                {nombreError && (
+                  <p className="text-red-400 text-xs mt-1">{nombreError}</p>
+                )}
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button

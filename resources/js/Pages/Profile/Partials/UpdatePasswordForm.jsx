@@ -5,10 +5,12 @@ import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
 import { useRef } from 'react';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function UpdatePasswordForm({ className = '' }) {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
+    const { showToast } = useToast(); // Usa el hook
 
     const {
         data,
@@ -29,7 +31,10 @@ export default function UpdatePasswordForm({ className = '' }) {
 
         put(route('password.update'), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                showToast("¡Contraseña actualizada correctamente!", "success");
+            },
             onError: (errors) => {
                 if (errors.password) {
                     reset('password', 'password_confirmation');

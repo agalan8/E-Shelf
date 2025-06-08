@@ -10,6 +10,7 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
+import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
 
 const containerStyle = { width: "100%", height: "300px" };
 const centerDefault = { lat: 40.4168, lng: -3.7038 };
@@ -35,6 +36,15 @@ const PostCreate = () => {
   const [precio, setPrecio] = useState("");
   const [locationCoords, setLocationCoords] = useState({ lat: null, lng: null });
   const searchBoxRef = useRef(null);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({
+    titulo: false,
+    descripcion: false,
+    imagen: false,
+    localizacion: false,
+  });
+
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -51,10 +61,63 @@ const PostCreate = () => {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const validateField = (name, value) => {
+    let error = "";
+    switch (name) {
+      case "titulo":
+        if (!value.trim()) error = "El título es obligatorio.";
+        else if (value.length > 255) error = "Máximo 255 caracteres.";
+        break;
+      case "descripcion":
+        if (!value.trim()) error = "La descripción es obligatoria.";
+        else if (value.length > 255) error = "Máximo 255 caracteres.";
+        break;
+      case "imagen":
+        if (!value) error = "La imagen es obligatoria.";
+        else if (
+          !["image/jpeg", "image/png", "image/jpg", "image/gif"].includes(
+            value.type
+          )
+        )
+          error = "Formato no permitido (jpeg, png, jpg, gif).";
+        else if (value.size > 20480 * 1024)
+          error = "La imagen no puede superar 20MB.";
+        break;
+      case "localizacion":
+        if (value.length > 255) error = "Máximo 255 caracteres.";
+        break;
+      case "precio":
+        if (isStoreActive) {
+          if (!value) error = "El precio es obligatorio.";
+          else if (!/^\d{1,10}(\.\d{2})?$/.test(value))
+            error = "Formato de precio inválido (máx 10 dígitos y 2 decimales).";
+        }
+        break;
+      default:
+        break;
+    }
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
+  useEffect(() => {
+    validateField("titulo", titulo);
+  }, [titulo]);
+  useEffect(() => {
+    validateField("descripcion", descripcion);
+  }, [descripcion]);
+  useEffect(() => {
+    validateField("localizacion", localizacion);
+  }, [localizacion]);
+  useEffect(() => {
+    validateField("precio", precio);
+  }, [precio, isStoreActive]);
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
     setImageUploaded(true);
+    setTouched((prev) => ({ ...prev, imagen: true }));
+    validateField("imagen", file);
   };
 
   const handleRemoveImage = () => {
@@ -118,42 +181,44 @@ const PostCreate = () => {
     );
   };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-  const formData = new FormData();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
 
-  if (imageFile) formData.append("imagen", imageFile);
-  formData.append("titulo", titulo);
-  formData.append("descripcion", descripcion);
+    if (imageFile) formData.append("imagen", imageFile);
+    formData.append("titulo", titulo);
+    formData.append("descripcion", descripcion);
 
-  const trimmedLoc = localizacion.trim();
-  const trimmedUltimaLoc = ultimaLocalizacion.trim();
+    const trimmedLoc = localizacion.trim();
+    const trimmedUltimaLoc = ultimaLocalizacion.trim();
 
-  if (!trimmedLoc || trimmedLoc !== trimmedUltimaLoc) {
-    // Input vacío o modificado: enviar última localización válida
-    formData.append("localizacion", trimmedUltimaLoc);
-  } else {
-    // No ha sido modificado: enviar tal cual
-    formData.append("localizacion", trimmedLoc);
-  }
+    if (!trimmedLoc || trimmedLoc !== trimmedUltimaLoc) {
+      formData.append("localizacion", trimmedUltimaLoc);
+    } else {
+      formData.append("localizacion", trimmedLoc);
+    }
 
-  if (locationCoords.lat && locationCoords.lng) {
-    formData.append("latitud", locationCoords.lat);
-    formData.append("longitud", locationCoords.lng);
-  }
+    if (locationCoords.lat && locationCoords.lng) {
+      formData.append("latitud", locationCoords.lat);
+      formData.append("longitud", locationCoords.lng);
+    }
 
-  selectedTags.forEach((t) => formData.append("tags[]", t.id));
-  selectedCommunities.forEach((c) =>
-    formData.append("communities[]", c.id)
-  );
+    selectedTags.forEach((t) => formData.append("tags[]", t.id));
+    selectedCommunities.forEach((c) =>
+      formData.append("communities[]", c.id)
+    );
 
-  if (isStoreActive) {
-    formData.append("add_to_store", "1");
-    formData.append("precio", precio);
-  }
+    if (isStoreActive) {
+      formData.append("add_to_store", "1");
+      formData.append("precio", precio);
+    }
 
-  router.post(route("regular-posts.store"), formData);
-};
+    router.post(route("regular-posts.store"), formData, {
+      onSuccess: () => {
+        showToast("¡Publicación creada con éxito!", "success");
+      },
+    });
+  };
 
 
   return (
@@ -224,9 +289,13 @@ const handleSubmit = (e) => {
                     type="text"
                     value={titulo}
                     onChange={(e) => setTitulo(e.target.value)}
+                    onBlur={() => setTouched((prev) => ({ ...prev, titulo: true }))}
                     className="w-full mt-2 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
                     required
                   />
+                  {touched.titulo && errors.titulo && (
+                    <p className="text-red-400 text-sm mt-1">{errors.titulo}</p>
+                  )}
                 </div>
 
                 {/* Descripción */}
@@ -237,10 +306,19 @@ const handleSubmit = (e) => {
                   <textarea
                     value={descripcion}
                     onChange={(e) => setDescripcion(e.target.value)}
-                    className="w-full mt-2 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
+                    onBlur={() => setTouched((prev) => ({ ...prev, descripcion: true }))}
+                    className=" resize-none w-full mt-2 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
                     required
                   />
+                  {touched.descripcion && errors.descripcion && (
+                    <p className="text-red-400 text-sm mt-1">{errors.descripcion}</p>
+                  )}
                 </div>
+
+                {/* Imagen */}
+                {!imageUploaded && touched.imagen && errors.imagen && (
+                  <p className="text-red-400 text-sm mt-2">{errors.imagen}</p>
+                )}
 
                 {/* Localización */}
                 <div>
@@ -260,6 +338,7 @@ const handleSubmit = (e) => {
                         placeholder="Escribe una ubicación"
                         value={localizacion}
                         onChange={(e) => setLocalizacion(e.target.value)}
+                        onBlur={() => setTouched((prev) => ({ ...prev, localizacion: true }))}
                         className="w-full mt-2 mb-4 p-2 border rounded-md bg-[#272729] hover:border-white focus:ring-white caret-white text-white"
                       />
                     </StandaloneSearchBox>
@@ -279,6 +358,9 @@ const handleSubmit = (e) => {
                       )}
                     </GoogleMap>
                   </LoadScript>
+                  {touched.localizacion && errors.localizacion && (
+                    <p className="text-red-400 text-sm mt-1">{errors.localizacion}</p>
+                  )}
                 </div>
 
                 {/* Etiquetas y comunidades */}
@@ -435,10 +517,14 @@ const handleSubmit = (e) => {
                       step="0.01"
                       value={precio}
                       onChange={(e) => setPrecio(e.target.value)}
+                      onBlur={() => setTouched((prev) => ({ ...prev, precio: true }))}
                       className="w-full p-2 rounded-md bg-[#272729] border border-gray-600 text-white focus:border-white focus:ring-white"
                       placeholder="Introduce el precio"
                       required={isStoreActive}
                     />
+                    {isStoreActive && touched.precio && errors.precio && (
+                      <p className="text-red-400 text-sm mt-1">{errors.precio}</p>
+                    )}
                   </div>
 
                   <button

@@ -5,6 +5,7 @@ import TextInput from '@/Components/TextInput';
 import TextAreaInput from '@/Components/TextAreaInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -12,8 +13,7 @@ export default function UpdateProfileInformation({
     className = '',
 }) {
     const { userEdit } = usePage().props;
-    console.log('user', userEdit);
-    const {socials} = usePage().props;
+    const { socials } = usePage().props;
 
     // Mapea las redes sociales del usuario y obtiene los perfiles actuales
     const userSocials = userEdit.socials.reduce((acc, social) => {
@@ -29,10 +29,15 @@ export default function UpdateProfileInformation({
             ...userSocials, // Carga las redes existentes
         });
 
+    const { showToast } = useToast(); // Usa el hook
+
     const submit = (e) => {
         e.preventDefault();
         patch(route('profile.update'), {
             preserveScroll: true,
+            onSuccess: () => {
+                showToast("¡Perfil actualizado correctamente!", "success");
+            },
         });
     };
 
@@ -40,7 +45,6 @@ export default function UpdateProfileInformation({
         <section className={className}>
             <header>
             <h3 className="text-lg font-medium text-white">Información del Perfil</h3>
-
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
@@ -78,13 +82,12 @@ export default function UpdateProfileInformation({
                     <InputLabel htmlFor="biografia" value="Biografía" />
                     <TextAreaInput
                         id="biografia"
-                        className="mt-1 block w-full bg-[#272729] rounded-md text-white resize-none placeholder:text-[#68686e]" // "resize-none" previene el redimensionado
+                        className="mt-1 block w-full bg-[#272729] rounded-md text-white resize-none placeholder:text-[#68686e]"
                         value={data.biografia || ''}
                         onChange={(e) => setData('biografia', e.target.value)}
                         placeholder="Escribe tu biografía aquí..."
                         rows={4}
                     />
-
                     <InputError className="mt-2" message={errors.biografia} />
                 </div>
 
@@ -132,15 +135,6 @@ export default function UpdateProfileInformation({
                 {/* Botón Guardar */}
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Guardar</PrimaryButton>
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">Guardado correctamente</p>
-                    </Transition>
                 </div>
             </form>
         </section>

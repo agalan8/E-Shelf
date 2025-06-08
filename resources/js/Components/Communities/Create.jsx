@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import ImageInput from "@/Components/ImageInput";
+import { useToast } from "@/contexts/ToastProvider"; // Asegúrate de que la ruta sea correcta
 
 export default function Create({ onClose }) {
   const [nombre, setNombre] = useState("");
@@ -10,8 +11,10 @@ export default function Create({ onClose }) {
   const [imageFondo, setImageFondo] = useState(null);
   const [visibilidad, setVisibilidad] = useState("publico");
   const [isVisible, setIsVisible] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const modalRef = useRef(null);
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 10);
@@ -37,13 +40,62 @@ export default function Create({ onClose }) {
     if (imageFondo) formData.append("background_image", imageFondo);
 
     router.post(route("communities.store"), formData, {
-      onFinish: () => handleClose(),
+      onSuccess: () => {
+        showToast("¡Comunidad creada con éxito!", "success");
+        handleClose();
+      },
+      onError: () => {
+        showToast("Ocurrió un error al crear la comunidad.", "error");
+      },
     });
   };
 
   const handleClose = () => {
     setIsVisible(false);
     setTimeout(() => onClose(), 300);
+  };
+
+  // Validaciones en caliente
+  const validateNombre = (value) => {
+    if (!value) return "El nombre es obligatorio.";
+    if (value.length > 255) return "Máximo 255 caracteres.";
+    return "";
+  };
+
+  const validateDescripcion = (value) => {
+    if (value && value.length > 255) return "Máximo 255 caracteres.";
+    return "";
+  };
+
+  const validateImage = (file) => {
+    if (!file) return "";
+    const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+    if (!validTypes.includes(file.type)) return "Formato no permitido.";
+    if (file.size > 20480 * 1024) return "Máximo 20MB.";
+    return "";
+  };
+
+  // Handlers con validación
+  const handleNombreChange = (e) => {
+    const value = e.target.value;
+    setNombre(value);
+    setErrors((prev) => ({ ...prev, nombre: validateNombre(value) }));
+  };
+
+  const handleDescripcionChange = (e) => {
+    const value = e.target.value;
+    setDescripcion(value);
+    setErrors((prev) => ({ ...prev, descripcion: validateDescripcion(value) }));
+  };
+
+  const handleImagePerfilChange = (file) => {
+    setImagePerfil(file);
+    setErrors((prev) => ({ ...prev, imagePerfil: validateImage(file) }));
+  };
+
+  const handleImageFondoChange = (file) => {
+    setImageFondo(file);
+    setErrors((prev) => ({ ...prev, imageFondo: validateImage(file) }));
   };
 
   return (
@@ -76,19 +128,25 @@ export default function Create({ onClose }) {
               <input
                 type="text"
                 value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
+                onChange={handleNombreChange}
                 className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white"
                 required
               />
+              {errors.nombre && (
+                <p className="text-red-400 text-xs mt-1">{errors.nombre}</p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Descripción</label>
               <textarea
                 value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
+                onChange={handleDescripcionChange}
                 className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white resize-none"
               />
+              {errors.descripcion && (
+                <p className="text-red-400 text-xs mt-1">{errors.descripcion}</p>
+              )}
             </div>
 
             <div>
@@ -124,17 +182,23 @@ export default function Create({ onClose }) {
                 <ImageInput
                   name="profile_image"
                   label="Imagen de perfil"
-                  onChange={setImagePerfil}
+                  onChange={handleImagePerfilChange}
                   previewClassName="rounded-full w-[100px] h-[100px] sm:w-[145px] sm:h-[145px] object-cover"
                 />
+                {errors.imagePerfil && (
+                  <p className="text-red-400 text-xs mt-1">{errors.imagePerfil}</p>
+                )}
               </div>
               <div className="flex-1 min-w-[140px] sm:min-w-[200px]">
                 <ImageInput
                   name="background_image"
                   label="Imagen de fondo"
-                  onChange={setImageFondo}
+                  onChange={handleImageFondoChange}
                   previewClassName="w-[200px] h-[90px] sm:w-[325px] sm:h-[145px] object-cover rounded-md"
                 />
+                {errors.imageFondo && (
+                  <p className="text-red-400 text-xs mt-1">{errors.imageFondo}</p>
+                )}
               </div>
             </div>
 
@@ -146,13 +210,12 @@ export default function Create({ onClose }) {
               >
                 Cancelar
               </button>
-<button
-  type="submit"
-  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-500"
->
-  Crear Comunidad
-</button>
-
+              <button
+                type="submit"
+                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-500"
+              >
+                Crear Comunidad
+              </button>
             </div>
           </form>
         </div>

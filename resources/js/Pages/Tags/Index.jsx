@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function TagIndex() {
   const { tags } = usePage().props;
@@ -10,10 +11,13 @@ export default function TagIndex() {
   const [isVisible, setIsVisible] = useState(false); // animación de opacidad
   const [editingTag, setEditingTag] = useState(null);
   const [nombre, setNombre] = useState('');
+  const [nombreError, setNombreError] = useState('');
   const [search, setSearch] = useState('');
   const [searchField, setSearchField] = useState('nombre');
   const [sortField, setSortField] = useState('nombre');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     if (showModal) {
@@ -36,24 +40,54 @@ export default function TagIndex() {
     }, 300); // igual a la transición
   };
 
+  const validateNombre = (value) => {
+    if (!value.trim()) {
+      return 'El nombre es obligatorio.';
+    }
+    if (value.length > 255) {
+      return 'El nombre no puede tener más de 255 caracteres.';
+    }
+    return '';
+  };
+
+  const handleNombreChange = (e) => {
+    const value = e.target.value;
+    setNombre(value);
+    setNombreError(validateNombre(value));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const error = validateNombre(nombre);
+    setNombreError(error);
+    if (error) return;
+
     const formData = { nombre };
 
     if (editingTag) {
       router.put(route('tags.update', editingTag.id), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Etiqueta actualizada correctamente.", "success");
+          closeModal();
+        },
       });
     } else {
       router.post(route('tags.store'), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Etiqueta creada correctamente.", "success");
+          closeModal();
+        },
       });
     }
   };
 
   const deleteTag = (id) => {
     if (confirm("¿Estás seguro de que deseas eliminar esta etiqueta?")) {
-      router.delete(route('tags.destroy', id));
+      router.delete(route('tags.destroy', id), {
+        onSuccess: () => {
+          showToast("Etiqueta eliminada correctamente.", "success");
+        },
+      });
     }
   };
 
@@ -157,10 +191,13 @@ export default function TagIndex() {
                 <input
                   type="text"
                   value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
+                  onChange={handleNombreChange}
                   required
                   className="w-full rounded-md bg-gray-800 border border-purple-600 px-4 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                 />
+                {nombreError && (
+                  <p className="text-red-400 text-sm mt-1">{nombreError}</p>
+                )}
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button

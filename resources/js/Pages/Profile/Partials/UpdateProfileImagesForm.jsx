@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useForm, usePage, router } from '@inertiajs/react';
 import ImageInput from '@/Components/ImageInput';
 import { Transition } from '@headlessui/react';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 const UpdateImagesProfileForm = () => {
     const { flash, auth } = usePage().props;
@@ -13,6 +14,8 @@ const UpdateImagesProfileForm = () => {
         profile_image: null,
         background_image: null,
     });
+
+    const { showToast } = useToast(); // Usa el hook
 
     // Función para manejar el envío del formulario
     const handleSubmit = (e) => {
@@ -30,10 +33,11 @@ const UpdateImagesProfileForm = () => {
         // Enviar la solicitud POST a la ruta de actualización de imágenes
         post(route('images.update'), {
             preserveScroll: true,
+            onSuccess: () => {
+                showToast("¡Imágenes actualizadas correctamente!", "success");
+            },
         });
     };
-
-    console.log(user);
 
     // Función para eliminar la imagen
     const handleDeleteImage = (imageType) => {
@@ -65,7 +69,6 @@ const UpdateImagesProfileForm = () => {
                     leaveTo="opacity-0"
                 >
                     <p className="text-sm text-green-600">
-                        {successMessage || 'Imágenes guardadas exitósamente.'}
                     </p>
                 </Transition>
             </div>

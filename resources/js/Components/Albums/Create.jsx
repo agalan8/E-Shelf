@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
+import { useToast } from "@/contexts/ToastProvider"; // Asegúrate de que la ruta sea correcta
 
 const Create = ({ onClose, posts }) => {
     const [nombre, setNombre] = useState("");
@@ -11,13 +12,59 @@ const Create = ({ onClose, posts }) => {
     const [imageUploaded, setImageUploaded] = useState(false);
     const [step, setStep] = useState(1);
     const [isVisible, setIsVisible] = useState(false);
+    const [errors, setErrors] = useState({});
+    const { showToast } = useToast(); // Usa el hook
 
     useEffect(() => {
         setTimeout(() => setIsVisible(true), 10);
     }, []);
 
+    const validateField = (field, value) => {
+        let error = "";
+        if (field === "nombre") {
+            if (!value.trim()) error = "El nombre es obligatorio.";
+            else if (value.length > 255) error = "Máximo 255 caracteres.";
+        }
+        if (field === "descripcion") {
+            if (value.length > 255) error = "Máximo 255 caracteres.";
+        }
+        if (field === "portada") {
+            if (value) {
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/jpg",
+                    "image/gif",
+                ];
+                if (!allowedTypes.includes(value.type))
+                    error = "Formato no permitido.";
+                if (value.size > 20480 * 1024) error = "Máximo 20MB.";
+            }
+        }
+        setErrors((prev) => ({ ...prev, [field]: error }));
+    };
+
+    const handleNombreChange = (e) => {
+        setNombre(e.target.value);
+        validateField("nombre", e.target.value);
+    };
+
+    const handleDescripcionChange = (e) => {
+        setDescripcion(e.target.value);
+        validateField("descripcion", e.target.value);
+    };
+
+    const handleCoverImageChange = (e) => {
+        const file = e.target.files[0];
+        setImageFile(file);
+        setImageUploaded(!!file);
+        validateField("portada", file);
+    };
+
     const handleNextStep = () => {
-        if (nombre.trim()) {
+        validateField("nombre", nombre);
+        validateField("descripcion", descripcion);
+        if (!errors.nombre && !errors.descripcion && nombre.trim()) {
             setStep(2);
         }
     };
@@ -28,12 +75,6 @@ const Create = ({ onClose, posts }) => {
                 ? prev.filter((id) => id !== postId)
                 : [...prev, postId]
         );
-    };
-
-    const handleCoverImageChange = (e) => {
-        const file = e.target.files[0];
-        setImageFile(file);
-        setImageUploaded(true);
     };
 
     const handleRemoveImage = () => {
@@ -54,7 +95,10 @@ const Create = ({ onClose, posts }) => {
         });
 
         router.post(route("albums.store"), formData, {
-            onFinish: () => handleClose(),
+            onSuccess: () => {
+                showToast("¡Álbum creado con éxito!", "success");
+                handleClose();
+            },
         });
     };
 
@@ -110,23 +154,26 @@ const Create = ({ onClose, posts }) => {
                                     <input
                                         type="text"
                                         value={nombre}
-                                        onChange={(e) =>
-                                            setNombre(e.target.value)
-                                        }
+                                        onChange={handleNombreChange}
                                         className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white"
                                         required
                                     />
+                                    {errors.nombre && (
+                                        <p className="text-red-400 text-xs mt-1">{errors.nombre}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1">
                                         Descripción
                                     </label>
                                     <textarea
-  value={descripcion}
-  onChange={(e) => setDescripcion(e.target.value)}
-  className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white h-[120px] resize-none"
-/>
-
+                                        value={descripcion}
+                                        onChange={handleDescripcionChange}
+                                        className="w-full px-3 py-2 rounded-md bg-[#1c1c1e] border border-white text-white h-[120px] resize-none"
+                                    />
+                                    {errors.descripcion && (
+                                        <p className="text-red-400 text-xs mt-1">{errors.descripcion}</p>
+                                    )}
                                 </div>
                                 <div className="text-center">
                                     {!imageUploaded ? (
@@ -138,12 +185,13 @@ const Create = ({ onClose, posts }) => {
                                                 <input
                                                     type="file"
                                                     accept="image/*"
-                                                    onChange={
-                                                        handleCoverImageChange
-                                                    }
+                                                    onChange={handleCoverImageChange}
                                                     className="hidden"
                                                 />
                                             </label>
+                                            {errors.portada && (
+                                                <p className="text-red-400 text-xs mt-1">{errors.portada}</p>
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="flex justify-center items-center">
