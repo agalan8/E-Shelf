@@ -21,12 +21,11 @@ public function downloadImage($orderLineId)
 
     $fullUrl = $orderLine->path_image;
 
-    // Extraer ruta relativa del URL completo
     $parsedUrl = parse_url($fullUrl);
     if (!isset($parsedUrl['path'])) {
         abort(404, 'Ruta de imagen inválida.');
     }
-    $relativePath = ltrim($parsedUrl['path'], '/'); // elimina la barra inicial
+    $relativePath = ltrim($parsedUrl['path'], '/');
 
     if (!Storage::disk('s3')->exists($relativePath)) {
         abort(404, 'Imagen no encontrada en S3.');

@@ -47,9 +47,9 @@ class CommunityMembershipController extends Controller
             ]);
         }
 
-        if($community->visibilidad === 'privado'){
-            // Crear notificacion para el administrador de la comunidad
-        }
+        // if($community->visibilidad === 'privado'){
+        //     // Crear notificacion para el administrador de la comunidad
+        // }
 
         return back();
     }

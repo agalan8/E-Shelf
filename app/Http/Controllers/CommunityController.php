@@ -133,7 +133,6 @@ class CommunityController extends Controller
      */
     public function show(Community $community)
     {
-        // Si la comunidad es privada y el usuario autenticado NO pertenece o su rol es 4, redirigir atrás
         if (
             $community->visibilidad === 'privado' &&
             Auth::check()
@@ -144,7 +143,6 @@ class CommunityController extends Controller
             }
         }
 
-        // Cargar comunidad con relaciones
         $community->load([
             'user',
             'profileImage',
@@ -155,12 +153,11 @@ class CommunityController extends Controller
         $community->getTotalMembers = $community->getTotalMembers();
         $community->getTotalPosts = $community->getTotalPosts();
 
-        // Obtener posts de la comunidad con todas sus relaciones
         $posts = $community->posts()
             ->with([
                 'comments.user',
                 'image',
-                'post.user', // si es re-post
+                'post.user',
                 'tags',
                 'communities',
                 'likedBy',
@@ -232,7 +229,6 @@ class CommunityController extends Controller
             Storage::disk('s3')->put($path_small, $smallImage, 'public');
 
             if ($community->profileImage) {
-                // Actualizamos la foto asociada al post
                 $community->profileImage()->update([
                     'path_small' => $path_aws . $path_small,
                 ]);
@@ -276,7 +272,6 @@ class CommunityController extends Controller
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
 
             if ($community->backgrounImage) {
-                // Actualizamos la foto asociada al post
                 $community->backgroundImage()->update([
                     'path_original' => $path_aws . $path_original,
                     'path_medium' => $path_aws . $path_medium,
@@ -319,10 +314,8 @@ class CommunityController extends Controller
                 $paths = [
                     ltrim(parse_url($community->profileImage->path_small, PHP_URL_PATH), '/'),
                 ];
-                // Eliminar archivos de AWS S3
                 Storage::disk('s3')->delete($paths);
 
-                // Eliminar el registro de la base de datos
                 $community->profileImage->delete();
             }
         }
@@ -335,10 +328,8 @@ class CommunityController extends Controller
                     ltrim(parse_url($community->backgroundImage->path_original, PHP_URL_PATH), '/'),
                     ltrim(parse_url($community->backgroundImage->path_medium, PHP_URL_PATH), '/'),
                 ];
-                // Eliminar archivos de AWS S3
                 Storage::disk('s3')->delete($paths);
 
-                // Eliminar el registro de la base de datos
                 $community->backgroundImage->delete();
             }
         }
@@ -371,7 +362,6 @@ class CommunityController extends Controller
                 ->get()
                 ->pluck('user');
 
-            // Enviar la notificación a cada uno
             foreach ($adminUsers as $adminUser) {
                 $adminUser->notify(new  CommunityJoinRequest($community, $user));
             }
@@ -409,26 +399,22 @@ class CommunityController extends Controller
             'notification_id' => 'required|exists:notifications,id',
         ]);
 
-        // Verifica si la notificación aún existe
         $notification = DatabaseNotification::find($request->notification_id);
         if (!$notification) {
             return back()->with('info', 'Esta solicitud ya fue procesada por otro administrador.');
         }
 
-        // Asegura que el membership exista y actualiza el rol
         $communityMembership = CommunityMembership::where('community_id', $request->community_id)
             ->where('user_id', $request->user_id)
             ->firstOrFail();
 
         $communityMembership->update(['community_role_id' => 3]);
 
-        // Elimina todas las notificaciones relacionadas con esta solicitud
         DatabaseNotification::whereRaw("data::json->>'requester_id' = ?", [(string) $request->user_id])
             ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
             ->whereRaw("data::json->>'type' = ?", ['request'])
             ->delete();
 
-        // Notifica al usuario que fue aceptado
         $requester = User::findOrFail($request->user_id);
         $community = Community::findOrFail($request->community_id);
         $requester->notify(new CommunityAccepted($community));
@@ -480,7 +466,6 @@ class CommunityController extends Controller
         }, 'memberships.user.profileImage', 'memberships.user.backgroundImage', 'profileImage',
             'backgroundImage',])->findOrFail($communityId);
 
-            // Comprobación de acceso para comunidades privadas
     if (
         $community->visibilidad === 'privado' &&
         Auth::check()
@@ -517,7 +502,7 @@ class CommunityController extends Controller
 
         CommunityMembership::where('community_id', $request->community_id)
             ->where('user_id', $request->user_id)
-            ->update(['community_role_id' => 2]); // Rol admin
+            ->update(['community_role_id' => 2]);
 
         return back();
     }
@@ -533,7 +518,7 @@ class CommunityController extends Controller
 
         CommunityMembership::where('community_id', $request->community_id)
             ->where('user_id', $request->user_id)
-            ->update(['community_role_id' => 3]); // Rol admin
+            ->update(['community_role_id' => 3]);
 
         return back();
     }

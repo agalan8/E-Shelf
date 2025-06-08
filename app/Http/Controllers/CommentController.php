@@ -42,17 +42,14 @@ class CommentController extends Controller
         $request->validate([
             'contenido' => 'required|string|max:1000',
             'commentable_id' => 'required|integer',
-            'commentable_type' => 'required|string|in:App\Models\RegularPost,App\Models\Comment', // Solo post o comment
+            'commentable_type' => 'required|string|in:App\Models\RegularPost,App\Models\Comment',
         ]);
 
-                // Validación condicional del commentable_id según el tipo de comentario
         if ($request->commentable_type === RegularPost::class) {
-            // Si es un Post, aseguramos que commentable_id esté en la tabla posts
             $request->validate([
                 'commentable_id' => 'exists:regular_posts,id',
             ]);
         } elseif ($request->commentable_type === Comment::class) {
-            // Si es un comentario, aseguramos que commentable_id esté en la tabla comments
             $request->validate([
                 'commentable_id' => 'exists:comments,id',
             ]);
@@ -60,13 +57,11 @@ class CommentController extends Controller
 
         $user = User::findOrFail(Auth::id());
 
-            // Crear el comentario
         $comment = new Comment([
             'contenido' => $request->contenido,
             'user_id' => $user->id,
         ]);
 
-        // Asociar el comentario al modelo correspondiente (Post o Comentario)
         if ($request->commentable_type === RegularPost::class) {
 
             $post = RegularPost::findOrFail($request->commentable_id);
@@ -79,30 +74,23 @@ class CommentController extends Controller
             $comment->commentable()->associate($parentComment);
         }
 
-        // Guardar el comentario
         $comment->save();
 
-            // Buscar menciones en el contenido
         preg_match_all('/@(\w+)/', $request->contenido, $matches);
 
-        // Si hay menciones
         if (isset($matches[1])) {
             foreach ($matches[1] as $username) {
-                // Buscar al usuario mencionado
                 $user = User::where('name', $username)->first();
                 if ($user) {
-                    // Guardar la mención en la tabla pivote
                     $comment->mentionedUsers()->attach($user->id);
                     $user->notify(new MentionedInComment($post, $comment->user));
                 }
             }
         }
 
-        // Guardar el comentario
         $comment->save();
 
         session(['newCommentId' => $comment->id]);
-
 
         return back();
 

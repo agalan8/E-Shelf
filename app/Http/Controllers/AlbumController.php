@@ -85,7 +85,7 @@ class AlbumController extends Controller
 
         if ($request->has('selectedPosts')) {
             foreach ($request->selectedPosts as $postId) {
-                // Verificar si la relación ya existe, si no, agregarla
+
                 if (!$album->posts->contains($postId)) {
                     $album->posts()->attach($postId);
                 }
@@ -105,7 +105,6 @@ class AlbumController extends Controller
     {
         $userId = Auth::user()->id;
 
-        // Verifica si el usuario autenticado es el dueño del álbum
         if ($album->user_id !== $userId) {
             return redirect()->back();
         }
@@ -184,7 +183,6 @@ class AlbumController extends Controller
             }
 
 
-            // Eliminar del bucket S3
 
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
             $mediumImage = ImageIntervention::read($imagen)->scale( height: 600)->encode();
@@ -194,7 +192,6 @@ class AlbumController extends Controller
 
 
             if($album->coverImage){
-                // Actualizamos la foto asociada al post
                 $album->coverImage()->update([
                     'path_original' => $path_aws . $path_original,
                     'path_medium' =>$path_aws . $path_medium,
@@ -236,10 +233,8 @@ class AlbumController extends Controller
             ltrim(parse_url($album->coverImage->path_original, PHP_URL_PATH), '/'),
             ltrim(parse_url($album->coverImage->path_medium, PHP_URL_PATH), '/'),
         ];
-        // Eliminar archivos de AWS S3
         Storage::disk('s3')->delete($paths);
 
-        // Eliminar el registro de la base de datos
         $album->coverImage->delete();
     }
 }

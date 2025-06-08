@@ -47,11 +47,11 @@ class RegularPostController extends Controller
         $user = User::findOrFail(Auth::id());
 
         $communities = $user->communityMemberships()
-            ->where('community_role_id', '!=', 4) // aplica el filtro aquí
-            ->with('community') // carga la relación community
+            ->where('community_role_id', '!=', 4)
+            ->with('community')
             ->get()
-            ->pluck('community') // extrae las comunidades
-            ->filter(); // elimina posibles null por seguridad
+            ->pluck('community')
+            ->filter();
 
         return Inertia::render('Posts/Create', [
             'tags' => Tag::all(),
@@ -96,10 +96,8 @@ if ($request->hasFile('imagen')) {
 
     $imagen = $request->file('imagen');
 
-    // Ruta temporal (necesaria para exif_read_data)
     $path = $imagen->getRealPath();
 
-    // Obtener EXIF (solo funciona con JPEG y TIFF)
     $exif = @exif_read_data($path);
 
     // Función para convertir valores tipo "850/10" a float
@@ -141,7 +139,6 @@ if ($request->hasFile('imagen')) {
         'localizacion' => $request->localizacion,
         'latitud' => $request->latitud,
         'longitud' => $request->longitud,
-        // Aquí los metadatos
         'fecha_hora' => $fechaHora,
         'marca' => $marca,
         'modelo' => $modelo,
@@ -241,7 +238,6 @@ if ($request->hasFile('imagen')) {
 
         DB::beginTransaction();
 
-        // Buscar el post que se quiere actualizar
         $RegularPost = RegularPost::findOrFail($id);
         $RegularPost->titulo = $request->titulo;
         $RegularPost->descripcion = $request->descripcion;
@@ -249,15 +245,12 @@ if ($request->hasFile('imagen')) {
         $RegularPost->image->latitud = $request->latitud;
         $RegularPost->image->longitud = $request->longitud;
 
-        // Actualizar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
 
             $imagen = $request->file('imagen');
 
-                // Ruta temporal (necesaria para exif_read_data)
             $path = $imagen->getRealPath();
 
-            // Obtener EXIF (solo funciona con JPEG y TIFF)
             $exif = @exif_read_data($path);
 
             // Función para convertir valores tipo "850/10" a float
@@ -298,24 +291,16 @@ if ($request->hasFile('imagen')) {
                 ltrim(parse_url($RegularPost->image->path_small, PHP_URL_PATH), '/'),
             ];
 
-            // Eliminar del bucket S3
             Storage::disk('s3')->delete($paths);
 
             $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
             $small_Image = ImageIntervention::read($imagen)->scale(height: 450)->encode();
             $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
 
-
-
             Storage::disk('s3')->put($path_original, $imagen, 'public');
             Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
             Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
-
-
-
-
-            // Actualizamos la foto asociada al post
             $RegularPost->image()->update([
                 'path_original' => $path_aws . $path_original,
                 'path_medium' => $path_aws . $path_medium,
@@ -323,7 +308,6 @@ if ($request->hasFile('imagen')) {
             ]);
         }
 
-        // Actualizar las etiquetas
         $tags = $request->input('tags');
 
         $RegularPost->tags()->detach();
