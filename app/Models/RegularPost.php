@@ -107,53 +107,51 @@ class RegularPost extends Model
     {
         static::deleting(function ($RegularPost) {
             if (! $RegularPost->isForceDeleting()) {
-                $RegularPost->sharedPosts()->delete();
+                // Eliminar posts compartidos relacionados
+                $RegularPost->sharedPosts()->each(function ($sharedPost) {
+                    // Eliminar la relación con el modelo Post
+                    $sharedPost->post()->delete();
+                    // Eliminar el SharedPost
+                    $sharedPost->delete();
+                });
 
-                $RegularPost->shopPost?->lineasCarrito()->delete();
+                // Eliminar líneas de carrito asociadas al shopPost (si existe)
+                if ($RegularPost->shopPost) {
+                    $RegularPost->shopPost->lineasCarrito()->delete();
+                    $RegularPost->shopPost->delete();
+                }
 
-                $RegularPost->shopPost()?->delete();
-
+                // Eliminar imagen asociada al RegularPost
                 if ($RegularPost->image) {
                     $image = $RegularPost->image;
-
                     $paths = [
                         ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
                         ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
                         ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
                     ];
-
-                    // Elimina las imágenes asociadas al RegularPost desde S3
                     Storage::disk('s3')->delete($paths);
-
-                    // Eliminar la imagen de la base de datos
                     $image->delete();
                 }
 
                 // Eliminar la relación con el modelo Post
                 $RegularPost->post()->delete();
 
+                // Eliminar comentarios asociados
+                $RegularPost->comments()->delete();
+
                 // Desvincular tags, comunidades y álbumes
                 $RegularPost->tags()->detach();
                 $RegularPost->communities()->detach();
                 $RegularPost->albums()->detach();
 
-                // $allRelatedNotifications = DatabaseNotification::where('type', 'App\Notifications\PostLiked')->get();
+                // Eliminar likes (pivot)
+                $RegularPost->likedBy()->detach();
 
-                // foreach ($allRelatedNotifications as $notification) {
-                //     $data = $notification->data;
-
-                //     if (isset($data['post']['id']) && $data['post']['id'] == $RegularPost->id) {
-                //         $notification->delete();
-                //     }
-                // }
-
+                // Eliminar notificaciones relacionadas a este post
                 DB::table('notifications')
-                ->whereIn('type', ['App\Notifications\PostLiked', 'App\Notifications\PostShared'])
-                ->whereRaw("(data::json->>'post_id')::int = ?", [$RegularPost->id])
-                ->delete();
-
-
-
+                    ->whereIn('type', ['App\Notifications\PostLiked', 'App\Notifications\PostShared'])
+                    ->whereRaw("(data::json->>'post_id')::int = ?", [$RegularPost->id])
+                    ->delete();
             }
         });
     }

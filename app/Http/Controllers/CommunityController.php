@@ -133,6 +133,17 @@ class CommunityController extends Controller
      */
     public function show(Community $community)
     {
+        // Si la comunidad es privada y el usuario autenticado NO pertenece o su rol es 4, redirigir atrás
+        if (
+            $community->visibilidad === 'privado' &&
+            Auth::check()
+        ) {
+            $membership = $community->memberships->where('user_id', Auth::id())->first();
+            if (!$membership || $membership->community_role_id == 4) {
+                return redirect()->route('communities.index');
+            }
+        }
+
         // Cargar comunidad con relaciones
         $community->load([
             'user',
@@ -434,6 +445,11 @@ class CommunityController extends Controller
             'notification_id' => 'required|exists:notifications,id',
         ]);
 
+        $notification = DatabaseNotification::find($request->notification_id);
+        if (!$notification) {
+            return back()->with('info', 'Esta solicitud ya fue procesada por otro administrador.');
+        }
+
         $notificaciones = DatabaseNotification::whereRaw("data::json->>'requester_id' = ?", [(string) $request->user_id])
             ->whereRaw("data::json->>'community_id' = ?", [(string) $request->community_id])
             ->whereRaw("data::json->>'type' = ?", ['request']);
@@ -463,6 +479,17 @@ class CommunityController extends Controller
             $query->where('community_role_id', '!=', 4);
         }, 'memberships.user.profileImage', 'memberships.user.backgroundImage', 'profileImage',
             'backgroundImage',])->findOrFail($communityId);
+
+            // Comprobación de acceso para comunidades privadas
+    if (
+        $community->visibilidad === 'privado' &&
+        Auth::check()
+    ) {
+        $membership = $community->memberships()->where('user_id', Auth::id())->where('community_role_id', '!=', 4)->first();
+        if (!$membership) {
+            return redirect()->route('communities.index')->with('info', 'No tienes acceso a los miembros de esta comunidad.');
+        }
+    }
 
         $community->getTotalMembers = $community->getTotalMembers();
         $community->getTotalPosts = $community->getTotalPosts();

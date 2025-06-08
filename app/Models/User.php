@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+
 
 class User extends Authenticatable
 {
@@ -161,35 +163,35 @@ class User extends Authenticatable
     {
         static::deleting(function ($user) {
             if (! $user->isForceDeleting()) {
-                // Eliminar imágenes asociadas al perfil
-                if ($user->profileImage) {
-                    $user->profileImage->delete(); // Eliminar imagen del perfil
-                }
+                // Eliminar todas las imágenes asociadas al usuario (perfil, fondo y otras)
+                $user->profileImage?->delete();
+                $user->backgroundImage?->delete();
 
-                if ($user->backgroundImage) {
-                    $user->backgroundImage->delete(); // Eliminar imagen de fondo
-                }
+                // Eliminar todas las imágenes que tengan imageable_id = $user->id y imageable_type = User::class
+                \App\Models\Image::where('imageable_id', $user->id)
+                    ->where('imageable_type', self::class)
+                    ->get()
+                    ->each(function ($image) {
+                        $paths = [
+                            ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                            ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                            ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
+                        ];
+                        Storage::disk('s3')->delete($paths);
+                        $image->delete();
+                    });
 
-                // Eliminar publicaciones
-                $user->posts->each(function ($post) {
-                    if ($post->image) {
-                        $post->image->each(function ($image) {
-                            // Asegúrate de eliminar cada imagen asociada a la publicación desde el disco S3
-                            $paths = [
-                                ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                                ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-                            ];
-                            Storage::disk('s3')->delete($paths);
-                            $image->delete();
-                        });
+                // Eliminar todos los posts del usuario (de cualquier tipo)
+                $user->hasMany(\App\Models\Post::class)->with('posteable')->get()->each(function ($post) {
+                    if ($post->posteable) {
+                        $post->posteable->delete(); // Esto dispara el deleting de RegularPost y elimina los SharedPost relacionados
                     }
                     $post->delete();
                 });
 
-                // Eliminar álbumes
+                // Eliminar álbumes y sus portadas
                 $user->albums->each(function ($album) {
                     if ($album->coverImage) {
-                        // Eliminar imagen de portada del álbum desde S3
                         $image = $album->coverImage;
                         $paths = [
                             ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
@@ -203,6 +205,31 @@ class User extends Authenticatable
 
                 // Desvincular redes sociales
                 $user->socials()->detach();
+
+                // Eliminar membresías de comunidades
+                $user->communityMemberships()->delete();
+
+                // Eliminar tienda y sus relaciones
+                if ($user->shop) {
+                    $user->shop->delete();
+                }
+
+                // Eliminar líneas de carrito
+                $user->lineasCarrito()->delete();
+
+                // Eliminar pedidos
+                $user->orders()->delete();
+
+                // Eliminar notificaciones enviadas por el usuario
+                DB::table('notifications')
+                    ->where(function ($query) use ($user) {
+                        $query->whereRaw("(data::json->>'liker_id')::int = ?", [$user->id])
+                            ->orWhereRaw("(data::json->>'sharer_id')::int = ?", [$user->id])
+                            ->orWhereRaw("(data::json->>'follower_id')::int = ?", [$user->id])
+                            ->orWhereRaw("(data::json->>'mentioner_id')::int = ?", [$user->id])
+                            ->orWhereRaw("(data::json->>'requester_id')::int = ?", [$user->id]);
+                    })
+                    ->delete();
             }
         });
     }

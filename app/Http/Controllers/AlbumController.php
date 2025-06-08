@@ -104,11 +104,17 @@ class AlbumController extends Controller
     public function show(Album $album)
     {
         $userId = Auth::user()->id;
+
+        // Verifica si el usuario autenticado es el dueño del álbum
+        if ($album->user_id !== $userId) {
+            return redirect()->back();
+        }
+
         $user = User::findOrFail($userId);
         $posts = RegularPost::whereHas('post', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->with(['image', 'tags','post', 'post.user', 'likedBy']) // Carga relaciones del Post
+            ->with(['image', 'tags','post', 'post.user', 'likedBy'])
             ->get();
 
         $album = tap(Album::with([
@@ -126,8 +132,6 @@ class AlbumController extends Controller
                 $post->isLikedByUser = $post->isLikedByUser();
             });
         });
-
-
 
         return Inertia::render('Albums/Show', [
             'album' => $album,

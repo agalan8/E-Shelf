@@ -16,6 +16,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->unique();
             $table->timestamps();
+            $table->softDeletes();
+
         });
 
         DB::table('shops')->insert([
@@ -30,6 +32,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shops');
+                Schema::table('shops', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

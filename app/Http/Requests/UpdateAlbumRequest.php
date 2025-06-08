@@ -12,7 +12,9 @@ class UpdateAlbumRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $album = $this->route('album'); // Esto ya es un modelo si usas model binding
+
+        return $album && $this->user() && $album->user_id === $this->user()->id;
     }
 
     /**

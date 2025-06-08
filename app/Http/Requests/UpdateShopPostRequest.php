@@ -11,7 +11,9 @@ class UpdateShopPostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $shopPost = $this->route('shop-post'); // Esto ya es un modelo si usas model binding
+
+        return $shopPost && $this->user() && $shopPost->user_id === $this->user()->id;
     }
 
     /**
