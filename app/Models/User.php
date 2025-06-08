@@ -172,12 +172,12 @@ class User extends Authenticatable
                     ->where('imageable_type', self::class)
                     ->get()
                     ->each(function ($image) {
-                        $paths = [
-                            ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                            ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-                            ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
-                        ];
-                        Storage::disk('s3')->delete($paths);
+                        // $paths = [
+                        //     ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                        //     ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                        //     ltrim(parse_url($image->path_small, PHP_URL_PATH), '/'),
+                        // ];
+                        // Storage::disk('s3')->delete($paths);
                         $image->delete();
                     });
 
@@ -193,11 +193,11 @@ class User extends Authenticatable
                 $user->albums->each(function ($album) {
                     if ($album->coverImage) {
                         $image = $album->coverImage;
-                        $paths = [
-                            ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                            ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-                        ];
-                        Storage::disk('s3')->delete($paths);
+                        // $paths = [
+                        //     ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+                        //     ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+                        // ];
+                        // Storage::disk('s3')->delete($paths);
                         $image->delete();
                     }
                     $album->delete();

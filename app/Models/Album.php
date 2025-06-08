@@ -43,13 +43,13 @@ class Album extends Model
             $image = $album->coverImage;
 
             // Asumiendo que `path_original` es el campo que almacena la ruta de la imagen original
-            $paths = [
-                ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
-                ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
-            ];
+            // $paths = [
+            //     ltrim(parse_url($image->path_original, PHP_URL_PATH), '/'),
+            //     ltrim(parse_url($image->path_medium, PHP_URL_PATH), '/'),
+            // ];
 
-            // Eliminar la imagen asociada al álbum desde S3
-            Storage::disk('s3')->delete($paths);
+            // // Eliminar la imagen asociada al álbum desde S3
+            // Storage::disk('s3')->delete($paths);
 
             // Eliminar la imagen de la base de datos
             $image->delete();
