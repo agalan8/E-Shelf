@@ -22,7 +22,6 @@ export default function LoginForm({
 
     const [errors, setErrors] = useState({});
 
-    // Validación simple en caliente
     const validate = (field, value) => {
         let newErrors = { ...errors };
 
@@ -57,7 +56,6 @@ export default function LoginForm({
     const submit = (e) => {
         e.preventDefault();
 
-        // Validar todo antes de enviar
         validate('email', data.email);
         validate('password', data.password);
 

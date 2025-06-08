@@ -8,7 +8,7 @@ import {
     Marker,
     StandaloneSearchBox,
 } from "@react-google-maps/api";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 const containerStyle = {
     width: "100%",
@@ -32,7 +32,7 @@ const Edit = ({ post, onClose, tags }) => {
                   lat: parseFloat(post.image.latitud),
                   lng: parseFloat(post.image.longitud),
               }
-            : { lat: 40.4168, lng: -3.7038 } // fallback: Madrid
+            : { lat: 40.4168, lng: -3.7038 }
     );
 
     const centerDefault = locationCoords;
@@ -54,7 +54,7 @@ const Edit = ({ post, onClose, tags }) => {
     const communityDropdownRef = useRef();
     const searchBoxRef = useRef(null);
 
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
     const onPlacesChanged = () => {
         const places = searchBoxRef.current.getPlaces();

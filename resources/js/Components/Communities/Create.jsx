@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import ImageInput from "@/Components/ImageInput";
-import { useToast } from "@/contexts/ToastProvider"; // Asegúrate de que la ruta sea correcta
+import { useToast } from "@/contexts/ToastProvider";
 
 export default function Create({ onClose }) {
   const [nombre, setNombre] = useState("");
@@ -14,7 +14,7 @@ export default function Create({ onClose }) {
   const [errors, setErrors] = useState({});
 
   const modalRef = useRef(null);
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 10);

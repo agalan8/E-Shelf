@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
-import { useToast } from "@/contexts/ToastProvider"; // Asegúrate de que la ruta sea correcta
+import { useToast } from "@/contexts/ToastProvider";
 
 const Create = ({ onClose, posts }) => {
     const [nombre, setNombre] = useState("");
@@ -13,7 +13,7 @@ const Create = ({ onClose, posts }) => {
     const [step, setStep] = useState(1);
     const [isVisible, setIsVisible] = useState(false);
     const [errors, setErrors] = useState({});
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
     useEffect(() => {
         setTimeout(() => setIsVisible(true), 10);
@@ -119,7 +119,7 @@ const Create = ({ onClose, posts }) => {
 
     return (
         <div
-            onClick={handleOverlayClick} // detecta clics en el fondo
+            onClick={handleOverlayClick}
             className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ${
                 isVisible ? "opacity-100" : "opacity-0"
             }`}

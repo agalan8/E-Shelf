@@ -16,7 +16,7 @@ export default function Busqueda() {
   const clearFilter = () => setFilter(null);
 
 const handleSearch = () => {
-  if (!filter && searchText.trim() === "") return; // Solo evita búsqueda si NO hay filtro ni texto
+  if (!filter && searchText.trim() === "") return;
 
   router.get("/buscar", { q: searchText, filter });
   setIsOpen(false);
@@ -43,7 +43,7 @@ const handleSearch = () => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Para evitar un submit de formulario o comportamiento por defecto
+      e.preventDefault();
       handleSearch();
     }
   };

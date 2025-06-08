@@ -12,12 +12,12 @@ const Image = ({ src, alt, className, style, ...props }) => {
       <img
         src={src}
         alt={alt}
-        className={`transition-opacity duration-200 ${className}`} // No modifica las clases adicionales
+        className={`transition-opacity duration-200 ${className}`}
         style={{
           ...style,
-          filter: isImageLoaded ? 'none' : 'blur(10px)', // Solo aplica el blur durante la carga
-          opacity: isImageLoaded ? 1 : 0, // Control de opacidad
-          transition: 'filter 0.2s ease-out, opacity 0.2s ease-out', // Transición suave
+          filter: isImageLoaded ? 'none' : 'blur(10px)',
+          opacity: isImageLoaded ? 1 : 0,
+          transition: 'filter 0.2s ease-out, opacity 0.2s ease-out',
         }}
         loading="lazy"
         onLoad={handleImageLoad}

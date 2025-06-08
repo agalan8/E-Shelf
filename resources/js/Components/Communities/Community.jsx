@@ -13,7 +13,7 @@ import {
   faClock,
 } from '@fortawesome/free-solid-svg-icons';
 import Edit from './Edit';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 export default function Community({ community }) {
   const { auth } = usePage().props;
@@ -21,8 +21,8 @@ export default function Community({ community }) {
   const [hovered, setHovered] = useState(false);
   const [loading, setLoading] = useState(false);
   const [buttonHovered, setButtonHovered] = useState(false);
-  const [requestSent, setRequestSent] = useState(false); // Para mostrar "Solicitud enviada"
-  const { showToast } = useToast(); // Usa el hook
+  const [requestSent, setRequestSent] = useState(false);
+  const { showToast } = useToast();
 
   const canEdit = auth.user && (auth.user.is_admin || auth.user.id === community.user_id);
   const isMember = community.memberships.some(
@@ -97,7 +97,6 @@ export default function Community({ community }) {
   };
 
   const handleCardClick = () => {
-    // Solo permitir clic si es pública o es miembro o dueño
     if (!isPrivate || isMember || isOwner) {
       router.visit(route('communities.show', community.id));
     }

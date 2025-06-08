@@ -6,16 +6,16 @@ import ForgotPasswordForm from "@/Components/ForgotPasswordForm";
 
 export default function AuthModal({ isOpen, onClose, status, canResetPassword }) {
     const [currentView, setCurrentView] = useState("register");
-    const [showForgotPassword, setShowForgotPassword] = useState(false);  // Estado para mostrar el formulario de "forgotPassword"
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
     const nodeRef = useRef(null);
 
     const handleForgotPasswordClick = () => {
-        setShowForgotPassword(true);  // Mostrar el formulario de forgot password sin cambiar la elipse
+        setShowForgotPassword(true);
     };
 
     const handleBackToLogin = () => {
-        setShowForgotPassword(false);  // Volver al formulario de login
-        setCurrentView("login");  // Asegurar que la elipse se mantenga en "login"
+        setShowForgotPassword(false);
+        setCurrentView("login");
     };
 
     return (
@@ -54,7 +54,6 @@ export default function AuthModal({ isOpen, onClose, status, canResetPassword })
                             {/* Botones de cambio */}
                             {!showForgotPassword && (
                                 <div className="bg-zinc-800 rounded-full p-1 flex overflow-hidden w-full mb-6 relative">
-                                    {/* Elipse de fondo que se mueve */}
                                     <div
                                         className={`absolute top-0 left-0 w-1/2 h-full transition-all duration-300 ease-in-out transform ${
                                             currentView === "login" ? "translate-x-0" : "translate-x-full"
@@ -85,7 +84,6 @@ export default function AuthModal({ isOpen, onClose, status, canResetPassword })
                                 </div>
                             )}
 
-                            {/* Formulario dinámico */}
                             <div className="pl-2 pr-2 md:pl-4 md:pr-4 w-full flex flex-col items-center mb-2">
                                 {currentView === "register" && !showForgotPassword && (
                                     <RegisterForm

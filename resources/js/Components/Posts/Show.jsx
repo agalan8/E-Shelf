@@ -44,7 +44,6 @@ const Show = ({
     const [showMap, setShowMap] = useState(false);
     const [showExif, setShowExif] = useState(false);
 
-    // Chequeo si latitud y longitud están disponibles y válidas
     const hasValidLocation =
         post?.image?.latitud !== null &&
         post?.image?.longitud !== null &&
@@ -207,7 +206,6 @@ const Show = ({
                 }`}
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Botón cerrar SIEMPRE visible en móvil, oculto en lg+ */}
                 <button
                     onClick={handleClose}
                     className="absolute top-2 left-2 p-1 bg-black bg-opacity-50 rounded-full transition-opacity duration-200 opacity-100 z-20 block lg:hidden"
@@ -221,12 +219,13 @@ const Show = ({
                         onMouseLeave={() => setHoveringImage(false)}
                     >
                         <Image
-                            src={`${post.image.path_original}?t=${new Date().getTime()}`}
+                            src={`${
+                                post.image.path_original
+                            }?t=${new Date().getTime()}`}
                             alt={post.titulo}
                             className="object-contain max-w-full max-h-[60vh] sm:max-h-72 lg:max-h-full cursor-pointer"
                             onClick={handleImageClick}
                         />
-                        {/* Botón cerrar SOLO visible en hover en escritorio */}
                         {hoveringImage && (
                             <button
                                 onClick={handleClose}
@@ -300,7 +299,6 @@ const Show = ({
                                 </div>
                             )}
 
-                            {/* Mostrar botón del mapa sólo si hay localización válida */}
                             {hasValidLocation && (
                                 <button
                                     onClick={() => {
@@ -362,69 +360,102 @@ const Show = ({
 
                         {/* Contenedor EXIF */}
                         <div
-                          className={`transition-[max-height,opacity] duration-500 ease-in-out px-4 sm:px-8 bg-[#202225] rounded overflow-hidden ${
-                            showExif
-                              ? "max-h-[3000px] sm:max-h-[400px] opacity-100 py-4"
-                              : "max-h-0 opacity-0 py-0"
-                          } ${
-                            showExif ? "static" : ""
-                          }`}
-                          style={{
-                            position: showExif ? "static" : undefined,
-                          }}
+                            className={`transition-[max-height,opacity] duration-500 ease-in-out px-4 sm:px-8 bg-[#202225] rounded overflow-hidden ${
+                                showExif
+                                    ? "max-h-[3000px] sm:max-h-[400px] opacity-100 py-4"
+                                    : "max-h-0 opacity-0 py-0"
+                            } ${showExif ? "static" : ""}`}
+                            style={{
+                                position: showExif ? "static" : undefined,
+                            }}
                         >
-                          {/* Encabezado: Fecha y Marca/Modelo */}
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-white text-base mb-6 gap-2">
-                            <div className="flex items-center gap-2">
-                              <FontAwesomeIcon icon={faClockRotateLeft} className="w-5 h-5" />
-                              {post.image.fecha_hora
-                                ? (() => {
-                                    const [date, time] = post.image.fecha_hora.split(" ");
-                                    const [year, month, day] = date.split(":");
-                                    return `${day}/${month}/${year} ${time}`;
-                                  })()
-                                : "No disponible"}
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-white text-base mb-6 gap-2">
+                                <div className="flex items-center gap-2">
+                                    <FontAwesomeIcon
+                                        icon={faClockRotateLeft}
+                                        className="w-5 h-5"
+                                    />
+                                    {post.image.fecha_hora
+                                        ? (() => {
+                                              const [date, time] =
+                                                  post.image.fecha_hora.split(
+                                                      " "
+                                                  );
+                                              const [year, month, day] =
+                                                  date.split(":");
+                                              return `${day}/${month}/${year} ${time}`;
+                                          })()
+                                        : "No disponible"}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <FontAwesomeIcon
+                                        icon={faCamera}
+                                        className="w-5 h-5"
+                                    />
+                                    {post.image.marca || "No disponible"} |{" "}
+                                    {post.image.modelo || "No disponible"}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <FontAwesomeIcon icon={faCamera} className="w-5 h-5" />
-                              {post.image.marca || "No disponible"} | {post.image.modelo || "No disponible"}
+
+                            <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-white text-base justify-center items-start">
+                                <ul className="space-y-4 flex-1">
+                                    <li className="flex items-center gap-2">
+                                        <img
+                                            src="/exposure_icon.png"
+                                            alt="Apertura"
+                                            className="w-5 h-5"
+                                        />
+                                        f/
+                                        {post.image.diafragma ||
+                                            "No disponible"}
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <img
+                                            src="/iso_icon.png"
+                                            alt="ISO"
+                                            className="w-5 h-5"
+                                        />
+                                        {post.image.iso !== null
+                                            ? post.image.iso
+                                            : "No disponible"}
+                                    </li>
+                                </ul>
+
+                                <ul className="space-y-4 flex-1">
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon
+                                            icon={faStopwatch}
+                                            className="w-5 h-5"
+                                        />
+                                        {post.image.exposicion ||
+                                            "No disponible"}{" "}
+                                        s
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <img
+                                            src="/focal_icon.png"
+                                            alt="Focal"
+                                            className="w-5 h-5"
+                                        />
+                                        {post.image.longitud_focal ||
+                                            "No disponible"}
+                                    </li>
+                                </ul>
+
+                                <ul className="space-y-4 flex-1">
+                                    <li className="flex items-center gap-2">
+                                        <FontAwesomeIcon
+                                            icon={faBoltLightning}
+                                            className="w-5 h-5"
+                                        />
+                                        {post.image.flash !== null
+                                            ? post.image.flash
+                                                ? "Sí"
+                                                : "No"
+                                            : "No disponible"}
+                                    </li>
+                                </ul>
                             </div>
-                          </div>
-
-                          {/* Tres listas debajo */}
-                          <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 text-white text-base justify-center items-start">
-                            {/* Lista 1: Diafragma, ISO */}
-                            <ul className="space-y-4 flex-1">
-                              <li className="flex items-center gap-2">
-                                <img src="/exposure_icon.png" alt="Apertura" className="w-5 h-5" />
-                                f/{post.image.diafragma || "No disponible"}
-                              </li>
-                              <li className="flex items-center gap-2">
-                                <img src="/iso_icon.png" alt="ISO" className="w-5 h-5" />
-                                {post.image.iso !== null ? post.image.iso : "No disponible"}
-                              </li>
-                            </ul>
-
-                            {/* Lista 2: Exposición, Longitud focal */}
-                            <ul className="space-y-4 flex-1">
-                              <li className="flex items-center gap-2">
-                                <FontAwesomeIcon icon={faStopwatch} className="w-5 h-5" />
-                                {post.image.exposicion || "No disponible"} s
-                              </li>
-                              <li className="flex items-center gap-2">
-                                <img src="/focal_icon.png" alt="Focal" className="w-5 h-5" />
-                                {post.image.longitud_focal || "No disponible"}
-                              </li>
-                            </ul>
-
-                            {/* Lista 3: Flash */}
-                            <ul className="space-y-4 flex-1">
-                              <li className="flex items-center gap-2">
-                                <FontAwesomeIcon icon={faBoltLightning} className="w-5 h-5" />
-                                {post.image.flash !== null ? (post.image.flash ? "Sí" : "No") : "No disponible"}
-                              </li>
-                            </ul>
-                          </div>
                         </div>
                         <div className="px-8 py-4 bg-[#292B2F] flex-shrink-0">
                             <h2 className="text-2xl font-semibold text-white">
@@ -445,16 +476,15 @@ const Show = ({
                                 </h3>
                                 {post.tags.length > 0 ? (
                                     <div className="flex flex-wrap gap-2 mt-2">
-    {post.tags.map((tag) => (
-        <span
-            key={tag.id}
-            className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm"
-        >
-            {tag.nombre}
-        </span>
-    ))}
-</div>
-
+                                        {post.tags.map((tag) => (
+                                            <span
+                                                key={tag.id}
+                                                className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm"
+                                            >
+                                                {tag.nombre}
+                                            </span>
+                                        ))}
+                                    </div>
                                 ) : (
                                     <p className="text-sm text-white">
                                         No hay etiquetas disponibles.

@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 const AddPosts = ({ album, userPosts, onClose }) => {
     const [selectedPosts, setSelectedPosts] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
-    const { showToast } = useToast(); // Usa el hook
+    const { showToast } = useToast();
 
-    // Filtrar posts que NO están en el álbum
     const postsNotInAlbum = userPosts.filter(
         (userPost) => !album.posts.some(albumPost => albumPost.id === userPost.id)
     );
@@ -56,20 +55,19 @@ const AddPosts = ({ album, userPosts, onClose }) => {
         setTimeout(() => onClose(), 300);
     };
 
-    // Evitar que al clicar dentro del modal se cierre el modal
     const handleModalClick = (e) => {
         e.stopPropagation();
     };
 
     return (
         <div
-            onClick={handleClose}  // Cerrar al hacer clic fuera
+            onClick={handleClose}
             className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ${
                 isVisible ? "opacity-100" : "opacity-0"
             }`}
         >
             <div
-                onClick={handleModalClick} // Prevenir cierre si se hace clic dentro del modal
+                onClick={handleModalClick}
                 className={`bg-[#292B2F] rounded-lg shadow-lg w-11/12 max-w-6xl h-[85vh] flex flex-col overflow-hidden relative transform transition-all duration-300 ${
                     isVisible ? "scale-100 translate-y-0" : "scale-95 translate-y-5"
                 }`}
@@ -114,7 +112,6 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Botón fijo abajo a la derecha */}
                     <div className="absolute bottom-6 right-6">
                         <button
                             type="submit"

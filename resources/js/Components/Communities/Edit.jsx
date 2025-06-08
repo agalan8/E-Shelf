@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import ImageInput from '@/Components/ImageInput';
-import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
+import { useToast } from '@/contexts/ToastProvider';
 
 export default function EditCommunity({ community, onClose }) {
   const { data, setData, post, processing, errors } = useForm({
@@ -13,10 +13,8 @@ export default function EditCommunity({ community, onClose }) {
     background_image: null,
   });
 
-  // Estado local para errores en caliente
   const [liveErrors, setLiveErrors] = useState({});
 
-  // Validaciones en caliente
   const validateField = (field, value) => {
     let error = '';
     if (field === 'nombre') {
@@ -32,7 +30,6 @@ export default function EditCommunity({ community, onClose }) {
     setLiveErrors(prev => ({ ...prev, [field]: error }));
   };
 
-  // Handlers para cada campo
   const handleNombreChange = e => {
     setData('nombre', e.target.value);
     validateField('nombre', e.target.value);
@@ -49,7 +46,7 @@ export default function EditCommunity({ community, onClose }) {
   };
 
   const [isVisible, setIsVisible] = useState(false);
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
@@ -105,12 +102,10 @@ export default function EditCommunity({ community, onClose }) {
     setTimeout(() => onClose(), 300);
   };
 
-  // Cierra modal al hacer clic en el overlay
   const handleOverlayClick = () => {
     handleClose();
   };
 
-  // Evita que el clic dentro del modal cierre el modal
   const handleModalClick = (e) => {
     e.stopPropagation();
   };
@@ -120,7 +115,7 @@ export default function EditCommunity({ community, onClose }) {
       className={`fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 transition-opacity duration-300 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
-      onClick={handleOverlayClick} // clic en overlay cierra modal
+      onClick={handleOverlayClick}
     >
       <div
         className={`bg-[#36393F] rounded-lg shadow-lg w-11/12 max-w-3xl p-2 sm:p-6 relative transform transition-all duration-300
@@ -128,7 +123,7 @@ export default function EditCommunity({ community, onClose }) {
     max-h-[95vh] overflow-y-auto
     sm:w-11/12 sm:max-w-3xl
     `}
-        onClick={handleModalClick} // evita cerrar modal al hacer clic dentro
+        onClick={handleModalClick}
       >
         <button
           onClick={handleClose}

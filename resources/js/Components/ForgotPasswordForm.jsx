@@ -65,7 +65,7 @@ export default function ForgotPasswordForm({ onClose, onSwitchToLogin }) {
                     href="#"
                     onClick={(e) => {
                         e.preventDefault();
-                        onSwitchToLogin();  // Volver a la vista de Login
+                        onSwitchToLogin();
                     }}
                     className="text-sm text-[#a42bfd] underline hover:text-[#8222cc] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
                 >

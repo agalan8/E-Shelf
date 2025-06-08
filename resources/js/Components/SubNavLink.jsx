@@ -17,8 +17,8 @@ export default function SubNavLink({
             <div
                 className={
                     (active
-                        ? 'bg-[#7A27BC] '  // Cuando está activo, se aplica el color de fondo para el estado activo
-                        : 'hover:bg-[#2A2D2F]') +  // Si no está activo, aplica el hover
+                        ? 'bg-[#7A27BC] '
+                        : 'hover:bg-[#2A2D2F]') +
                     ' rounded-xl p-2 transition-colors duration-200 flex items-center space-x-2 w-full'
                 }
             >

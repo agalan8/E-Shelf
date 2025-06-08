@@ -26,7 +26,7 @@ const ImageInput = ({ name, label, onChange, onDelete, initialImage, previewClas
     const handleDelete = () => {
         setImagePreview(null);
         onChange(null);
-        if (onDelete) onDelete(); // llamar a función del padre si está definida
+        if (onDelete) onDelete();
     };
 
     return (

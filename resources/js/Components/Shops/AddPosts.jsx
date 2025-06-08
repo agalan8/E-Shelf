@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
-import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
+import { useToast } from "@/contexts/ToastProvider";
 
 const AddPosts = ({ shop, userPosts, onClose }) => {
   const [selectedPosts, setSelectedPosts] = useState({});
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState({});
   const modalRef = useRef(null);
-  const { showToast } = useToast(); // Usa el hook
+  const { showToast } = useToast();
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 10);
@@ -59,7 +59,6 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
         });
         return newSelected;
       } else {
-        // No agregues error aquí, solo selecciona el post
         return { ...prevSelected, [postId]: "" };
       }
     });
