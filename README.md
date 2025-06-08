@@ -66,10 +66,6 @@
 - Regístrate y comienza a crear álbumes, publicaciones y comunidades.
 - Explora las funcionalidades sociales y de gestión de imágenes.
 
-## Contribución
-
-¡Las contribuciones son bienvenidas! Por favor, abre un [issue](https://github.com/tuusuario/e-shelf/issues) o un pull request para sugerencias y mejoras.
-
 ## Licencia
 
 Este proyecto está bajo la licencia [MIT License](https://opensource.org/license/MIT).
