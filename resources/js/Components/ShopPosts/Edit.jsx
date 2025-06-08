@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 const Edit = ({ post, onClose }) => {
   const { data, setData, processing, errors } = useForm({
@@ -9,6 +10,7 @@ const Edit = ({ post, onClose }) => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [precioError, setPrecioError] = useState('');
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
@@ -46,7 +48,10 @@ const Edit = ({ post, onClose }) => {
 
     router.put(route('shop-posts.update', post.id), data, {
       preserveScroll: true,
-      onSuccess: () => handleClose(),
+      onSuccess: () => {
+        showToast("¡Publicación editada correctamente!", "success");
+        handleClose();
+      },
     });
   };
 

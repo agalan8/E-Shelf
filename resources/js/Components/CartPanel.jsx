@@ -3,17 +3,24 @@ import { usePage, router } from '@inertiajs/react';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBillWave, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function CartPanel({ onClose }) {
   const { auth } = usePage().props;
   const lineasCarrito = auth.user?.lineas_carrito || [];
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast(); // Usa el hook
 
   const handleRemove = (shopPostId) => {
     router.post(
       route('linea-carrito.remove'),
       { shop_post_id: shopPostId },
-      { preserveScroll: true }
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          showToast("Publicación eliminada del carrito.", "success");
+        },
+      }
     );
   };
 

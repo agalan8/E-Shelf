@@ -13,6 +13,7 @@ import {
   faClock,
 } from '@fortawesome/free-solid-svg-icons';
 import Edit from './Edit';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function Community({ community }) {
   const { auth } = usePage().props;
@@ -21,6 +22,7 @@ export default function Community({ community }) {
   const [loading, setLoading] = useState(false);
   const [buttonHovered, setButtonHovered] = useState(false);
   const [requestSent, setRequestSent] = useState(false); // Para mostrar "Solicitud enviada"
+  const { showToast } = useToast(); // Usa el hook
 
   const canEdit = auth.user && (auth.user.is_admin || auth.user.id === community.user_id);
   const isMember = community.memberships.some(
@@ -50,11 +52,16 @@ export default function Community({ community }) {
       route('communities.join', community.id),
       {},
       {
-        onFinish: () => {
-          setLoading(false);
+        onSuccess: () => {
           if (isPrivate && !isMember) {
             setRequestSent(true);
+            showToast("¡Solicitud enviada para unirse a la comunidad!", "success");
+          } else {
+            showToast("¡Te has unido a la comunidad!", "success");
           }
+        },
+        onFinish: () => {
+          setLoading(false);
         },
         preserveScroll: true,
       }
@@ -68,6 +75,9 @@ export default function Community({ community }) {
       route('communities.leave', community.id),
       {},
       {
+        onSuccess: () => {
+          showToast("Has salido de la comunidad.", "success");
+        },
         onFinish: () => setLoading(false),
         preserveScroll: true,
       }
@@ -79,6 +89,9 @@ export default function Community({ community }) {
     if (confirm('¿Estás seguro de que quieres eliminar esta comunidad?')) {
       router.delete(route('communities.destroy', community.id), {
         preserveScroll: true,
+        onSuccess: () => {
+          showToast("¡Comunidad eliminada con éxito!", "success");
+        },
       });
     }
   };

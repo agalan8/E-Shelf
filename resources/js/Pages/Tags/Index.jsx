@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function TagIndex() {
   const { tags } = usePage().props;
@@ -15,6 +16,8 @@ export default function TagIndex() {
   const [searchField, setSearchField] = useState('nombre');
   const [sortField, setSortField] = useState('nombre');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     if (showModal) {
@@ -63,18 +66,28 @@ export default function TagIndex() {
 
     if (editingTag) {
       router.put(route('tags.update', editingTag.id), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Etiqueta actualizada correctamente.", "success");
+          closeModal();
+        },
       });
     } else {
       router.post(route('tags.store'), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Etiqueta creada correctamente.", "success");
+          closeModal();
+        },
       });
     }
   };
 
   const deleteTag = (id) => {
     if (confirm("¿Estás seguro de que deseas eliminar esta etiqueta?")) {
-      router.delete(route('tags.destroy', id));
+      router.delete(route('tags.destroy', id), {
+        onSuccess: () => {
+          showToast("Etiqueta eliminada correctamente.", "success");
+        },
+      });
     }
   };
 

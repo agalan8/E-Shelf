@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
+import { useToast } from "@/contexts/ToastProvider"; // Asegúrate de que la ruta sea correcta
 
 const Create = ({ onClose, posts }) => {
     const [nombre, setNombre] = useState("");
@@ -12,6 +13,7 @@ const Create = ({ onClose, posts }) => {
     const [step, setStep] = useState(1);
     const [isVisible, setIsVisible] = useState(false);
     const [errors, setErrors] = useState({});
+    const { showToast } = useToast(); // Usa el hook
 
     useEffect(() => {
         setTimeout(() => setIsVisible(true), 10);
@@ -93,7 +95,10 @@ const Create = ({ onClose, posts }) => {
         });
 
         router.post(route("albums.store"), formData, {
-            onFinish: () => handleClose(),
+            onSuccess: () => {
+                showToast("¡Álbum creado con éxito!", "success");
+                handleClose();
+            },
         });
     };
 

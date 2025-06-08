@@ -10,6 +10,7 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
+import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
 
 const containerStyle = { width: "100%", height: "300px" };
 const centerDefault = { lat: 40.4168, lng: -3.7038 };
@@ -42,6 +43,8 @@ const PostCreate = () => {
     imagen: false,
     localizacion: false,
   });
+
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -190,10 +193,8 @@ const PostCreate = () => {
     const trimmedUltimaLoc = ultimaLocalizacion.trim();
 
     if (!trimmedLoc || trimmedLoc !== trimmedUltimaLoc) {
-      // Input vacío o modificado: enviar última localización válida
       formData.append("localizacion", trimmedUltimaLoc);
     } else {
-      // No ha sido modificado: enviar tal cual
       formData.append("localizacion", trimmedLoc);
     }
 
@@ -212,7 +213,11 @@ const PostCreate = () => {
       formData.append("precio", precio);
     }
 
-    router.post(route("regular-posts.store"), formData);
+    router.post(route("regular-posts.store"), formData, {
+      onSuccess: () => {
+        showToast("¡Publicación creada con éxito!", "success");
+      },
+    });
   };
 
 

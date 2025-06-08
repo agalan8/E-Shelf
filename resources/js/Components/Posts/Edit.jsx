@@ -8,6 +8,7 @@ import {
     Marker,
     StandaloneSearchBox,
 } from "@react-google-maps/api";
+import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
 
 const containerStyle = {
     width: "100%",
@@ -52,6 +53,8 @@ const Edit = ({ post, onClose, tags }) => {
     const tagDropdownRef = useRef();
     const communityDropdownRef = useRef();
     const searchBoxRef = useRef(null);
+
+    const { showToast } = useToast(); // Usa el hook
 
     const onPlacesChanged = () => {
         const places = searchBoxRef.current.getPlaces();
@@ -217,10 +220,8 @@ const Edit = ({ post, onClose, tags }) => {
         const trimmedUltimaLoc = ultimaLocalizacion.trim();
 
         if (!trimmedLoc || trimmedLoc !== trimmedUltimaLoc) {
-            // Input vacío o modificado: enviar última localización válida
             formData.append("localizacion", trimmedUltimaLoc);
         } else {
-            // No ha sido modificado: enviar tal cual
             formData.append("localizacion", trimmedLoc);
         }
         formData.append("latitud", locationCoords.lat);
@@ -234,8 +235,11 @@ const Edit = ({ post, onClose, tags }) => {
 
         router.post(route("regular-posts.update", post.id), formData, {
             preserveScroll: true,
+            onSuccess: () => {
+                showToast("¡Publicación actualizada con éxito!", "success");
+                handleClose();
+            },
         });
-        handleClose();
     };
 
     const handleClose = () => {

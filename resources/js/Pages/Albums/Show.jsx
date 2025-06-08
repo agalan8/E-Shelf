@@ -6,11 +6,13 @@ import Edit from "@/Components/Albums/Edit";
 import AddPosts from "@/Components/Albums/AddPosts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
 
 const Show = ({ album, userPosts, tags }) => {
     const [posts, setPosts] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddPostsModalOpen, setIsAddPostsModalOpen] = useState(false);
+    const { showToast } = useToast(); // Usa el hook
 
     useEffect(() => {
         if (album && album.posts) {
@@ -37,6 +39,7 @@ const Show = ({ album, userPosts, tags }) => {
                 },
                 onSuccess: () => {
                     setPosts(posts.filter((post) => post.id !== postId));
+                    showToast("¡Publicación eliminada del álbum!", "success");
                 },
             });
         }

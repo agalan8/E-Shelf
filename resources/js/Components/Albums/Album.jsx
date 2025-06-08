@@ -5,9 +5,11 @@ import { faEye, faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Edit from '@/Components/Albums/Edit';
 import FlipBook from '@/Components/Albums/FlipBook';
 import Image from '../Image';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 const Album = ({ album }) => {
   const { auth } = usePage().props;
+  const { showToast } = useToast(); // Usa el hook
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isFlipBookOpen, setIsFlipBookOpen] = useState(false);
@@ -33,6 +35,9 @@ const Album = ({ album }) => {
       try {
         await router.delete(route('albums.destroy', album.id), {
           preserveScroll: true,
+          onSuccess: () => {
+            showToast("¡Álbum eliminado con éxito!", "success");
+          },
         });
       } catch (error) {
         console.error('Error al eliminar el álbum:', error);

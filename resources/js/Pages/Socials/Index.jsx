@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function SocialIndex() {
   const { socials } = usePage().props;
@@ -14,6 +15,8 @@ export default function SocialIndex() {
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState('nombre');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     if (showModal) {
@@ -62,18 +65,28 @@ export default function SocialIndex() {
 
     if (editingSocial) {
       router.put(route('socials.update', editingSocial.id), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Red social actualizada correctamente.", "success");
+          closeModal();
+        },
       });
     } else {
       router.post(route('socials.store'), formData, {
-        onSuccess: () => closeModal(),
+        onSuccess: () => {
+          showToast("Red social creada correctamente.", "success");
+          closeModal();
+        },
       });
     }
   };
 
   const deleteSocial = (id) => {
     if (confirm("¿Estás seguro de que deseas eliminar esta red social?")) {
-      router.delete(route('socials.destroy', id));
+      router.delete(route('socials.destroy', id), {
+        onSuccess: () => {
+          showToast("Red social eliminada correctamente.", "success");
+        },
+      });
     }
   };
 

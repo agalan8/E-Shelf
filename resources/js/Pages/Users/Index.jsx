@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Image from '@/Components/Image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function UserIndex() {
   const { users, auth } = usePage().props;
@@ -23,6 +24,8 @@ export default function UserIndex() {
   });
   const [errors, setErrors] = useState({});
 
+  const { showToast } = useToast(); // Usa el hook
+
   useEffect(() => {
     if (showModal) {
       setIsVisible(true);
@@ -36,7 +39,11 @@ export default function UserIndex() {
 
   const deleteUser = (id) => {
     if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
-      router.delete(route('users.destroy', id));
+      router.delete(route('users.destroy', id), {
+        onSuccess: () => {
+          showToast("Usuario eliminado correctamente.", "success");
+        },
+      });
     }
   };
 
@@ -360,7 +367,10 @@ export default function UserIndex() {
                   const formData = new FormData();
                   Object.entries(form).forEach(([key, value]) => formData.append(key, value));
                   router.post(route('users.store'), formData, {
-                    onSuccess: () => closeModal(),
+                    onSuccess: () => {
+                      showToast("¡Usuario creado con éxito!", "success");
+                      closeModal();
+                    },
                   });
                 }
               }}

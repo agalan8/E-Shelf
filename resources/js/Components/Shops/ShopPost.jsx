@@ -9,6 +9,7 @@ import {
   faCartArrowDown
 } from "@fortawesome/free-solid-svg-icons";
 import Edit from "@/Components/ShopPosts/Edit";
+import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
 
 const ShopPost = ({ post }) => {
   const { auth } = usePage().props;
@@ -25,15 +26,25 @@ const ShopPost = ({ post }) => {
     (linea) => linea.shop_post_id === post.id
   );
 
+  const { showToast } = useToast(); // Usa el hook
+
   const handleRemoveFromShop = () => {
     if (confirm("¿Eliminar esta publicación de la tienda?")) {
-      router.delete(route("shop-posts.destroy", post.id));
+      router.delete(route("shop-posts.destroy", post.id), {
+        onSuccess: () => {
+          showToast("Publicación eliminada de la tienda.", "success");
+        },
+      });
     }
   };
 
   const handleDeletePost = () => {
     if (confirm("¿Eliminar esta publicación permanentemente?")) {
-      router.delete(route("regular-posts.destroy", post.regular_post.id));
+      router.delete(route("regular-posts.destroy", post.regular_post.id), {
+        onSuccess: () => {
+          showToast("Publicación eliminada permanentemente.", "success");
+        },
+      });
     }
   };
 
@@ -42,7 +53,7 @@ const ShopPost = ({ post }) => {
     setEditModalOpen(true);
   };
 
-  const handleCloseEditModal = () => {
+  const handleCloseEditModal = (wasEdited = false) => {
     setEditModalOpen(false);
     setSelectedPost(null);
   };
@@ -51,6 +62,10 @@ const ShopPost = ({ post }) => {
   const handleAddToCart = () => {
     router.post(route("linea-carrito.add"), {
       shop_post_id: post.id,
+    }, {
+      onSuccess: () => {
+        showToast("¡Publicación añadida al carrito!", "success");
+      },
     });
   };
 
@@ -58,6 +73,10 @@ const ShopPost = ({ post }) => {
   const handleRemoveFromCart = () => {
     router.post(route("linea-carrito.remove"), {
       shop_post_id: post.id,
+    }, {
+      onSuccess: () => {
+        showToast("Publicación eliminada del carrito.", "success");
+      },
     });
   };
 
@@ -68,7 +87,7 @@ const ShopPost = ({ post }) => {
 
           {/* Botones del dueño */}
           {isOwner && (
-                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 flex flex-col gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 z-10">
+            <div className="absolute top-1 right-1 sm:top-2 sm:right-2 flex flex-col gap-1 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 z-10">
               <button
                 onClick={handleRemoveFromShop}
                 className="w-8 h-8 bg-[#3a3a3d] text-white rounded hover:bg-red-600 flex items-center justify-center"

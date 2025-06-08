@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import ImageInput from '@/Components/ImageInput';
+import { useToast } from '@/contexts/ToastProvider'; // Importa el hook
 
 export default function EditCommunity({ community, onClose }) {
   const { data, setData, post, processing, errors } = useForm({
@@ -48,6 +49,7 @@ export default function EditCommunity({ community, onClose }) {
   };
 
   const [isVisible, setIsVisible] = useState(false);
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
@@ -91,7 +93,10 @@ export default function EditCommunity({ community, onClose }) {
 
     router.post(route('communities.update', community.id), formData, {
       preserveScroll: true,
-      onSuccess: () => handleClose(),
+      onSuccess: () => {
+        showToast("¡Comunidad actualizada con éxito!", "success");
+        handleClose();
+      },
     });
   };
 

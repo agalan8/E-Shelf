@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import ImageInput from '@/Components/ImageInput';
+import { useToast } from '@/contexts/ToastProvider'; // Asegúrate de que la ruta sea correcta
 
 const Edit = ({ album, onClose }) => {
   const { data, setData, post, processing, errors } = useForm({
@@ -13,6 +14,7 @@ const Edit = ({ album, onClose }) => {
 
   const [isVisible, setIsVisible] = useState(false);
   const [liveErrors, setLiveErrors] = useState({});
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
@@ -78,7 +80,10 @@ const Edit = ({ album, onClose }) => {
 
     router.post(route('albums.update', album.id), formData, {
       preserveScroll: true,
-      onSuccess: () => handleClose(),
+      onSuccess: () => {
+        showToast("¡Álbum actualizado con éxito!", "success");
+        handleClose();
+      },
     });
   };
 

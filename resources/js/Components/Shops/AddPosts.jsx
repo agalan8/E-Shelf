@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
+import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
 
 const AddPosts = ({ shop, userPosts, onClose }) => {
   const [selectedPosts, setSelectedPosts] = useState({});
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState({});
   const modalRef = useRef(null);
+  const { showToast } = useToast(); // Usa el hook
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 10);
@@ -95,7 +97,10 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
       route("shop-posts.store"),
       { posts: postsData },
       {
-        onSuccess: () => handleClose(),
+        onSuccess: () => {
+          showToast("¡Publicaciones añadidas a la tienda!", "success");
+          handleClose();
+        },
         preserveScroll: true,
       }
     );

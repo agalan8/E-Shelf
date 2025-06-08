@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import Image from "../Image";
+import { useToast } from "@/contexts/ToastProvider"; // Importa el hook
 
 const AddPosts = ({ album, userPosts, onClose }) => {
     const [selectedPosts, setSelectedPosts] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
+    const { showToast } = useToast(); // Usa el hook
 
     // Filtrar posts que NO están en el álbum
     const postsNotInAlbum = userPosts.filter(
@@ -40,7 +42,10 @@ const AddPosts = ({ album, userPosts, onClose }) => {
             route("albums.posts.store", album.id),
             { posts: selectedPosts },
             {
-                onSuccess: () => handleClose(),
+                onSuccess: () => {
+                    showToast("¡Publicaciones agregadas al álbum!", "success");
+                    handleClose();
+                },
                 preserveScroll: true,
             }
         );
