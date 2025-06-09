@@ -214,6 +214,8 @@ const Show = ({ album, userPosts, tags }) => {
                                                         isLikedByUser={
                                                             post.isLikedByUser
                                                         }
+                                                        isSharedByUser={post.isSharedByUser}
+                                                        getTotalShares={post.getTotalShares}
                                                         post={post}
                                                         tags={tags}
                                                     />

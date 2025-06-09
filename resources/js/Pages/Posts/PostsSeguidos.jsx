@@ -90,56 +90,59 @@ const PostsSeguidos = ({ posts, tags }) => {
             {posts.map((post, index) => (
               <div
                 key={`${post.post_type}-${post.id}`}
-                className={`space-y-2 w-full py-4 px-2 bg-white/10 rounded-xl shadow-lg shadow-black backdrop-blur-md ${index !== posts.length - 1 ? 'mb-4' : ''}`}
+                className={`space-y-2 w-full py-8 ${index !== posts.length - 1 ? 'border-b border-purple-600' : ''}`}
               >
-                {/* Usuario y perfil */}
-                <div className="flex items-center space-x-3 px-4 mb-4">
-                  <a
-                    href={route('users.show', post.post.user.id)}
-                    className="flex items-center space-x-3 group"
-                  >
-                    {post.post.user.profile_image ? (
-                      <img
-                        src={post.post.user.profile_image.path_small}
-                        alt={`${post.post.user.name} perfil`}
-                        className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-purple-400 transition"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-lg">
-                        ?
-                      </div>
-                    )}
-                    <span className="text-white font-semibold group-hover:underline">
-                      {post.post.user.name}
-                    </span>
-                  </a>
-                  <span className="text-purple-400 text-sm ml-auto">{timeAgo(post.post.created_at)}</span>
-                </div>
-
                 <div className="flex justify-center w-auto">
-                  <Post
-                    post={post}
-                    tags={tags}
-                    isLikedByUser={post.isLikedByUser}
-                    getTotalLikes={post.getTotalLikes}
-                    isSharedByUser={post.isSharedByUser}
-                    getTotalShares={post.getTotalShares}
-                    postType={post.post_type}
-                    className="shadow-2xl shadow-black"
-                  />
-                </div>
+                  <div className="bg-white/10 rounded-xl shadow-2xl shadow-black p-4 transition-colors max-w-lg mx-auto">
+                    {/* Usuario y perfil */}
+                    <div className="flex items-center space-x-3 px-4 mb-4">
+                      <a
+                        href={route('users.show', post.post.user.id)}
+                        className="flex items-center space-x-3 group"
+                      >
+                        {post.post.user.profile_image ? (
+                          <img
+                            src={post.post.user.profile_image.path_small}
+                            alt={`${post.post.user.name} perfil`}
+                            className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-purple-400 transition"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-lg">
+                            ?
+                          </div>
+                        )}
+                        <span className="text-white font-semibold group-hover:underline">
+                          {post.post.user.name}
+                        </span>
+                      </a>
+                      <span className="text-purple-400 text-sm ml-auto">{timeAgo(post.post.created_at)}</span>
+                    </div>
 
-                {/* Campo para comentarios */}
-                <div className="px-4">
-                  <textarea
-                    ref={(el) => (textareaRefs.current[post.id] = el)}
-                    rows={1}
-                    className="w-full h-10 border-none rounded-md p-2 mt-2 text-base resize-none overflow-hidden bg-[#373841] text-white"
-                    placeholder="Escribe un comentario..."
-                    value={comments[post.id] || ''}
-                    onChange={(e) => handleCommentChange(post.id, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(post.id, e)}
-                  />
+                    {/* Post */}
+                    <Post
+                      post={post}
+                      tags={tags}
+                      isLikedByUser={post.isLikedByUser}
+                      getTotalLikes={post.getTotalLikes}
+                      isSharedByUser={post.isSharedByUser}
+                      getTotalShares={post.getTotalShares}
+                      postType={post.post_type}
+                      className="shadow-none"
+                    />
+
+                    {/* Campo para comentarios */}
+                    <div className="px-4">
+                      <textarea
+                        ref={(el) => (textareaRefs.current[post.id] = el)}
+                        rows={1}
+                        className="w-full h-10 border-none rounded-md p-2 mt-2 text-base resize-none overflow-hidden bg-[#373841] text-white"
+                        placeholder="Escribe un comentario..."
+                        value={comments[post.id] || ''}
+                        onChange={(e) => handleCommentChange(post.id, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(post.id, e)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

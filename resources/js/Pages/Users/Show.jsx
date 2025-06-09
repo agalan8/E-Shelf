@@ -203,6 +203,13 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
                 </div>
               </div>
 
+              {/* Nombre del usuario */}
+              <div className="flex-1 flex justify-center sm:justify-start mt-2 sm:mt-0 ml-0 sm:ml-8">
+                <h1 className="text-white text-2xl sm:text-4xl font-extrabold text-center sm:text-left drop-shadow-lg">
+                  {user.name}
+                </h1>
+              </div>
+
               {/* Botón seguir */}
               <div className="flex items-center mt-2 sm:mt-0">{renderIcon()}</div>
             </div>

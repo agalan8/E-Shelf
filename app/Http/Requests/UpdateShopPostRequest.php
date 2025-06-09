@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\RegularPost;
+use App\Models\ShopPost;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateShopPostRequest extends FormRequest
@@ -11,9 +13,7 @@ class UpdateShopPostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $shopPost = $this->route('shop-post');
-
-        return $shopPost && $this->user() && $shopPost->user_id === $this->user()->id;
+        return true;
     }
 
     /**

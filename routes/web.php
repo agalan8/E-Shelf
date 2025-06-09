@@ -67,7 +67,13 @@ Route::get('/', function () {
             )
                 ->doesntHave('shopPost')
                 ->orderBy('created_at', 'desc')
-                ->get(),
+                ->get()->map(function ($post) {
+            $post->getTotalLikes = $post->getTotalLikes();
+            $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false;
+            $post->isSharedByUser = Auth::check() ? $post->isSharedByUser() : false;
+            $post->getTotalShares = $post->getTotalShares();
+            return $post;
+        }),
         ]);
     }
 
@@ -89,6 +95,8 @@ Route::get('/explorar', function () {
         'posts' => RegularPost::with('image', 'tags', 'communities', 'post', 'post.user', 'post.user.profileImage', 'post.user.backgroundImage', 'comments', 'comments.user', 'comments.user.profileImage', 'comments.user.backgroundImage', 'comments.replies', 'comments.replies.user', 'comments.replies.user.profileImage', 'comments.replies.user.backgroundImage')->doesntHave('shopPost')->orderBy('created_at', 'desc')->get()->map(function ($post) {
             $post->getTotalLikes = $post->getTotalLikes();
             $post->isLikedByUser = Auth::check() ? $post->isLikedByUser() : false;
+            $post->isSharedByUser = Auth::check() ? $post->isSharedByUser() : false;
+            $post->getTotalShares = $post->getTotalShares();
             return $post;
         }),
         'tags' => Tag::all(),

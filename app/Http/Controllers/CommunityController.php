@@ -167,6 +167,9 @@ class CommunityController extends Controller
             ->map(function ($post) {
                 $post->getTotalLikes = $post->getTotalLikes();
                 $post->isLikedByUser = $post->isLikedByUser();
+                $post->isSharedByUser = Auth::check() ? $post->isSharedByUser() : false;
+                $post->getTotalShares = $post->getTotalShares();
+
                 return $post;
             });
 

@@ -108,6 +108,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Comment::class, 'comment_mentions', 'user_id', 'comment_id');
     }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     public function likedPosts()
     {
         return $this->belongsToMany(RegularPost::class, 'likes');
@@ -176,6 +181,15 @@ class User extends Authenticatable
                         // Storage::disk('s3')->delete($paths);
                         $image->delete();
                     });
+
+                $user->comments->each(function ($comment) {
+
+                    $comment->replies->each(function ($reply) {
+                        $reply->delete();
+                    });
+
+                    $comment->delete();
+                });
 
                 $user->hasMany(\App\Models\Post::class)->with('posteable')->get()->each(function ($post) {
                     if ($post->posteable) {
