@@ -273,16 +273,6 @@ const Edit = ({ post, onClose, tags }) => {
                             alt="Imagen actual"
                             className="max-h-60 md:max-h-full max-w-full object-contain rounded shadow-2xl shadow-black"
                         />
-                        <label className="cursor-pointer mt-3 text-white hover:underline">
-                            <ArrowUpTrayIcon className="w-5 h-5 inline mr-2" />
-                            Subir nueva imagen
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                className="hidden"
-                            />
-                        </label>
                     </div>
                 </div>
 

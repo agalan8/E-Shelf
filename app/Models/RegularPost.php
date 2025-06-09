@@ -130,7 +130,11 @@ class RegularPost extends Model
 
                 $RegularPost->post()->delete();
 
-                $RegularPost->comments()->delete();
+                $RegularPost->comments()->each(function ($comment) {
+                    $comment->replies()->delete();
+                    $comment->mentionedUsers()->detach();
+                    $comment->delete();
+                });
 
                 $RegularPost->tags()->detach();
                 $RegularPost->communities()->detach();
@@ -139,7 +143,7 @@ class RegularPost extends Model
                 $RegularPost->likedBy()->detach();
 
                 DB::table('notifications')
-                    ->whereIn('type', ['App\Notifications\PostLiked', 'App\Notifications\PostShared'])
+                    ->whereIn('type', ['App\Notifications\PostLiked', 'App\Notifications\PostShared', 'App\Notifications\MentionedInComment'])
                     ->whereRaw("(data::json->>'post_id')::int = ?", [$RegularPost->id])
                     ->delete();
             }

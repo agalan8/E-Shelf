@@ -230,7 +230,7 @@ if ($request->hasFile('imagen')) {
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string|max:255',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            // 'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'localizacion' => 'nullable|string|max:255',
             'latitud' => 'nullable|numeric|between:-90,90',
             'longitud' => 'nullable|numeric|between:-180,180',
@@ -245,68 +245,68 @@ if ($request->hasFile('imagen')) {
         $RegularPost->image->latitud = $request->latitud;
         $RegularPost->image->longitud = $request->longitud;
 
-        if ($request->hasFile('imagen')) {
+        // if ($request->hasFile('imagen')) {
 
-            $imagen = $request->file('imagen');
+        //     $imagen = $request->file('imagen');
 
-            $path = $imagen->getRealPath();
+        //     $path = $imagen->getRealPath();
 
-            $exif = @exif_read_data($path);
+        //     $exif = @exif_read_data($path);
 
-            // Función para convertir valores tipo "850/10" a float
-            $evalFraction = fn($val) => is_string($val) && strpos($val, '/') !== false
-                ? (float)eval('return ' . $val . ';')
-                : (float)$val;
+        //     // Función para convertir valores tipo "850/10" a float
+        //     $evalFraction = fn($val) => is_string($val) && strpos($val, '/') !== false
+        //         ? (float)eval('return ' . $val . ';')
+        //         : (float)$val;
 
-            $fechaHora = $exif['DateTimeOriginal'] ?? null;
-            $marca = $exif['Make'] ?? null;
-            $modelo = $exif['Model'] ?? null;
-            $exposicion = $exif['ExposureTime'] ?? null;
-            $diafragma = isset($exif['FNumber']) ? $evalFraction($exif['FNumber']) : null;
-            $iso = isset($exif['ISOSpeedRatings']) ? (int)$exif['ISOSpeedRatings'] : null;
+        //     $fechaHora = $exif['DateTimeOriginal'] ?? null;
+        //     $marca = $exif['Make'] ?? null;
+        //     $modelo = $exif['Model'] ?? null;
+        //     $exposicion = $exif['ExposureTime'] ?? null;
+        //     $diafragma = isset($exif['FNumber']) ? $evalFraction($exif['FNumber']) : null;
+        //     $iso = isset($exif['ISOSpeedRatings']) ? (int)$exif['ISOSpeedRatings'] : null;
 
-            // Flash: bit 0 indica si flash fue disparado (1 = sí, 0 = no)
-            $flash = isset($exif['Flash']) ? (($exif['Flash'] & 1) === 1) : null;
+        //     // Flash: bit 0 indica si flash fue disparado (1 = sí, 0 = no)
+        //     $flash = isset($exif['Flash']) ? (($exif['Flash'] & 1) === 1) : null;
 
-            $longitudFocal = isset($exif['FocalLength']) ? $evalFraction($exif['FocalLength']) . ' mm' : null;
+        //     $longitudFocal = isset($exif['FocalLength']) ? $evalFraction($exif['FocalLength']) . ' mm' : null;
 
-            $RegularPost->image->fecha_hora = $fechaHora;
-            $RegularPost->image->marca = $marca;
-            $RegularPost->image->modelo = $modelo;
-            $RegularPost->image->exposicion = $exposicion;
-            $RegularPost->image->diafragma = $diafragma;
-            $RegularPost->image->iso = $iso;
-            $RegularPost->image->flash = $flash;
-            $RegularPost->image->longitud_focal = $longitudFocal;
+        //     $RegularPost->image->fecha_hora = $fechaHora;
+        //     $RegularPost->image->marca = $marca;
+        //     $RegularPost->image->modelo = $modelo;
+        //     $RegularPost->image->exposicion = $exposicion;
+        //     $RegularPost->image->diafragma = $diafragma;
+        //     $RegularPost->image->iso = $iso;
+        //     $RegularPost->image->flash = $flash;
+        //     $RegularPost->image->longitud_focal = $longitudFocal;
 
-            $extension = $imagen->getClientOriginalExtension();
-            $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
-            $path_original = "public/posts/{$RegularPost->id}/original/{$RegularPost->id}.{$extension}";
-            $path_medium = "public/posts/{$RegularPost->id}/medium/{$RegularPost->id}.{$extension}";
-            $path_small = "public/posts/{$RegularPost->id}/small/{$RegularPost->id}.{$extension}";
+        //     $extension = $imagen->getClientOriginalExtension();
+        //     $path_aws = 'https://e-shelf-bucket.s3.eu-north-1.amazonaws.com/';
+        //     $path_original = "public/posts/{$RegularPost->id}/original/{$RegularPost->id}.{$extension}";
+        //     $path_medium = "public/posts/{$RegularPost->id}/medium/{$RegularPost->id}.{$extension}";
+        //     $path_small = "public/posts/{$RegularPost->id}/small/{$RegularPost->id}.{$extension}";
 
-            $paths = [
-                ltrim(parse_url($RegularPost->image->path_original, PHP_URL_PATH), '/'),
-                ltrim(parse_url($RegularPost->image->path_medium, PHP_URL_PATH), '/'),
-                ltrim(parse_url($RegularPost->image->path_small, PHP_URL_PATH), '/'),
-            ];
+        //     $paths = [
+        //         ltrim(parse_url($RegularPost->image->path_original, PHP_URL_PATH), '/'),
+        //         ltrim(parse_url($RegularPost->image->path_medium, PHP_URL_PATH), '/'),
+        //         ltrim(parse_url($RegularPost->image->path_small, PHP_URL_PATH), '/'),
+        //     ];
 
-            Storage::disk('s3')->delete($paths);
+        //     Storage::disk('s3')->delete($paths);
 
-            $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
-            $small_Image = ImageIntervention::read($imagen)->scale(height: 450)->encode();
-            $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
+        //     $mediumImage = ImageIntervention::read($imagen)->scale(height: 600)->encode();
+        //     $small_Image = ImageIntervention::read($imagen)->scale(height: 450)->encode();
+        //     $imagen = ImageIntervention::read($imagen)->encodeByMediaType(quality: 75);
 
-            Storage::disk('s3')->put($path_original, $imagen, 'public');
-            Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
-            Storage::disk('s3')->put($path_small, $small_Image, 'public');
+        //     Storage::disk('s3')->put($path_original, $imagen, 'public');
+        //     Storage::disk('s3')->put($path_medium, $mediumImage, 'public');
+        //     Storage::disk('s3')->put($path_small, $small_Image, 'public');
 
-            $RegularPost->image()->update([
-                'path_original' => $path_aws . $path_original,
-                'path_medium' => $path_aws . $path_medium,
-                'path_small' => $path_aws . $path_small,
-            ]);
-        }
+        //     $RegularPost->image()->update([
+        //         'path_original' => $path_aws . $path_original,
+        //         'path_medium' => $path_aws . $path_medium,
+        //         'path_small' => $path_aws . $path_small,
+        //     ]);
+        // }
 
         $tags = $request->input('tags');
 

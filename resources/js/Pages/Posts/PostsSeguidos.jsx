@@ -94,18 +94,25 @@ const PostsSeguidos = ({ posts, tags }) => {
               >
                 {/* Usuario y perfil */}
                 <div className="flex items-center space-x-3 px-4 mb-4">
-                  {post.post.user.profile_image ? (
-                    <img
-                      src={post.post.user.profile_image}
-                      alt={`${post.post.user.name} perfil`}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-lg">
-                      ?
-                    </div>
-                  )}
-                  <span className="text-white font-semibold">{post.post.user.name}</span>
+                  <a
+                    href={route('users.show', post.post.user.id)}
+                    className="flex items-center space-x-3 group"
+                  >
+                    {post.post.user.profile_image ? (
+                      <img
+                        src={post.post.user.profile_image}
+                        alt={`${post.post.user.name} perfil`}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-purple-400 transition"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-lg">
+                        ?
+                      </div>
+                    )}
+                    <span className="text-white font-semibold group-hover:underline">
+                      {post.post.user.name}
+                    </span>
+                  </a>
                   <span className="text-purple-400 text-sm ml-auto">{timeAgo(post.post.created_at)}</span>
                 </div>
 

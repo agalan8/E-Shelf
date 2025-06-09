@@ -39,7 +39,9 @@ const Show = ({
     const [hoveringFollow, setHoveringFollow] = useState(false);
     const [hoveringImage, setHoveringImage] = useState(false);
     const [commentBody, setCommentBody] = useState("");
-    const [comments, setComments] = useState(post.comments || []);
+    const [comments, setComments] = useState(
+        (post.comments || []).slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    );
     const [hoveredLike, setHoveredLike] = useState(false);
     const [showMap, setShowMap] = useState(false);
     const [showExif, setShowExif] = useState(false);
@@ -162,7 +164,9 @@ const Show = ({
                         created_at: new Date().toISOString(),
                         user: { name: user.name, id: user.id },
                     };
-                    setComments([newComment, ...comments]);
+                    setComments(prev =>
+                        [newComment, ...prev].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    );
                     setCommentBody("");
                 },
             }

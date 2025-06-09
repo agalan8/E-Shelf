@@ -13,9 +13,11 @@ import GuestPageLayout from "@/Layouts/GuestPageLayout";
 import Image from "@/Components/Image";
 import CommunitySubnav from "@/Components/Subnavs/CommunitySubnav";
 import User from "@/Components/Users/User";
+import { useToast } from "@/contexts/ToastProvider";
 
 const Members = ({ community, auth, authUserRole }) => {
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
+    const { showToast } = useToast();
 
     const isMemberInitial = community.memberships.some(
         (membership) =>
@@ -74,18 +76,19 @@ const Members = ({ community, auth, authUserRole }) => {
     const handleKickUser = (userId, targetRoleId) => {
         if (authUserRole === 1) {
             if (userId === auth.user.id) {
-                alert("No puedes expulsarte a ti mismo.");
+                showToast("No puedes expulsarte a ti mismo.", "error");
                 return;
             }
         } else if (authUserRole === 2) {
             if (targetRoleId <= 2) {
-                alert(
-                    "Los administradores solo pueden expulsar a miembros, no a otros admins ni al dueño."
+                showToast(
+                    "Los administradores solo pueden expulsar a miembros, no a otros admins ni al dueño.",
+                    "error"
                 );
                 return;
             }
         } else {
-            alert("No tienes permisos para expulsar usuarios.");
+            showToast("No tienes permisos para expulsar usuarios.", "error");
             return;
         }
 
@@ -102,10 +105,10 @@ const Members = ({ community, auth, authUserRole }) => {
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    alert("Usuario expulsado correctamente.");
+                    showToast("Usuario expulsado correctamente.", "success");
                 },
                 onError: () => {
-                    alert("Error al expulsar al usuario.");
+                    showToast("Error al expulsar al usuario.", "error");
                 },
             }
         );

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text('contenido');
             $table->morphs('commentable');
             $table->foreignId('user_id')->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -25,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comments');
+                Schema::table('comments', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

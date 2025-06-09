@@ -38,19 +38,8 @@ const Comment = ({ comment, onReplySubmitted }) => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setReplyText(value);
-    const lastWord = value.split(' ').pop();
-
-    if (lastWord.startsWith('@')) {
-      const query = lastWord.slice(1);
-      if (query.length >= 2) {
-        const filteredSuggestions = users.filter(user =>
-          user.name.toLowerCase().includes(query.toLowerCase())
-        );
-        setSuggestions(filteredSuggestions);
-      }
-    } else {
-      setSuggestions([]);
-    }
+    // Elimina la lógica de sugerencias
+    setSuggestions([]);
   };
 
   const handleMentionSelect = (userName) => {
@@ -176,26 +165,29 @@ const Comment = ({ comment, onReplySubmitted }) => {
 
       {showReplies && (
         <div className="ml-4 mt-2 border-l pl-3">
-          {replies.map((reply) => (
-            <div key={reply.id} className="mb-2">
-              <p className="text-sm text-white">
-                <strong>{reply.user.name}</strong>
-              </p>
-              <p className="text-sm text-white">
-                {renderCommentWithMentions(reply.contenido)}
-              </p>
-              <p className="text-xs text-gray-400">
-                {new Date(reply.created_at).toLocaleString()}
-              </p>
+          {replies
+            .slice() // Para no mutar el estado original
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .map((reply) => (
+              <div key={reply.id} className="mb-2">
+                <p className="text-sm text-white">
+                  <strong>{reply.user.name}</strong>
+                </p>
+                <p className="text-sm text-white">
+                  {renderCommentWithMentions(reply.contenido)}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {new Date(reply.created_at).toLocaleString()}
+                </p>
 
-              <button
-                onClick={() => toggleReply(reply.id, reply.user.name)}
-                className="text-blue-500 text-sm hover:underline mt-1"
-              >
-                {activeReply === reply.id ? 'Cancelar' : 'Responder'}
-              </button>
-            </div>
-          ))}
+                <button
+                  onClick={() => toggleReply(reply.id, reply.user.name)}
+                  className="text-blue-500 text-sm hover:underline mt-1"
+                >
+                  {activeReply === reply.id ? 'Cancelar' : 'Responder'}
+                </button>
+              </div>
+            ))}
         </div>
       )}
 

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->decimal('total', 10, 2);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -24,6 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+                Schema::table('orders', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };
