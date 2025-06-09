@@ -127,10 +127,10 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
           <NavLink title="Home" href={route("posts-seguidos")} active={!isNotifOpen && route().current("posts-seguidos")} className="flex justify-center">
             <HomeIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("explorar")} active={!isNotifOpen && route().current("explorar") || !isNotifOpen && route().current("home")} className="flex justify-center">
+          <NavLink title="Explorar" href={route("explorar")} active={!isNotifOpen && route().current("explorar") || !isNotifOpen && route().current("home")} className="flex justify-center">
             <GlobeAsiaAustraliaIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("users.show", { user: user.id })} active={!isNotifOpen && route().current("users.show") || !isNotifOpen && route().current("mis-albums") || !isNotifOpen && route().current("mis-comunidades") || !isNotifOpen && route().current("orders.index")} className="flex justify-center">
+          <NavLink title="Mi Perfil" href={route("users.show", { user: user.id })} active={!isNotifOpen && route().current("users.show") || !isNotifOpen && route().current("mis-albums") || !isNotifOpen && route().current("mis-comunidades") || !isNotifOpen && route().current("orders.index")} className="flex justify-center">
             <UserIcon className="h-9 w-9" />
           </NavLink>
 
@@ -150,28 +150,28 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
             )}
           </button>
 
-          <NavLink href={route("regular-posts.create")} active={!isNotifOpen && route().current("regular-posts.create")} className="flex justify-center mt-4">
+          <NavLink title="Subir Publicación" href={route("regular-posts.create")} active={!isNotifOpen && route().current("regular-posts.create")} className="flex justify-center mt-4">
             <ArrowUpTrayIcon className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("shops.show", { shop: user.shop.id })} active={!isNotifOpen && route().current("shops.show")} className="flex justify-center">
+          <NavLink title="Mi Tienda" href={route("shops.show", { shop: user.shop.id })} active={!isNotifOpen && route().current("shops.show")} className="flex justify-center">
             <FontAwesomeIcon icon={faStore} className="h-9 w-9" />
           </NavLink>
-          <NavLink href={route("communities.index")} active={!isNotifOpen && route().current("communities.index")} className="flex justify-center">
+          <NavLink title="Comunidades" href={route("communities.index")} active={!isNotifOpen && route().current("communities.index")} className="flex justify-center">
             <FontAwesomeIcon icon={faUsers} className="h-9 w-9" />
           </NavLink>
 
           {user.is_admin && (
             <div className="flex flex-col space-y-3 border-t border-purple-950 pt-3">
-              <NavLink href={route("users.index")} active={!isNotifOpen && route().current("users.index")} className="flex justify-center">
+              <NavLink title="Gestión de Usuarios" href={route("users.index")} active={!isNotifOpen && route().current("users.index")} className="flex justify-center">
                 <FontAwesomeIcon icon={faUsersGear} className="h-9 w-9" />
               </NavLink>
-              <NavLink href={route("regular-posts.index")} active={!isNotifOpen && route().current("regular-posts.index")} className="flex justify-center">
+              <NavLink title="Gestión de Publicaciones" href={route("regular-posts.index")} active={!isNotifOpen && route().current("regular-posts.index")} className="flex justify-center">
                 <RectangleStackIcon className="h-9 w-9" />
               </NavLink>
-              <NavLink href={route("tags.index")} active={!isNotifOpen && route().current("tags.index")} className="flex justify-center">
+              <NavLink title="Gestión de Etiquetas" href={route("tags.index")} active={!isNotifOpen && route().current("tags.index")} className="flex justify-center">
                 <SwatchIcon className="h-9 w-9" />
               </NavLink>
-              <NavLink href={route("socials.index")} active={!isNotifOpen && route().current("socials.index")} className="flex justify-center">
+              <NavLink title="Gestión de Redes Sociales" href={route("socials.index")} active={!isNotifOpen && route().current("socials.index")} className="flex justify-center">
                 <AtSymbolIcon className="h-9 w-9" />
               </NavLink>
             </div>
@@ -179,11 +179,11 @@ export default function AuthenticatedLayout({ header, children, subnav }) {
 
           <div className="flex justify-center">
             <button onClick={() => setIsModalOpen(true)} className="flex justify-center hover:text-gray-300 text-sm px-2 py-2 rounded hover:bg-[#2A2D2F]">
-              <Cog8ToothIcon className="h-9 w-9" />
+              <Cog8ToothIcon title="Editar Perfil" className="h-9 w-9" />
             </button>
           </div>
           <div className="flex justify-center">
-            <NavLink href={route("logout")} method="post" className="flex justify-center">
+            <NavLink title="Cerrar Sesión" href={route("logout")} method="post" className="flex justify-center">
               <ArrowLeftStartOnRectangleIcon className="h-9 w-9" />
             </NavLink>
           </div>

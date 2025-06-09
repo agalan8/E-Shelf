@@ -90,7 +90,7 @@ const PostsSeguidos = ({ posts, tags }) => {
             {posts.map((post, index) => (
               <div
                 key={`${post.post_type}-${post.id}`}
-                className={`space-y-2 w-full py-8 ${index !== posts.length - 1 ? 'border-b border-purple-600' : ''}`}
+                className={`space-y-2 w-full py-4 px-2 bg-white/10 rounded-xl shadow-lg shadow-black backdrop-blur-md ${index !== posts.length - 1 ? 'mb-4' : ''}`}
               >
                 {/* Usuario y perfil */}
                 <div className="flex items-center space-x-3 px-4 mb-4">
@@ -100,7 +100,7 @@ const PostsSeguidos = ({ posts, tags }) => {
                   >
                     {post.post.user.profile_image ? (
                       <img
-                        src={post.post.user.profile_image}
+                        src={post.post.user.profile_image.path_small}
                         alt={`${post.post.user.name} perfil`}
                         className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-purple-400 transition"
                       />
@@ -130,7 +130,7 @@ const PostsSeguidos = ({ posts, tags }) => {
                 </div>
 
                 {/* Campo para comentarios */}
-                <div className="px-4 shadow-lg shadow-black">
+                <div className="px-4">
                   <textarea
                     ref={(el) => (textareaRefs.current[post.id] = el)}
                     rows={1}
