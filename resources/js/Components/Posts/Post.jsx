@@ -39,9 +39,6 @@ const Post = ({
 
     const { showToast } = useToast();
 
-    console.log("Post:", post);
-    console.log("Post Type:", postType);
-
     const toggleLike = (e) => {
         e.stopPropagation();
         if (!auth.user) return;

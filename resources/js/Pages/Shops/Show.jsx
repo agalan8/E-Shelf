@@ -39,7 +39,7 @@ const Show = ({ posts, shop, user, userPosts }) => {
       subnav={shop.user.id !== user.id ? <UsersSubnav currentUser={shop.user} /> : null}
       header={
         <h2 className="font-semibold leading-tight text-white">
-          Tienda de {user.name}
+          Tienda de {shop.user.name}
         </h2>
       }
     >

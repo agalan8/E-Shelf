@@ -6,7 +6,6 @@ import Post from '@/Components/Posts/Post';
 export default function Explorar({ auth, posts, tags }) {
     const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
-    console.log(posts);
 
     return (
         <Layout
