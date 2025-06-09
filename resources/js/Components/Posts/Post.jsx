@@ -193,41 +193,46 @@ const Post = ({
 
                 {/* Likes y acciones */}
                 <div className="flex items-center space-x-3">
-                    {/* Me gusta */}
-                    <button
-                        onClick={toggleLike}
-                        onMouseEnter={() => setHovered(true)}
-                        onMouseLeave={() => setHovered(false)}
-                        className="text-lg focus:outline-none"
-                    >
-                        <FontAwesomeIcon
-                            icon={
-                                isLiked
-                                    ? hovered
-                                        ? faHeartCrack
-                                        : faHeartSolid
-                                    : faHeartRegular
-                            }
-                            className={`w-6 h-6 transition duration-200 ${
-                                isLiked ? "text-red-500" : "text-white"
-                            }`}
-                        />
-                    </button>
-                    <span className="text-sm">{totalLikes}</span>
+                    {/* Me gusta y Compartir solo si hay usuario */}
+                    {auth.user && (
+                        <>
+                            {/* Me gusta */}
+                            <button
+                                onClick={toggleLike}
+                                onMouseEnter={() => setHovered(true)}
+                                onMouseLeave={() => setHovered(false)}
+                                className="text-lg focus:outline-none"
+                            >
+                                <FontAwesomeIcon
+                                    icon={
+                                        isLiked
+                                            ? hovered
+                                                ? faHeartCrack
+                                                : faHeartSolid
+                                            : faHeartRegular
+                                    }
+                                    className={`w-6 h-6 transition duration-200 ${
+                                        isLiked ? "text-red-500" : "text-white"
+                                    }`}
+                                />
+                            </button>
+                            <span className="text-sm">{totalLikes}</span>
 
-                    {/* Compartir */}
-                    <button
-                        onClick={toggleShare}
-                        className="text-lg focus:outline-none"
-                    >
-                        <FontAwesomeIcon
-                            icon={faRetweet}
-                            className={`w-6 h-6 transition duration-200 ${
-                                isShared ? "text-[#E0B0FF]" : "text-white"
-                            }`}
-                        />
-                    </button>
-                    <span className="text-sm">{totalShares}</span>
+                            {/* Compartir */}
+                            <button
+                                onClick={toggleShare}
+                                className="text-lg focus:outline-none"
+                            >
+                                <FontAwesomeIcon
+                                    icon={faRetweet}
+                                    className={`w-6 h-6 transition duration-200 ${
+                                        isShared ? "text-[#E0B0FF]" : "text-white"
+                                    }`}
+                                />
+                            </button>
+                            <span className="text-sm">{totalShares}</span>
+                        </>
+                    )}
 
                     {/* Editar */}
                     {canEdit && (

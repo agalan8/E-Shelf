@@ -241,13 +241,24 @@ const Show = ({
                     </div>
                     <div className="w-full lg:w-1/4 h-auto lg:h-full lg:overflow-y-auto relative bg-[#18191C] flex flex-col">
                         <div className="flex items-center space-x-3 p-8 bg-[#292B2F]">
-                            <Link href={route("users.show", post.post.user.id)}>
-                                {post.post.user.profile_image?.path_small ? (
+                            {user ? (
+                                <Link href={route("users.show", post.post.user.id)}>
+                                    {post.post.user.profile_image?.path_small ? (
+                                        <Image
+                                            src={`${post.post.user.profile_image.path_small}?t=${new Date().getTime()}`}
+                                            alt={post.post.user.name}
+                                            className="w-14 h-14 rounded-full"
+                                        />
+                                    ) : (
+                                        <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm">
+                                            ?
+                                        </div>
+                                    )}
+                                </Link>
+                            ) : (
+                                post.post.user.profile_image?.path_small ? (
                                     <Image
-                                        src={`${
-                                            post.post.user.profile_image
-                                                .path_small
-                                        }?t=${new Date().getTime()}`}
+                                        src={`${post.post.user.profile_image.path_small}?t=${new Date().getTime()}`}
                                         alt={post.post.user.name}
                                         className="w-14 h-14 rounded-full"
                                     />
@@ -255,14 +266,20 @@ const Show = ({
                                     <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm">
                                         ?
                                     </div>
-                                )}
-                            </Link>
-                            <Link
-                                href={route("users.show", post.post.user.id)}
-                                className="font-semibold text-lg text-white"
-                            >
-                                {post.post.user.name}
-                            </Link>
+                                )
+                            )}
+                            {user ? (
+                                <Link
+                                    href={route("users.show", post.post.user.id)}
+                                    className="font-semibold text-lg text-white"
+                                >
+                                    {post.post.user.name}
+                                </Link>
+                            ) : (
+                                <span className="font-semibold text-lg text-white">
+                                    {post.post.user.name}
+                                </span>
+                            )}
                             {renderFollowIcon()}
                             {/* Fecha de creación de la publicación */}
                             <span className="text-sm text-gray-400 ml-2">
@@ -276,21 +293,15 @@ const Show = ({
                             </span>
                         </div>
                         <div className="flex justify-between items-center py-4 px-8 bg-[#202225] space-x-2">
-                            {!notification && (
+                            {!notification && user && (
                                 <div className="flex items-center space-x-2">
                                     <button
                                         onClick={() => toggleLike(post.id)}
-                                        onMouseEnter={() =>
-                                            setHoveredLike(true)
-                                        }
-                                        onMouseLeave={() =>
-                                            setHoveredLike(false)
-                                        }
+                                        onMouseEnter={() => setHoveredLike(true)}
+                                        onMouseLeave={() => setHoveredLike(false)}
                                         className="text-xl focus:outline-none"
                                         disabled={!user}
-                                        title={
-                                            isLiked ? "Quitar like" : "Dar like"
-                                        }
+                                        title={isLiked ? "Quitar like" : "Dar like"}
                                     >
                                         <FontAwesomeIcon
                                             icon={

@@ -110,7 +110,7 @@ class AlbumController extends Controller
         }
 
         $user = User::findOrFail($userId);
-        $posts = RegularPost::whereHas('post', function ($query) use ($userId) {
+        $posts = RegularPost::doesntHave('shopPost')->whereHas('post', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
             ->with(['image', 'tags','post', 'post.user', 'likedBy'])
