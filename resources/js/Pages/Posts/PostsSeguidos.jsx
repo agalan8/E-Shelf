@@ -86,36 +86,36 @@ const PostsSeguidos = ({ posts, tags }) => {
         {posts.length === 0 ? (
           <p className="text-white">No sigues a nadie aún.</p>
         ) : (
-          <div className="flex flex-col max-w-xl mx-auto">
+          <div className="flex flex-col items-center"> {/* Elimina max-w-3xl y centra */}
             {posts.map((post, index) => (
               <div
                 key={`${post.post_type}-${post.id}`}
-                className={`space-y-2 w-full py-8 ${index !== posts.length - 1 ? 'border-b border-purple-600' : ''}`}
+                className={`space-y-2 w-auto py-8 ${index !== posts.length - 1 ? 'border-b border-purple-600' : ''}`}
               >
                 <div className="flex justify-center w-auto">
-                  <div className="bg-white/10 rounded-xl shadow-2xl shadow-black p-4 transition-colors max-w-lg mx-auto">
+                  <div className="bg-white/10 rounded-xl shadow-2xl shadow-black p-8 transition-colors max-w-2xl w-full mx-auto"> {/* max-w-2xl, p-8, rounded-xl */}
                     {/* Usuario y perfil */}
-                    <div className="flex items-center space-x-3 px-4 mb-4">
+                    <div className="flex items-center space-x-4 px-6 mb-6">
                       <a
                         href={route('users.show', post.post.user.id)}
-                        className="flex items-center space-x-3 group"
+                        className="flex items-center space-x-4 group"
                       >
                         {post.post.user.profile_image ? (
                           <img
                             src={post.post.user.profile_image.path_small}
                             alt={`${post.post.user.name} perfil`}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-purple-400 transition"
+                            className="w-14 h-14 rounded-full object-cover border-2 border-transparent group-hover:border-purple-400 transition"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-lg">
+                          <div className="w-14 h-14 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold text-xl">
                             ?
                           </div>
                         )}
-                        <span className="text-white font-semibold group-hover:underline">
+                        <span className="text-white font-semibold text-lg group-hover:underline">
                           {post.post.user.name}
                         </span>
                       </a>
-                      <span className="text-purple-400 text-sm ml-auto">{timeAgo(post.post.created_at)}</span>
+                      <span className="text-purple-400 text-base ml-auto">{timeAgo(post.post.created_at)}</span>
                     </div>
 
                     {/* Post */}
@@ -127,15 +127,15 @@ const PostsSeguidos = ({ posts, tags }) => {
                       isSharedByUser={post.isSharedByUser}
                       getTotalShares={post.getTotalShares}
                       postType={post.post_type}
-                      className="shadow-none"
+                      className="shadow-none text-xl"
                     />
 
                     {/* Campo para comentarios */}
-                    <div className="px-4">
+                    <div className="px-6">
                       <textarea
                         ref={(el) => (textareaRefs.current[post.id] = el)}
                         rows={1}
-                        className="w-full h-10 border-none rounded-md p-2 mt-2 text-base resize-none overflow-hidden bg-[#373841] text-white"
+                        className="w-full h-12 border-none rounded-lg p-3 mt-4 text-lg resize-none overflow-hidden bg-[#373841] text-white"
                         placeholder="Escribe un comentario..."
                         value={comments[post.id] || ''}
                         onChange={(e) => handleCommentChange(post.id, e.target.value)}
