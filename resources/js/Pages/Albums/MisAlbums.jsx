@@ -12,6 +12,7 @@ const MisAlbums = ({ albums, posts, user }) => {
   const [order, setOrder] = useState('recent');
   const [filterYear, setFilterYear] = useState('');
   const [filterMonth, setFilterMonth] = useState('');
+  const [searchName, setSearchName] = useState('');
 
   const albumYears = useMemo(() => {
     const yearSet = new Set();
@@ -45,7 +46,10 @@ const MisAlbums = ({ albums, posts, user }) => {
       const albumMonth = String(date.getMonth() + 1).padStart(2, '0');
       const matchesYear = filterYear ? albumYear === filterYear : true;
       const matchesMonth = filterMonth ? albumMonth === filterMonth : true;
-      return matchesYear && matchesMonth;
+      const matchesName = searchName.trim() === ''
+        ? true
+        : album.nombre?.toLowerCase().includes(searchName.trim().toLowerCase());
+      return matchesYear && matchesMonth && matchesName;
     })
     .sort((a, b) => {
       const dateA = new Date(a.created_at);
@@ -93,6 +97,15 @@ const MisAlbums = ({ albums, posts, user }) => {
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>
+
+              {/* Campo de búsqueda por título */}
+              <input
+                type="text"
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                placeholder="Buscar por nombre"
+                className="bg-[#292B2F] text-white rounded-md px-3 py-2 border border-gray-600 w-full sm:w-64"
+              />
             </div>
 
             {/* Botón de crear */}

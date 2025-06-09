@@ -8,6 +8,7 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
   const [selectedPosts, setSelectedPosts] = useState({});
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState({});
+  const [searchTitle, setSearchTitle] = useState("");
   const modalRef = useRef(null);
   const { showToast } = useToast();
 
@@ -110,6 +111,10 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
     setTimeout(() => onClose(), 300);
   };
 
+  const filteredPosts = userPosts.filter((post) =>
+    post.posteable.titulo?.toLowerCase().includes(searchTitle.trim().toLowerCase())
+  );
+
   return (
     <div
       className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ${
@@ -132,11 +137,21 @@ const AddPosts = ({ shop, userPosts, onClose }) => {
         <form onSubmit={handleSubmit} className="flex flex-col flex-grow relative">
           <div className="p-6 text-white overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6">Añadir Publicaciones a la Tienda</h2>
+            {/* Campo de búsqueda por título */}
+            <div className="mb-4">
+              <input
+                type="text"
+                value={searchTitle}
+                onChange={(e) => setSearchTitle(e.target.value)}
+                placeholder="Buscar por título"
+                className="w-full sm:w-1/2 px-3 py-2 rounded bg-[#1f1f22] border border-white text-white"
+              />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto p-4">
-              {userPosts.length === 0 ? (
+              {filteredPosts.length === 0 ? (
                 <p>No tienes posts disponibles.</p>
               ) : (
-                userPosts.map((post) => {
+                filteredPosts.map((post) => {
                   const postId = post.posteable.id;
                   const isSelected = selectedPosts.hasOwnProperty(postId);
 

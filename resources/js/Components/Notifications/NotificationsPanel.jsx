@@ -122,6 +122,10 @@ const loadMore = async () => {
                   }
                 />
               )}
+              {/* Fecha de la notificación */}
+              <div className="text-xs text-gray-400 mt-2">
+                {n.created_at}
+              </div>
             </div>
 
             {!n.read_at && n.type !== "request" && (

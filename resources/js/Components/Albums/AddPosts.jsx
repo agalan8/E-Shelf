@@ -7,10 +7,15 @@ import { useToast } from "@/contexts/ToastProvider";
 const AddPosts = ({ album, userPosts, onClose }) => {
     const [selectedPosts, setSelectedPosts] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
+    const [searchTitle, setSearchTitle] = useState("");
     const { showToast } = useToast();
 
     const postsNotInAlbum = userPosts.filter(
         (userPost) => !album.posts.some(albumPost => albumPost.id === userPost.id)
+    );
+
+    const filteredPosts = postsNotInAlbum.filter((post) =>
+        post.titulo?.toLowerCase().includes(searchTitle.trim().toLowerCase())
     );
 
     useEffect(() => {
@@ -84,11 +89,21 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                         <h2 className="text-2xl font-bold mb-6">
                             Añadir Publicaciones al Álbum
                         </h2>
+                        {/* Campo de búsqueda por título */}
+                        <div className="mb-4">
+                            <input
+                                type="text"
+                                value={searchTitle}
+                                onChange={(e) => setSearchTitle(e.target.value)}
+                                placeholder="Buscar por título"
+                                className="w-full sm:w-1/2 px-3 py-2 rounded bg-[#1c1c1e] border border-white text-white"
+                            />
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto p-4">
-                            {postsNotInAlbum.length === 0 ? (
+                            {filteredPosts.length === 0 ? (
                                 <p>No tienes posts disponibles para agregar.</p>
                             ) : (
-                                postsNotInAlbum.map((post) => (
+                                filteredPosts.map((post) => (
                                     <div
                                         key={post.id}
                                         onClick={() => togglePostSelection(post.id)}

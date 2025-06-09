@@ -13,6 +13,7 @@ const Create = ({ onClose, posts }) => {
     const [step, setStep] = useState(1);
     const [isVisible, setIsVisible] = useState(false);
     const [errors, setErrors] = useState({});
+    const [searchTitle, setSearchTitle] = useState("");
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -116,6 +117,13 @@ const Create = ({ onClose, posts }) => {
     const handleModalClick = (e) => {
         e.stopPropagation();
     };
+
+    // Filtrar posts por título
+    const filteredPosts = posts.filter((post) =>
+        post.posteable.titulo
+            ?.toLowerCase()
+            .includes(searchTitle.trim().toLowerCase())
+    );
 
     return (
         <div
@@ -221,11 +229,21 @@ const Create = ({ onClose, posts }) => {
                             <h2 className="text-2xl font-bold mb-6">
                                 Selecciona las Publicaciones
                             </h2>
+                            {/* Campo de búsqueda por título */}
+                            <div className="mb-4">
+                                <input
+                                    type="text"
+                                    value={searchTitle}
+                                    onChange={(e) => setSearchTitle(e.target.value)}
+                                    placeholder="Buscar por título"
+                                    className="w-full sm:w-1/2 px-3 py-2 rounded bg-[#1c1c1e] border border-white text-white"
+                                />
+                            </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 max-h-[75vh] sm:max-h-[50vh] overflow-y-auto p-4">
-                                {posts.length === 0 ? (
-                                    <p>No tienes posts disponibles.</p>
+                                {filteredPosts.length === 0 ? (
+                                    <p>No hay publicaciones con ese título.</p>
                                 ) : (
-                                    posts.map((post) => (
+                                    filteredPosts.map((post) => (
                                         <div
                                             key={post.posteable.id}
                                             onClick={() =>

@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
+use Carbon\Carbon;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -36,6 +37,8 @@ class HandleInertiaRequests extends Middleware
         }
 
         $newCommentId = session('newCommentId');
+
+        Carbon::setLocale('es');
 
         // Cargar notificaciones no leídas (limitadas a 10)
         $notifications = [];

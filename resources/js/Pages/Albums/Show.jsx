@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, Head, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Post from "@/Components/Posts/Post";
@@ -14,11 +14,63 @@ const Show = ({ album, userPosts, tags }) => {
     const [isAddPostsModalOpen, setIsAddPostsModalOpen] = useState(false);
     const { showToast } = useToast();
 
+    const [sortCreatedAt, setSortCreatedAt] = useState("none");
+    const [sortFechaCaptura, setSortFechaCaptura] = useState("none");
+    const [searchTitle, setSearchTitle] = useState("");
+
     useEffect(() => {
         if (album && album.posts) {
             setPosts(album.posts);
         }
     }, [album]);
+
+    function parseFechaHora(fechaStr) {
+        if (!fechaStr) return new Date(0);
+        const [fecha, hora] = fechaStr.split(' ');
+        if (!fecha || !hora) return new Date(0);
+        const partes = fecha.split(':');
+        if (partes.length !== 3) return new Date(0);
+        const isoString = `${partes[0]}-${partes[1]}-${partes[2]}T${hora}`;
+        return new Date(isoString);
+    }
+
+    const filteredAndSortedPosts = useMemo(() => {
+        let filtered = [...posts];
+
+        if (searchTitle.trim() !== "") {
+            filtered = filtered.filter((post) =>
+                post.titulo
+                    ?.toLowerCase()
+                    .includes(searchTitle.trim().toLowerCase())
+            );
+        }
+
+        if (sortCreatedAt !== "none") {
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+                return sortCreatedAt === "asc"
+                    ? dateA - dateB
+                    : dateB - dateA;
+            });
+        }
+
+        if (sortFechaCaptura !== "none") {
+            filtered.sort((a, b) => {
+                const fechaA = a.image?.fecha_hora
+                    ? parseFechaHora(a.image.fecha_hora)
+                    : new Date(0);
+                const fechaB = b.image?.fecha_hora
+                    ? parseFechaHora(b.image.fecha_hora)
+                    : new Date(0);
+                return sortFechaCaptura === "asc"
+                    ? fechaA - fechaB
+                    : fechaB - fechaA;
+            });
+        }
+
+        return filtered;
+    }, [posts, sortCreatedAt, sortFechaCaptura, searchTitle]);
 
     const handleOpenAddPostsModal = () => setIsAddPostsModalOpen(true);
     const handleCloseAddPostsModal = () => setIsAddPostsModalOpen(false);
@@ -81,10 +133,52 @@ const Show = ({ album, userPosts, tags }) => {
                 <div className="text-md text-white mb-2 sm:mb-4">
                     <strong>Descripción:</strong>
                     <p>{album.descripcion}</p>
+                    {/* Fecha de creación del álbum */}
+                    <p className="text-sm text-gray-400 mt-2">
+                        Creado el: {new Date(album.created_at).toLocaleDateString("es-ES", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        })}
+                    </p>
+                </div>
+
+                {/* Filtros y búsqueda */}
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-2 sm:px-4 mb-4 my-5">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:space-x-4">
+                        <select
+                            value={sortCreatedAt}
+                            onChange={(e) => setSortCreatedAt(e.target.value)}
+                            className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+                        >
+                            <option value="none">Ordenar por publicación</option>
+                            <option value="asc">Más antiguos primero</option>
+                            <option value="desc">Más recientes primero</option>
+                        </select>
+
+                        <select
+                            value={sortFechaCaptura}
+                            onChange={(e) => setSortFechaCaptura(e.target.value)}
+                            className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+                        >
+                            <option value="none">Ordenar por fecha de captura</option>
+                            <option value="asc">Más antiguos primero</option>
+                            <option value="desc">Más recientes primero</option>
+                        </select>
+                    </div>
+                    <input
+                        type="text"
+                        value={searchTitle}
+                        onChange={(e) => setSearchTitle(e.target.value)}
+                        placeholder="Buscar por título"
+                        className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full sm:w-64"
+                    />
                 </div>
 
                 {/* Mostrar publicaciones */}
-                {posts.length === 0 ? (
+                {filteredAndSortedPosts.length === 0 ? (
                     <p className="text-white">
                         No hay publicaciones en este álbum.
                     </p>
@@ -94,7 +188,7 @@ const Show = ({ album, userPosts, tags }) => {
                             <div className="flex flex-col sm:flex-row gap-2">
                                 {[0, 1, 2].map((colIndex) => (
                                     <div key={colIndex} className="flex-1">
-                                        {posts
+                                        {filteredAndSortedPosts
                                             .filter((_, index) => index % 3 === colIndex)
                                             .map((post) => (
                                                 <div
