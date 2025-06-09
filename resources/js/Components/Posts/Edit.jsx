@@ -252,8 +252,12 @@ const Edit = ({ post, onClose, tags }) => {
             className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ${
                 isVisible ? "opacity-100" : "opacity-0"
             }`}
+            onClick={handleClose} // Cierra al hacer clic fuera del modal
         >
-            <div className="bg-[#1f1f1f] rounded-lg shadow-lg w-11/12 h-[90vh] flex flex-col md:flex-row overflow-hidden relative transform transition-all duration-300 md:h-[90vh] md:w-11/12">
+            <div
+                className="bg-[#1f1f1f] rounded-lg shadow-lg w-11/12 h-[90vh] flex flex-col md:flex-row overflow-hidden relative transform transition-all duration-300 md:h-[90vh] md:w-11/12"
+                onClick={e => e.stopPropagation()} // Evita que el clic dentro del modal lo cierre
+            >
                 <button
                     onClick={handleClose}
                     className="absolute top-4 right-4 text-white hover:text-red-400 z-10"

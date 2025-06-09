@@ -285,7 +285,7 @@ Route::get('/mis-albums', function () {
     return Inertia::render('Albums/MisAlbums', [
         'user' => $user,
         'albums' => $user->albums()->with('posts', 'user', 'user.profileImage', 'user.backgroundImage', 'coverImage', 'posts.image')->orderBy('created_at', 'desc')->get(),
-        'posts' => $user->posts()->with('posteable', 'posteable.image', 'posteable.tags', 'posteable.communities', 'user')->get(),
+        'posts' => $user->posts()->with('posteable', 'posteable.image', 'posteable.tags', 'posteable.communities', 'user')->orderBy('created_at','desc')->get(),
     ]);
 })->middleware('auth')->name('mis-albums');
 

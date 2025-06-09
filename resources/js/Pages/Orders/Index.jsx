@@ -106,7 +106,7 @@ export default function OrderIndex() {
 
 {/* PEDIDOS */}
 {filteredOrders.length === 0 ? (
-  <p className="text-purple-300 text-center text-lg">
+  <p className="text-white text-center text-lg">
     No se encontraron compras con los filtros aplicados.
   </p>
 ) : (

@@ -142,10 +142,21 @@ const Post = ({
 
             {/* Indicador si es post compartido */}
             {postType === "shared" && (
-                <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg select-none z-10 max-w-[140px] text-center">
-                    Compartido por <br />
-                    <span className="font-bold">{post.shared_by.name}</span>
-                </div>
+                <Link
+                    href={route("users.show", post.shared_by.id)}
+                    onClick={e => e.stopPropagation()}
+                    className="absolute top-2 right-2 bg-[#18191C]/80 backdrop-blur-md text-white text-xs font-semibold px-5 py-2 rounded-lg shadow-lg select-none z-10 max-w-xs text-center flex items-center gap-2 border border-purple-500 hover:bg-purple-700 transition"
+                    style={{
+                        minWidth: "220px",
+                        maxWidth: "320px",
+                        backdropFilter: "blur(8px)",
+                    }}
+                    title={`Ver perfil de ${post.shared_by.name}`}
+                >
+                    <FontAwesomeIcon icon={faRetweet} className="text-[#E0B0FF] w-4 h-4" />
+                    Compartido por&nbsp;
+                    <span className="font-bold underline underline-offset-2">{post.shared_by.name}</span>
+                </Link>
             )}
 
             {/* Overlay */}

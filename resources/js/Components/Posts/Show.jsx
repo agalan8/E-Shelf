@@ -172,11 +172,11 @@ const Show = ({
     const renderFollowIcon = () => {
         if (!user || user.id === post.post.user.id) return null;
         let icon = faUserPlus;
-        let color = "text-blue-500";
+        let color = "text-white";
         let title = "Seguir";
         if (following) {
             icon = hoveringFollow ? faUserMinus : faUserCheck;
-            color = hoveringFollow ? "text-red-500" : "text-green-500";
+            color = hoveringFollow ? "text-red-500" : "text-purple-500";
             title = hoveringFollow ? "Dejar de seguir" : "Siguiendo";
         }
         return (
@@ -260,6 +260,16 @@ const Show = ({
                                 {post.post.user.name}
                             </Link>
                             {renderFollowIcon()}
+                            {/* Fecha de creación de la publicación */}
+                            <span className="text-sm text-gray-400 ml-2">
+                                {new Date(post.created_at).toLocaleDateString("es-ES", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                })}
+                            </span>
                         </div>
                         <div className="flex justify-between items-center py-4 px-8 bg-[#202225] space-x-2">
                             {!notification && (

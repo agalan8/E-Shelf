@@ -10,15 +10,15 @@ import { Head } from '@inertiajs/react';
 export default function Index({ communities, auth }) {
   const [showModal, setShowModal] = useState(false);
 
-  const [sortUsers, setSortUsers] = useState('none'); // 'asc' | 'desc' | 'none'
-  const [sortPosts, setSortPosts] = useState('none'); // 'asc' | 'desc' | 'none'
+  const [sortUsers, setSortUsers] = useState('none');
+  const [sortPosts, setSortPosts] = useState('none');
+  const [searchName, setSearchName] = useState('');
 
   const Layout = auth.user ? AuthenticatedLayout : GuestPageLayout;
 
   const sortedCommunities = useMemo(() => {
     let sorted = [...communities];
 
-    // Ordenar por usuarios
     if (sortUsers !== 'none') {
       sorted.sort((a, b) => {
         const diff = a.getTotalMembers - b.getTotalMembers;
@@ -26,7 +26,6 @@ export default function Index({ communities, auth }) {
       });
     }
 
-    // Ordenar por posts
     if (sortPosts !== 'none') {
       sorted.sort((a, b) => {
         const diff = a.getTotalPosts - b.getTotalPosts;
@@ -34,8 +33,14 @@ export default function Index({ communities, auth }) {
       });
     }
 
+    if (searchName.trim() !== '') {
+      sorted = sorted.filter(c =>
+        c.nombre?.toLowerCase().includes(searchName.trim().toLowerCase())
+      );
+    }
+
     return sorted;
-  }, [communities, sortUsers, sortPosts]);
+  }, [communities, sortUsers, sortPosts, searchName]);
 
   return (
     <Layout
@@ -68,6 +73,15 @@ export default function Index({ communities, auth }) {
               <option value="asc">Menos publicaciones</option>
               <option value="desc">Más publicaciones</option>
             </select>
+
+            {/* Campo de búsqueda por nombre de comunidad */}
+            <input
+              type="text"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              placeholder="Buscar por nombre"
+              className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full sm:w-64"
+            />
           </div>
           <button
             onClick={() => setShowModal(true)}

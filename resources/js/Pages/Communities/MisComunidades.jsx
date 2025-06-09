@@ -13,6 +13,7 @@ export default function MisComunidades({ communities, user }) {
 
   const [sortUsers, setSortUsers] = useState('none');
   const [sortPosts, setSortPosts] = useState('none');
+  const [searchName, setSearchName] = useState('');
 
   const sortedCommunities = useMemo(() => {
     let sorted = [...communities];
@@ -31,8 +32,14 @@ export default function MisComunidades({ communities, user }) {
       });
     }
 
+    if (searchName.trim() !== '') {
+      sorted = sorted.filter(c =>
+        c.nombre?.toLowerCase().includes(searchName.trim().toLowerCase())
+      );
+    }
+
     return sorted;
-  }, [communities, sortUsers, sortPosts]);
+  }, [communities, sortUsers, sortPosts, searchName]);
 
   const administradas = sortedCommunities.filter(c => c.user.id === user.id);
   const miembro = sortedCommunities.filter(c => c.user.id !== user.id);
@@ -69,6 +76,15 @@ export default function MisComunidades({ communities, user }) {
             <option value="asc">Menos publicaciones</option>
             <option value="desc">Más publicaciones</option>
           </select>
+
+          {/* Campo de búsqueda por nombre de comunidad */}
+          <input
+            type="text"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            placeholder="Buscar por nombre"
+            className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full sm:w-64"
+          />
         </div>
 
         <button

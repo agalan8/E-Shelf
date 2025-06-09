@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { router, Link, Head } from "@inertiajs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -25,6 +25,59 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
   const [hovering, setHovering] = useState(false);
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [showFollowingModal, setShowFollowingModal] = useState(false);
+
+  const [sortCreatedAt, setSortCreatedAt] = useState("none");
+  const [sortFechaCaptura, setSortFechaCaptura] = useState("none");
+  const [searchTitle, setSearchTitle] = useState("");
+
+  function parseFechaHora(fechaStr) {
+    if (!fechaStr) return new Date(0);
+    // Convierte "2024:07:27 19:34:45" a "2024-07-27T19:34:45"
+    const [fecha, hora] = fechaStr.split(' ');
+    if (!fecha || !hora) return new Date(0);
+    const partes = fecha.split(':');
+    if (partes.length !== 3) return new Date(0);
+    const isoString = `${partes[0]}-${partes[1]}-${partes[2]}T${hora}`;
+    return new Date(isoString);
+  }
+
+  const filteredAndSortedPosts = useMemo(() => {
+    let filtered = [...posts];
+
+    if (searchTitle.trim() !== "") {
+      filtered = filtered.filter((post) =>
+        post.posteable.titulo
+          ?.toLowerCase()
+          .includes(searchTitle.trim().toLowerCase())
+      );
+    }
+
+    if (sortCreatedAt !== "none") {
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.posteable.created_at);
+        const dateB = new Date(b.posteable.created_at);
+        return sortCreatedAt === "asc"
+          ? dateA - dateB
+          : dateB - dateA;
+      });
+    }
+
+    if (sortFechaCaptura !== "none") {
+      filtered.sort((a, b) => {
+        const fechaA = a.posteable.image?.fecha_hora
+          ? parseFechaHora(a.posteable.image.fecha_hora)
+          : new Date(0);
+        const fechaB = b.posteable.image?.fecha_hora
+          ? parseFechaHora(b.posteable.image.fecha_hora)
+          : new Date(0);
+        return sortFechaCaptura === "asc"
+          ? fechaA - fechaB
+          : fechaB - fechaA;
+      });
+    }
+
+    return filtered;
+  }, [posts, sortCreatedAt, sortFechaCaptura, searchTitle]);
 
   const handleFollowToggle = () => {
     if (!auth.user) return;
@@ -83,8 +136,14 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
   };
 
   return (
-    <Layout subnav={<UsersSubnav currentUser={user}/>} header={<h2 className=" font-semibold leading-tight text-white">Publicaciones</h2>}
->
+    <Layout
+      subnav={<UsersSubnav currentUser={user} />}
+      header={
+        <h2 className=" font-semibold leading-tight text-white">
+          Publicaciones
+        </h2>
+      }
+    >
       <Head title="Publicaciones" />
 
       <div className="user-profile">
@@ -199,9 +258,41 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
         </div>
       </div>
 
+      {/* Controles de filtrado y búsqueda */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-2 sm:px-4 mb-4 my-5">
+        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-4">
+          <select
+            value={sortCreatedAt}
+            onChange={(e) => setSortCreatedAt(e.target.value)}
+            className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+          >
+            <option value="none">Ordenar por fecha de publicación</option>
+            <option value="asc">Más antiguos primero</option>
+            <option value="desc">Más recientes primero</option>
+          </select>
+
+          <select
+            value={sortFechaCaptura}
+            onChange={(e) => setSortFechaCaptura(e.target.value)}
+            className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600"
+          >
+            <option value="none">Ordenar por fecha de captura</option>
+            <option value="asc">Más antiguos primero</option>
+            <option value="desc">Más recientes primero</option>
+          </select>
+        </div>
+        <input
+          type="text"
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
+          placeholder="Buscar por título"
+          className="rounded px-3 py-2 bg-[#292B2F] text-white border border-gray-600 w-full sm:w-64"
+        />
+      </div>
+
       {/* Publicaciones */}
       <div className="mt-1">
-        {posts.length === 0 ? (
+        {filteredAndSortedPosts.length === 0 ? (
           <p className="text-white my-8 ml-2 sm:ml-5 text-center sm:text-left">
             Este usuario no tiene publicaciones aún.
           </p>
@@ -209,7 +300,7 @@ const Show = ({ user, auth, totalFollowing, totalFollowers, posts, tags }) => {
           <div className="flex flex-col sm:flex-row gap-1">
             {[0, 1, 2].map((colIndex) => (
               <div key={colIndex} className="flex flex-col gap-1 flex-1">
-                {posts
+                {filteredAndSortedPosts
                   .filter((_, index) => index % 3 === colIndex)
                   .map((post) => (
                     <Post
