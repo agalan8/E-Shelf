@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes; // Para soft deletes
+use Illuminate\Support\Facades\DB;
 
 class Community extends Model
 {
@@ -84,6 +85,12 @@ class Community extends Model
             $community->posts()->detach();
 
             $community->memberships()->delete();
+
+            DB::table('notifications')
+                    ->where(function ($query) use ($community) {
+                        $query->whereRaw("(data::json->>'community_id')::int = ?", [$community->id]);
+                    })
+                    ->delete();
         }
     });
 }
