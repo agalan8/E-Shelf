@@ -178,6 +178,13 @@ const Show = ({ community, auth, posts, tags }) => {
                             </div>
                         </div>
 
+                        {/* Nombre de la comunidad */}
+                        <div className="flex-1 flex justify-center sm:justify-start mt-2 sm:mt-0">
+                            <h1 className="text-white text-2xl sm:text-4xl font-extrabold text-center sm:text-left drop-shadow-lg">
+                                {community.nombre}
+                            </h1>
+                        </div>
+
                         {/* Botón de unirse/salir */}
                         <div className="mt-2 sm:mt-0">{renderJoinButton()}</div>
                     </div>

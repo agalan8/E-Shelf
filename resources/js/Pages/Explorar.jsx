@@ -28,7 +28,8 @@ export default function Explorar({ auth, posts, tags }) {
                     {posts
                         .filter((_, index) => index % 3 === colIndex)
                         .map((post) => (
-                        <Post key={post.id} getTotalLikes={post.getTotalLikes} isLikedByUser={post.isLikedByUser} post={post} tags={tags} />
+                        <Post key={post.id} getTotalLikes={post.getTotalLikes} isLikedByUser={post.isLikedByUser} isSharedByUser={post.isSharedByUser}
+                      getTotalShares={post.getTotalShares} post={post} tags={tags} />
                         ))}
                     </div>
                 ))}

@@ -129,6 +129,8 @@ class AlbumController extends Controller
             $album->posts->each(function ($post) {
                 $post->getTotalLikes = $post->getTotalLikes();
                 $post->isLikedByUser = $post->isLikedByUser();
+                $post->isSharedByUser = Auth::check() ? $post->isSharedByUser() : false;
+                $post->getTotalShares = $post->getTotalShares();
             });
         });
 

@@ -506,12 +506,12 @@ const Show = ({
                                 )}
                             </div>
                         </div>
-                        <div className="flex-grow overflow-y-auto px-4 pt-6 bg-[#18191C] flex flex-col">
+                        <div className="flex flex-col flex-1 overflow-y-auto px-4 pt-6 bg-[#18191C] min-h-0 max-h-full">
                             <h4 className="text-md font-semibold mb-4 text-white">
                                 Comentarios
                             </h4>
 
-                            <div className="overflow-y-auto flex-grow">
+                            <div className="overflow-y-auto flex-1">
                                 {comments.length === 0 ? (
                                     <p className="text-sm text-gray-500">
                                         No hay comentarios todavía.
@@ -543,9 +543,10 @@ const Show = ({
                                     }
                                     className="w-full border-none bg-[#2a2b2f] text-white rounded resize-none overflow-hidden ml-2"
                                     disabled={!user}
+                                    style={{ maxHeight: "60px" }}
                                     onInput={(e) => {
                                         e.target.style.height = "auto";
-                                        e.target.style.height = `${e.target.scrollHeight}px`;
+                                        e.target.style.height = `${Math.min(e.target.scrollHeight, 60)}px`;
                                     }}
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") {
