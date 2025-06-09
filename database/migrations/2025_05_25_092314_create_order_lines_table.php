@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('path_small');
             $table->string('path_image');
             $table->decimal('precio', 10, 2);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -28,6 +29,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_lines');
+        Schema::table('order_lines', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

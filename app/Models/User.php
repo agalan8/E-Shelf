@@ -199,6 +199,10 @@ class User extends Authenticatable
 
                 $user->socials()->detach();
 
+                $user->ownedCommunities()->each(function ($community) {
+                    $community->delete();
+                });
+
                 $user->communityMemberships()->delete();
 
                 if ($user->shop) {
