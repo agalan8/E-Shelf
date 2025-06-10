@@ -138,11 +138,18 @@ export default function OrderIndex() {
 <div
   className={`transition-all duration-500 ease-in-out overflow-hidden rounded-b-xl ${
     openOrderId === order.id
-      ? "max-h-[1000px] opacity-100"
+      ? "max-h-[1200px] opacity-100"
       : "max-h-0 opacity-0"
   } bg-gray-900 px-2 sm:px-6`}
 >
-  <div className="py-6 space-y-4">
+  <div
+    className="py-6 space-y-4 pr-3"
+    style={{
+      maxHeight: openOrderId === order.id ? "550px" : "0",
+      overflowY: openOrderId === order.id ? "auto" : "hidden",
+      transition: "max-height 0.5s ease"
+    }}
+  >
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 font-semibold text-white text-xs sm:text-sm pb-2 border-b border-purple-700">
       <div>Imagen</div>
       <div>Título</div>
