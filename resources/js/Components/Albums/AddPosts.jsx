@@ -99,7 +99,7 @@ const AddPosts = ({ album, userPosts, onClose }) => {
                                 className="w-full sm:w-1/2 px-3 py-2 rounded bg-[#1c1c1e] border border-white text-white"
                             />
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[65vh] overflow-y-auto p-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto p-4">
                             {filteredPosts.length === 0 ? (
                                 <p>No tienes posts disponibles para agregar.</p>
                             ) : (
