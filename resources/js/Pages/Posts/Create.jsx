@@ -17,7 +17,7 @@ const centerDefault = { lat: 40.4168, lng: -3.7038 };
 const libraries = ["places"];
 
 const PostCreate = () => {
-  const { tags, communities } = usePage().props;
+  const { tags, communities, googleMapsApiKey } = usePage().props;
   const [imageFile, setImageFile] = useState(null);
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
@@ -326,7 +326,7 @@ const PostCreate = () => {
                     Localización
                   </label>
                   <LoadScript
-                    googleMapsApiKey="AIzaSyCTy_UZS2tqbYIoYFUDkreos9Q8vq4pkEc"
+                    googleMapsApiKey={googleMapsApiKey}
                     libraries={libraries}
                   >
                     <StandaloneSearchBox

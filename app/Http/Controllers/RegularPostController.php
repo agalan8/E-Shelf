@@ -56,6 +56,7 @@ class RegularPostController extends Controller
         return Inertia::render('Posts/Create', [
             'tags' => Tag::all(),
             'communities' => $communities,
+            'googleMapsApiKey' => config('services.google_maps.api_key'),
         ]);
     }
 
